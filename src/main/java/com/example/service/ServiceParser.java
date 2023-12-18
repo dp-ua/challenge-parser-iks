@@ -15,9 +15,8 @@ public class ServiceParser {
         String dateId = parts[6].substring(1, parts[6].length() - 1);
         String dayName = parts[1].substring(1) + " " + parts[2];
         String dayNameEn = parts[4] + " " + parts[5].substring(0, parts[5].length() - 1);
-        Day day = new Day(date, dateId, dayName, dayNameEn);
 
-        return day;
+        return new Day(date, dateId, dayName, dayNameEn);
     }
 
     private static void checkParts(String[] parts) {

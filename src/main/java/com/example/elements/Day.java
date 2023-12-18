@@ -8,10 +8,10 @@ import lombok.extern.java.Log;
 @Getter
 @Log
 public class Day {
-    private String date;
-    private String dateId;
-    private String dayName;
-    private String dayNameEn;
+    private final String date;
+    private final String dateId;
+    private final String dayName;
+    private final String dayNameEn;
 
     public Day(String date, String dateId, String dayName, String dayNameEn) {
         this.date = date;
