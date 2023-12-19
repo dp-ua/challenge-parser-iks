@@ -10,7 +10,7 @@ import java.util.List;
 @EqualsAndHashCode
 public class Heat {
     private final String name;
-    private List<Participant> participants;
+    private final List<Participant> participants;
 
     public Heat(String heatName) {
         this.name = heatName;

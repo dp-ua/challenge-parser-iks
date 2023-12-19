@@ -13,8 +13,8 @@ import java.util.List;
 
 @Log
 public class CompetitionPageParser {
-    private ServiceParser serviceParser;
-    private Downloader downloader;
+    private final ServiceParser serviceParser;
+    private final Downloader downloader;
 
     public CompetitionPageParser(ServiceParser serviceParser, Downloader downloader) {
         this.serviceParser = serviceParser;
@@ -25,9 +25,7 @@ public class CompetitionPageParser {
         List<Day> days = getUnfilledDays(document);
         days.forEach(day -> {
             List<Event> events = getEvents(document, day.getDateId());
-            events.forEach(event -> {
-                day.addEvent(event);
-            });
+            events.forEach(event -> day.addEvent(event));
         });
         return days;
     }
@@ -46,7 +44,7 @@ public class CompetitionPageParser {
     }
 
     private void checkDays(Elements days) {
-        if (days.size() == 0) {
+        if (days.isEmpty()) {
             throw new RuntimeException("Wrong number of days");
         }
     }
@@ -71,9 +69,7 @@ public class CompetitionPageParser {
         events.forEach(event -> {
             Document eventDocument = downloader.getDocument(event.getStartListUrl());
             List<Heat> heats = pageParser.getHeats(eventDocument);
-            heats.forEach(heat -> {
-                event.addHeat(heat);
-            });
+            heats.forEach(heat -> event.addHeat(heat));
             log.info("For event[" + event.getEventName() + "] Heats count: " + heats.size());
         });
 
@@ -82,7 +78,7 @@ public class CompetitionPageParser {
     }
 
     private void checkEvents(Elements rows) {
-        if (rows.size() == 0) {
+        if (rows.isEmpty()) {
             throw new RuntimeException("Wrong number of events");
         }
     }

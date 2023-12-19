@@ -16,7 +16,7 @@ public class Event {
     private final String category;
     private final String round;
     private final String startListUrl;
-    private List<Heat> heats;
+    private final List<Heat> heats;
 
     public Event(String time, String eventName, String category, String round, String startListUrl) {
         this.time = time;

@@ -17,13 +17,4 @@ public class Participant {
     private String name;
     private String born;
     private String url;
-
-    public Participant(String lane, String bib, String surname, String name, String born, String url) {
-        this.lane = lane;
-        this.bib = bib;
-        this.surname = surname;
-        this.name = name;
-        this.born = born;
-        this.url = url;
-    }
 }

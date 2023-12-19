@@ -17,7 +17,7 @@ public class Day {
     private final String dateId;
     private final String dayName;
     private final String dayNameEn;
-    private List<Event> events;
+    private final List<Event> events;
 
     public Day(String date, String dateId, String dayName, String dayNameEn) {
         this.date = date;

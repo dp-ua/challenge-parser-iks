@@ -43,7 +43,7 @@ public class EventPageParser {
                 }
             });
 
-            if (heat.getParticipants().size() != 0) heats.add(heat);
+            if (!heat.getParticipants().isEmpty()) heats.add(heat);
         });
 
         return heats;
