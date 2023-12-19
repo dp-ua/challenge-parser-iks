@@ -25,7 +25,7 @@ public class CompetitionPageParser {
         List<Day> days = getUnfilledDays(document);
         days.forEach(day -> {
             List<Event> events = getEvents(document, day.getDateId());
-            events.forEach(event -> day.addEvent(event));
+            events.forEach(day::addEvent);
         });
         return days;
     }
@@ -69,7 +69,7 @@ public class CompetitionPageParser {
         events.forEach(event -> {
             Document eventDocument = downloader.getDocument(event.getStartListUrl());
             List<Heat> heats = pageParser.getHeats(eventDocument);
-            heats.forEach(heat -> event.addHeat(heat));
+            heats.forEach(event::addHeat);
             log.info("For event[" + event.getEventName() + "] Heats count: " + heats.size());
         });
 
