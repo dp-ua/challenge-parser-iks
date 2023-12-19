@@ -3,14 +3,14 @@ package com.example.elements;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @ToString
 @Getter
-@Log
+@Slf4j
 @EqualsAndHashCode
 public class Day {
     private final String date;

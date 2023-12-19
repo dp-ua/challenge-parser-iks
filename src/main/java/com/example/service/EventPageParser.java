@@ -4,11 +4,13 @@ import com.example.elements.Heat;
 import com.example.elements.Participant;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+@Component
 public class EventPageParser {
 
     public List<Heat> getHeats(Document document) {

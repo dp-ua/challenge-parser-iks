@@ -3,22 +3,26 @@ package com.example.service;
 import com.example.elements.Day;
 import com.example.elements.Event;
 import com.example.elements.Heat;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Log
+@Slf4j
+@Component
 public class CompetitionPageParser {
     private final ServiceParser serviceParser;
     private final Downloader downloader;
+    private final EventPageParser pageParser;
 
-    public CompetitionPageParser(ServiceParser serviceParser, Downloader downloader) {
+    public CompetitionPageParser(ServiceParser serviceParser, Downloader downloader, EventPageParser pageParser) {
         this.serviceParser = serviceParser;
         this.downloader = downloader;
+        this.pageParser = pageParser;
     }
 
     public List<Day> getParsedDays(Document document) {
@@ -62,7 +66,6 @@ public class CompetitionPageParser {
     }
 
     public List<Event> getEvents(Document document, String dayId) {
-        EventPageParser pageParser = new EventPageParser();
 
         List<Event> events = getUnfilledEvents(document, dayId);
 
@@ -70,7 +73,7 @@ public class CompetitionPageParser {
             Document eventDocument = downloader.getDocument(event.getStartListUrl());
             List<Heat> heats = pageParser.getHeats(eventDocument);
             heats.forEach(event::addHeat);
-            log.info("For event[" + event.getEventName() + "] Heats count: " + heats.size());
+            log.debug("For event[" + event.getEventName() + "] Heats count: " + heats.size());
         });
 
         return events;

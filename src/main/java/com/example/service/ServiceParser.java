@@ -1,14 +1,14 @@
 package com.example.service;
 
 import com.example.elements.Day;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
-import static java.util.logging.Level.INFO;
-
-@Log
+@Slf4j
+@Component
 public class ServiceParser {
     public Day parseDay(String input) {
-        log.log(INFO, "parse: " + input);
+        log.info("parse: " + input);
         String[] parts = input.split(" ");
         checkParts(parts);
         String date = parts[0];

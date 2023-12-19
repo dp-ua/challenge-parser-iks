@@ -1,14 +1,15 @@
 package com.example.service;
 
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-@Log
-public enum Downloader {
-    INSTANCE;
+@Slf4j
+@Component
+public class Downloader {
     public Document getDocument(String url) {
         log.info("getDocument: " + url);
         try {
