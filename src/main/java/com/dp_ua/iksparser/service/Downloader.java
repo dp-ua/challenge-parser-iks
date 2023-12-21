@@ -1,4 +1,4 @@
-package com.example.service;
+package com.dp_ua.iksparser.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;

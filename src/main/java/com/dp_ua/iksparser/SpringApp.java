@@ -1,4 +1,4 @@
-package com.example;
+package com.dp_ua.iksparser;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

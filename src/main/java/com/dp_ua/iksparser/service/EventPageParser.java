@@ -1,7 +1,7 @@
-package com.example.service;
+package com.dp_ua.iksparser.service;
 
-import com.example.elements.Heat;
-import com.example.elements.Participant;
+import com.dp_ua.iksparser.element.Heat;
+import com.dp_ua.iksparser.element.Participant;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;

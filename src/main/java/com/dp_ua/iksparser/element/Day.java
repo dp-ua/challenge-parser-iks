@@ -1,4 +1,4 @@
-package com.example.elements;
+package com.dp_ua.iksparser.element;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

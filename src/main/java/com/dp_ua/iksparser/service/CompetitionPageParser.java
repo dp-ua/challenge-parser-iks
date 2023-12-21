@@ -1,8 +1,8 @@
-package com.example.service;
+package com.dp_ua.iksparser.service;
 
-import com.example.elements.Day;
-import com.example.elements.Event;
-import com.example.elements.Heat;
+import com.dp_ua.iksparser.element.Day;
+import com.dp_ua.iksparser.element.Event;
+import com.dp_ua.iksparser.element.Heat;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;

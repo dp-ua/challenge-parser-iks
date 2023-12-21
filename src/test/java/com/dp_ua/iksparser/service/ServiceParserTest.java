@@ -1,6 +1,6 @@
-package com.example.service;
+package com.dp_ua.iksparser.service;
 
-import com.example.elements.Day;
+import com.dp_ua.iksparser.element.Day;
 import org.junit.Before;
 import org.junit.Test;
 
