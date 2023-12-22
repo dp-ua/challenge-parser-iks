@@ -1,27 +1,44 @@
-package com.example;
+package com.dp_ua.iksparser;
 
-import com.example.elements.Day;
-import com.example.elements.Match;
-import com.example.service.CompetitionPageParser;
-import com.example.service.Downloader;
+import com.dp_ua.iksparser.bot.command.CommandProvider;
+import com.dp_ua.iksparser.bot.controller.ControllerService;
+import com.dp_ua.iksparser.element.Day;
+import com.dp_ua.iksparser.element.Match;
+import com.dp_ua.iksparser.service.CompetitionPageParser;
+import com.dp_ua.iksparser.service.Downloader;
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.generics.BotSession;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Hello world!
- */
 @Component
+@Slf4j
 public class App {
+
     @Autowired
     private Downloader downloader;
     @Autowired
     private CompetitionPageParser competitionPageParser;
+    @Autowired
+    private CommandProvider commandProvider;
+
+    @Autowired
+    ControllerService botController;
+
 
     public void start(String url, String surname) {
+//        parseURL(url, surname);
+        BotSession botSession = botController.botConnect();
+        // todo save botSession to memory
+        log.info("BotSession: " + botSession);
+    }
+
+
+    private void parseURL(String url, String surname) {
         Document document = downloader.getDocument(url);
 
         List<Day> days = competitionPageParser.getParsedDays(document);
