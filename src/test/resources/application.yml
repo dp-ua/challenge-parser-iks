@@ -1,0 +1,22 @@
+spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+  profiles:
+    active: test
+
+telegram:
+  bot:
+    token: 1234567890:abcdefghijklmnopqrstuvwxyz
+    name: MyBot
+    reconnectTimeout: 10000
+
+logging:
+  level:
+    root: INFO
+    com.example: INFO
+  file: file.log
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
