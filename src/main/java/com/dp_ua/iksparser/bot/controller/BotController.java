@@ -25,7 +25,7 @@ public class BotController implements ControllerService {
             log.info("TelegramAPI started. Look for messages");
             return botSession;
         } catch (TelegramApiException e) {
-            log.error("Cant Connect. Pause " + reconnectTimeout / 1000 + "sec and try again. Error: " + e.getMessage());
+            log.error("Cant Connect. Pause " + getTimeInSec() + "sec and I'll try again. Error: " + e.getMessage());
             try {
                 Thread.sleep(reconnectTimeout);
             } catch (InterruptedException e1) {
@@ -35,5 +35,9 @@ public class BotController implements ControllerService {
             botConnect();
         }
         return null;
+    }
+
+    private int getTimeInSec() {
+        return reconnectTimeout / 1000;
     }
 }
