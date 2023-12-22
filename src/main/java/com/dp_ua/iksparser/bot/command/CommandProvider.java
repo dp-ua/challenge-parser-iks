@@ -42,18 +42,39 @@ public class CommandProvider implements ApplicationListener<ContextRefreshedEven
     private void checkCommand(CommandInterface command) {
         checkSimpleCommands(command);
         checkPartOfStringCommands(command);
-        // TODO check other commands types
-        // TODO refactoring
-    }
-
-    private void checkPartOfStringCommands(CommandInterface command) {
-        command.partOfStringCommands().forEach(cmd -> {
+        command.fullStringCommands().forEach(cmd -> {
             commands.forEach(c -> {
-                if (c.partOfStringCommands().contains(cmd)) {
+                if (c.fullStringCommands().contains(cmd)) {
                     throw new DuplicateCommandException("Command already exists [" + cmd + "] in "
                             + c.getClass().getSimpleName() + " and "
                             + command.getClass().getSimpleName());
                 }
+            });
+        });
+    }
+
+    // TODO test this method
+    private void checkPartOfStringCommands(CommandInterface command) {
+        command.partOfStringCommands().forEach(partOfStringCmd -> {
+            command.fullStringCommands().forEach(fullCmd -> {
+                if (fullCmd.contains(partOfStringCmd)) {
+                    throw new DuplicateCommandException("FullString command contain partCommand [" + partOfStringCmd + "] in "
+                            + command.getClass().getSimpleName());
+                }
+            });
+            commands.forEach(c -> {
+                if (c.partOfStringCommands().contains(partOfStringCmd)) {
+                    throw new DuplicateCommandException("Command already exists [" + partOfStringCmd + "] in "
+                            + c.getClass().getSimpleName() + " and "
+                            + command.getClass().getSimpleName());
+                }
+                c.fullStringCommands().forEach(fullCmd -> {
+                    if (fullCmd.contains(partOfStringCmd)) {
+                        throw new DuplicateCommandException("FullString command contain partCommand [" + partOfStringCmd + "] in "
+                                + c.getClass().getSimpleName() + " and "
+                                + command.getClass().getSimpleName());
+                    }
+                });
             });
         });
     }
