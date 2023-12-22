@@ -8,7 +8,7 @@ import static org.junit.Assert.assertEquals;
 
 public class ServiceParserTest {
     public static String INPUT = "15.12.23 (День 1 | Day 1) (151223)";
-    public static String INPUT_WRONG = "15.12.23 (День 1 | Day 1) (151223) (151223)";
+    public static String INPUT_WRONG = "15.12.23 (День 1 | Day 1) (151223) (161223)";
 
     ServiceParser parser;
 
@@ -20,7 +20,7 @@ public class ServiceParserTest {
     @Test
     public void testToString() {
         String result = parser.parseDay(INPUT).toString();
-        assertEquals("Day(date=15.12.23, dateId=151223, dayName=День 1, dayNameEn=Day 1)", result);
+        assertEquals("Day(date=15.12.23, dateId=151223, dayName=День 1, dayNameEn=Day 1, events=[])", result);
     }
 
     @Test
