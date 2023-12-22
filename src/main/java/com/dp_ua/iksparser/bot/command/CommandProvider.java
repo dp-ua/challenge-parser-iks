@@ -42,15 +42,13 @@ public class CommandProvider implements ApplicationListener<ContextRefreshedEven
     private void checkCommand(CommandInterface command) {
         checkSimpleCommands(command);
         checkPartOfStringCommands(command);
-        command.fullStringCommands().forEach(cmd -> {
-            commands.forEach(c -> {
-                if (c.fullStringCommands().contains(cmd)) {
-                    throw new DuplicateCommandException("Command already exists [" + cmd + "] in "
-                            + c.getClass().getSimpleName() + " and "
-                            + command.getClass().getSimpleName());
-                }
-            });
-        });
+        command.fullStringCommands().forEach(cmd -> commands.forEach(c -> {
+            if (c.fullStringCommands().contains(cmd)) {
+                throw new DuplicateCommandException("Command already exists [" + cmd + "] in "
+                        + c.getClass().getSimpleName() + " and "
+                        + command.getClass().getSimpleName());
+            }
+        }));
     }
 
     // TODO test this method
@@ -80,14 +78,12 @@ public class CommandProvider implements ApplicationListener<ContextRefreshedEven
     }
 
     private void checkSimpleCommands(CommandInterface command) {
-        command.allSimpleCommands().forEach(cmd -> {
-            commands.forEach(c -> {
-                if (c.allSimpleCommands().contains(cmd)) {
-                    throw new DuplicateCommandException("Command already exists [" + cmd + "] in "
-                            + c.getClass().getSimpleName() + " and "
-                            + command.getClass().getSimpleName());
-                }
-            });
-        });
+        command.allSimpleCommands().forEach(cmd -> commands.forEach(c -> {
+            if (c.allSimpleCommands().contains(cmd)) {
+                throw new DuplicateCommandException("Command already exists [" + cmd + "] in "
+                        + c.getClass().getSimpleName() + " and "
+                        + command.getClass().getSimpleName());
+            }
+        }));
     }
 }
