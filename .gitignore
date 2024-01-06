@@ -8,3 +8,7 @@ target/
 *.ear
 .DS_Store
 .idea/
+
+# Spring Boot
+# settings
+application-dev.yml
