@@ -70,7 +70,12 @@ public class CompetitionPageParser {
         List<Event> events = getUnfilledEvents(document, dayId);
 
         events.forEach(event -> {
-            Document eventDocument = downloader.getDocument(event.getStartListUrl());
+            String url = event.getStartListUrl();
+            if (url == null || url.isEmpty()) {
+                log.info("No start list url for event: " + event.getEventName());
+                return;
+            }
+            Document eventDocument = downloader.getDocument(url);
             List<Heat> heats = pageParser.getHeats(eventDocument);
             heats.forEach(event::addHeat);
             log.debug("For event[" + event.getEventName() + "] Heats count: " + heats.size());
