@@ -32,4 +32,9 @@ public class CommandProviderTest extends MockBotControllerTest {
                         "start",
                 actual);
     }
+
+    @Override
+    public void additionalSetUp() {
+        // nothing to do
+    }
 }
