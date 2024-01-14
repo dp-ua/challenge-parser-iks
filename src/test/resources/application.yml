@@ -9,13 +9,13 @@ spring:
 telegram:
   bot:
     token: 1234567890:abcdefghijklmnopqrstuvwxyz
-    name: MyBot
+    name: MyBotT
     reconnectTimeout: 10000
 
 logging:
   level:
     root: INFO
-    com.example: INFO
+    com.dp_ua: DEBUG
   file: file.log
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
