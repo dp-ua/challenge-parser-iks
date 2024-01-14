@@ -12,7 +12,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 
-public class MockBotControllerTest {
+public abstract class MockBotControllerTest {
     @Mock
     BotSession botSession;
     @MockBean
@@ -22,5 +22,8 @@ public class MockBotControllerTest {
     @Before
     public void setUp() {
         when(telegramBotsApi.registerBot(any(LongPollingBot.class))).thenReturn(botSession);
+        additionalSetUp();
     }
+
+    public abstract void additionalSetUp();
 }
