@@ -14,4 +14,8 @@ public class SpringAppTest extends MockBotControllerTest {
         Assert.assertTrue(true);
     }
 
+    @Override
+    public void additionalSetUp() {
+        // nothing to do
+    }
 }
