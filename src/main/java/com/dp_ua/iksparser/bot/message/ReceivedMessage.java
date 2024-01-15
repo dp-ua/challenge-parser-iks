@@ -17,11 +17,17 @@ public class ReceivedMessage implements Message {
 
     @Override
     public String getChatId() {
+        if (update.hasMessage()) {
+            return update.getMessage().getChatId().toString();
+        }
         return "";
     }
 
     @Override
     public String getUserId() {
+        if (update.hasMessage()) {
+            return update.getMessage().getFrom().getId().toString();
+        }
         return "";
     }
 
@@ -32,6 +38,9 @@ public class ReceivedMessage implements Message {
 
     @Override
     public String getMessageText() {
+        if (update.hasMessage()) {
+            return update.getMessage().getText();
+        }
         return "";
     }
 }
