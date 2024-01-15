@@ -1,5 +1,7 @@
 package com.dp_ua.iksparser.bot.command;
 
+import com.dp_ua.iksparser.bot.message.Message;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,4 +34,6 @@ public interface CommandInterface {
                 + "{" + command() + "},"
                 + "alt{" + altCommands() + "}";
     }
+
+    void execute(Message message);
 }
