@@ -12,7 +12,10 @@ public class SpringApp implements CommandLineRunner {
     @Autowired
     private App app;
     private final String surname = "Решетило";
-    private final String URL = "https://iks.org.ua/competitions1/en/2023.12.15-16_kyiv/live?s=333DE691-FB1E-4E01-B46C-1F52A5D9D6CC";
+    // барьеры
+//    private final String URL = "https://iks.org.ua/competitions1/en/2024.01.12_kyiv/live?s=D6439A95-F3D4-4E71-B1EA-084D7B356947";
+    // пантера
+    private final String URL = "https://iks.org.ua/competitions1/en/2024.01.13_kyiv/live?s=0257D292-2228-4316-9141-DF185D18CDCF";
 
 
     public static void main(String[] args) {
