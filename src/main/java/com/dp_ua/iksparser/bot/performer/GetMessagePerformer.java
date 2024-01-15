@@ -24,7 +24,8 @@ public class GetMessagePerformer implements ApplicationListener<GetMessageEvent>
                     .forEach(command -> command.execute(message));
         } catch (NotForMeException e) {
             log.info("NotForMeException: {}", e.getMessage());
-            throw new RuntimeException(e);
+        } catch (IllegalArgumentException e) {
+            log.info("IllegalArgumentException: {}", e.getMessage());
         } catch (Exception e) {
             log.error("Exception: {}", e.getMessage());
             throw new RuntimeException(e);
