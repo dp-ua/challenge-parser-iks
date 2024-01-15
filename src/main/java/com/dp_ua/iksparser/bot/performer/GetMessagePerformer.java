@@ -1,5 +1,6 @@
 package com.dp_ua.iksparser.bot.performer;
 
+import com.dp_ua.iksparser.bot.command.CommandInterface;
 import com.dp_ua.iksparser.bot.command.TextCommandDetectorService;
 import com.dp_ua.iksparser.bot.message.Message;
 import com.dp_ua.iksparser.bot.performer.event.GetMessageEvent;
@@ -8,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 @Slf4j
@@ -20,7 +23,9 @@ public class GetMessagePerformer implements ApplicationListener<GetMessageEvent>
         Message message = event.getMessage();
         log.info("GetMessageEvent: {}", message);
         try {
-            commandDetector.getParsedCommands(message.getMessageText())
+            List<CommandInterface> commands = commandDetector.getParsedCommands(message.getMessageText());
+            log.info("commands: {}", commands);
+            commands
                     .forEach(command -> command.execute(message));
         } catch (NotForMeException e) {
             log.info("NotForMeException: {}", e.getMessage());
