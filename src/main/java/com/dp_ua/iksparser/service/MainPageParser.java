@@ -46,8 +46,7 @@ public class MainPageParser {
 
     private static LocalDate parseDate(String text) {
         String[] parts = text.split("\\.");
-        LocalDate date = LocalDate.of(Integer.parseInt(parts[2]), Integer.parseInt(parts[1]), Integer.parseInt(parts[0]));
-        return date;
+        return LocalDate.of(Integer.parseInt(parts[2]), Integer.parseInt(parts[1]), Integer.parseInt(parts[0]));
     }
 }
 

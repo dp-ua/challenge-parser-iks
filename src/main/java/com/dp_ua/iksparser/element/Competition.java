@@ -1,14 +1,14 @@
 package com.dp_ua.iksparser.element;
 
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDate;
 
+@Getter
 @NoArgsConstructor
 @ToString
 @EqualsAndHashCode
+@AllArgsConstructor
 public class Competition {
     private String url;
     private LocalDate begin;
@@ -22,55 +22,28 @@ public class Competition {
         this.url = url;
     }
 
-    public String getUrl() {
-        return url;
-    }
-
     public void setBegin(LocalDate begin) {
         this.begin = begin;
-    }
-
-    public LocalDate getBegin() {
-        return begin;
     }
 
     public void setEnd(LocalDate end) {
         this.end = end;
     }
 
-    public LocalDate getEnd() {
-        return end;
-    }
-
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public void setCountry(String country) {
         this.country = country;
     }
 
-    public String getCountry() {
-        return country;
-    }
-
     public void setTer(String ter) {
         this.ter = ter;
-    }
-
-    public String getTer() {
-        return ter;
     }
 
     public void setCity(String city) {
         this.city = city;
     }
 
-    public String getCity() {
-        return city;
-    }
 }
