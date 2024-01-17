@@ -1,6 +1,5 @@
 package com.dp_ua.iksparser;
 
-import com.dp_ua.iksparser.bot.command.CommandProvider;
 import com.dp_ua.iksparser.bot.controller.ControllerService;
 import com.dp_ua.iksparser.element.Day;
 import com.dp_ua.iksparser.element.Match;
@@ -9,6 +8,9 @@ import com.dp_ua.iksparser.service.Downloader;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.generics.BotSession;
 
@@ -17,26 +19,29 @@ import java.util.List;
 
 @Component
 @Slf4j
-public class App {
-
+public class App implements ApplicationListener<ContextRefreshedEvent>, Ordered {
     @Autowired
     private Downloader downloader;
     @Autowired
     private CompetitionPageParser competitionPageParser;
-    @Autowired
-    private CommandProvider commandProvider;
 
     @Autowired
     ControllerService botController;
+    private final static String surname = "Решетило";
+    private final static String URL = "https://iks.org.ua/competitions1/en/2024.01.13_kyiv/live?s=0257D292-2228-4316-9141-DF185D18CDCF";
 
-
-    public void start(String url, String surname) {
-//        parseURL(url, surname);
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+        //        parseURL(URL, surname);
         BotSession botSession = botController.botConnect();
         // todo save botSession to memory
         log.info("BotSession: " + botSession);
     }
 
+    @Override
+    public int getOrder() {
+        return SpringApp.ORDER_FOR_APP_AND_BOT_STARTER;
+    }
 
     private void parseURL(String url, String surname) {
         Document document = downloader.getDocument(url);

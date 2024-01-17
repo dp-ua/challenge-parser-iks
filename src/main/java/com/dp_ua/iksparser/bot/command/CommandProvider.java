@@ -1,5 +1,6 @@
 package com.dp_ua.iksparser.bot.command;
 
+import com.dp_ua.iksparser.SpringApp;
 import com.dp_ua.iksparser.exeption.DuplicateCommandException;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -7,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
@@ -16,7 +18,11 @@ import java.util.stream.Collectors;
 
 @Component
 @Slf4j
-public class CommandProvider implements ApplicationListener<ContextRefreshedEvent> {
+public class CommandProvider implements ApplicationListener<ContextRefreshedEvent>, Ordered {
+    @Override
+    public int getOrder() {
+        return SpringApp.ORDER_FOR_COMMAND_PROVIDER;
+    }
     @Autowired
     ApplicationContext context;
 
