@@ -28,9 +28,10 @@ public class CommandProviderTest extends MockBotControllerTest {
 
         String actual = String.join("\n", allCommands);
         Assert.assertEquals(
-                "competitions\n" +
-                        "help\n" +
-                        "start",
+                """
+                        competitions
+                        help
+                        start""",
                 actual);
     }
 
