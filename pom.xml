@@ -73,10 +73,13 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-            <version>3.1.2</version>
+            <version>3.1.7</version>
         </dependency>
-        <!--пока не нужно-->
-
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-core</artifactId>
+            <version>10.1.18</version>
+        </dependency>
         <!-- Зависимости для Spring Boot и тестирования -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
