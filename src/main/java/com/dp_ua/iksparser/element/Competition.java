@@ -1,49 +1,54 @@
 package com.dp_ua.iksparser.element;
 
-import lombok.*;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-@Getter
-@NoArgsConstructor
 @ToString
-@EqualsAndHashCode
-@AllArgsConstructor
+@Entity
+@Getter
+@Setter
+@Table(indexes = {
+        @Index(name = "idx_name", columnList = "name"),
+        @Index(name = "idx_NameDateUrl", columnList = "name,beginDate,url")
+})
 public class Competition {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
     private String url;
-    private LocalDate begin;
-    private LocalDate end;
+    private String beginDate;
+    private String endDate;
     private String name;
     private String country;
-    private String ter;
     private String city;
 
-    public void setUrl(String url) {
-        this.url = url;
+    @Column(updatable = false)
+    private String createdTime;
+
+    private String updatedTime;
+
+    @PrePersist
+    protected void onCreate() {
+        createdTime = LocalDateTime.now().toString();
+        updatedTime = LocalDateTime.now().toString();
     }
 
-    public void setBegin(LocalDate begin) {
-        this.begin = begin;
+    @PreUpdate
+    protected void onUpdate() {
+        updatedTime = LocalDateTime.now().toString();
     }
 
-    public void setEnd(LocalDate end) {
-        this.end = end;
+    public void fillCompetition(Competition competition) {
+        this.url = competition.getUrl();
+        this.beginDate = competition.getBeginDate();
+        this.endDate = competition.getEndDate();
+        this.name = competition.getName();
+        this.country = competition.getCountry();
+        this.city = competition.getCity();
     }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setCountry(String country) {
-        this.country = country;
-    }
-
-    public void setTer(String ter) {
-        this.ter = ter;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
 }
