@@ -37,11 +37,11 @@ public class CommandProvider implements ApplicationListener<ContextRefreshedEven
     private void init() {
         log.info("Initializing CommandProvider");
         commands = context.getBeansOfType(CommandInterface.class).values().stream()
-                .peek(this::registerCommand)
+                .peek(this::preRegisterCheck)
                 .collect(Collectors.toList());
     }
 
-    private void registerCommand(CommandInterface command) {
+    private void preRegisterCheck(CommandInterface command) {
         log.info("Registering command: {}", command.logString());
         checkCommand(command);
     }
