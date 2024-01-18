@@ -12,8 +12,6 @@ import java.util.List;
 @Component
 public class MainPageParser {
     public List<Competition> getParsedCompetitions(Document document) {
-        // parse Competitions from document
-        // return List<Competition>
         List<Competition> result = new ArrayList<>();
         Elements results = document.select("div.row.results");
         results.forEach(row -> {
@@ -27,11 +25,10 @@ public class MainPageParser {
                         if (cells.size() == 8) {
                             Competition competition = new Competition();
                             competition.setUrl(cells.get(0).select("a").attr("href"));
-                            competition.setBegin(parseDate(cells.get(1).text()));
-                            competition.setEnd(parseDate(cells.get(2).text()));
+                            competition.setBeginDate(parseDate(cells.get(1).text()).toString());
+                            competition.setEndDate(parseDate(cells.get(2).text()).toString());
                             competition.setName(cells.get(3).text());
                             competition.setCountry(cells.get(4).text());
-                            competition.setTer(cells.get(5).text());
                             competition.setCity(cells.get(6).text());
 
                             result.add(competition);

@@ -28,19 +28,23 @@ public class Competition {
     private String city;
 
     @Column(updatable = false)
-    private String createdTime;
+    private String created;
 
-    private String updatedTime;
+    private String updated;
 
     @PrePersist
     protected void onCreate() {
-        createdTime = LocalDateTime.now().toString();
-        updatedTime = LocalDateTime.now().toString();
+        created = LocalDateTime.now().toString();
+        updated = LocalDateTime.now().toString();
     }
 
     @PreUpdate
     protected void onUpdate() {
-        updatedTime = LocalDateTime.now().toString();
+        updated = LocalDateTime.now().toString();
+    }
+
+    public LocalDateTime getUpdatedTime() {
+        return LocalDateTime.parse(updated);
     }
 
     public void fillCompetition(Competition competition) {
