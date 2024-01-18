@@ -16,6 +16,25 @@ public class CompetitionService {
         this.repo = repo;
     }
 
+    public List<Competition> findAllOrderByUpdated() {
+        return repo.findAllByOrderByUpdated();
+    }
+
+    public List<Competition> findAllOrderByBeginDate(boolean reverse) {
+        if (reverse) {
+            return repo.findAllByOrderByBeginDateDesc();
+        }
+        return repo.findAllByOrderByBeginDate();
+    }
+
+    public Competition getFreshestCompetition() {
+        List<Competition> competitions = findAllOrderByUpdated();
+        if (competitions.isEmpty()) {
+            return null;
+        }
+        return competitions.get(0);
+    }
+
     public List<Competition> findAll() {
         List<Competition> competitions = new ArrayList<>();
         repo.findAll().forEach(competitions::add);
