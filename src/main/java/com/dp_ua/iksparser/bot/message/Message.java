@@ -2,7 +2,7 @@ package com.dp_ua.iksparser.bot.message;
 
 import javax.validation.constraints.NotNull;
 
-public interface Message{
+public interface Message {
     @NotNull
     String getMessageText();
 
@@ -15,7 +15,6 @@ public interface Message{
     Type getType();
 
     enum Type {
-        RECEIVE, SEND, SELF
+        RECEIVE, SELF
     }
-
 }
