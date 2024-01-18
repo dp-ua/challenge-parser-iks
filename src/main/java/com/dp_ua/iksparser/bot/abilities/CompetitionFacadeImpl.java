@@ -12,13 +12,16 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendChatAction;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import static com.dp_ua.iksparser.bot.performer.event.SendMessageEvent.MsgType.CHAT_ACTION;
-import static com.dp_ua.iksparser.bot.performer.event.SendMessageEvent.MsgType.SEND_MESSAGE;
+import static com.dp_ua.iksparser.bot.performer.event.SendMessageEvent.MsgType.*;
 import static com.dp_ua.iksparser.service.MessageCreator.*;
 
 @Component
@@ -26,10 +29,9 @@ import static com.dp_ua.iksparser.service.MessageCreator.*;
 public class CompetitionFacadeImpl implements CompetitionFacade {
     public static final String URL = "https://iks.org.ua/";
     public static final String COMPETITIONS_PAGE = "/competitions1/";
-    public static final int COMPETITIONS_PAGE_SIZE = 5;
+    public static final int COMPETITIONS_PAGE_SIZE = 4;
     public static final int COMPETITION_NAME_LIMIT = 55;
     public static final int TTL_MINUTES_COMPETITION_UPDATE = 10;
-    public static final int FIRST_PAGE = 0;
     @Autowired
     Downloader downloader = new Downloader();
     @Autowired
@@ -40,42 +42,100 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
     ApplicationEventPublisher publisher;
 
     @Override
-    public void showCompetitions(String chatId) {
-        log.info("showCompetitions for chat: " + chatId);
-        sendTyping(chatId);
+    public void showCompetitions(String chatId, int pageNumber, Integer editMessageId) {
+        if (pageNumber < 0) {
+            throw new IllegalArgumentException("Page number must be positive");
+        }
+        log.info("showCompetitions. Page {}, chatId:{} ", pageNumber, chatId);
+        sendTypingAction(chatId);
 
         List<Competition> competitions = getCompetitions();
-        List<Competition> page = getPage(competitions, FIRST_PAGE, COMPETITIONS_PAGE_SIZE);
 
-        SendMessage message = getMessage(page, chatId);
-        SendMessageEvent sendMessageEvent = new SendMessageEvent(this, message, SEND_MESSAGE);
-
+        SendMessageEvent sendMessageEvent = getSendMessageEvent(competitions, chatId, editMessageId, pageNumber);
         publisher.publishEvent(sendMessageEvent);
     }
 
-    private void sendTyping(String chatId) {
+    private void sendTypingAction(String chatId) {
         log.info("sendTyping for chat: " + chatId);
         SendChatAction chatAction = SERVICE.getChatAction(chatId);
         publisher.publishEvent(new SendMessageEvent(this, chatAction, CHAT_ACTION));
     }
 
-    private SendMessage getMessage(List<Competition> competitions, String chatId) {
-        String text = getText(competitions);
+    private SendMessageEvent getSendMessageEvent(List<Competition> competitions, String chatId, Integer messageId, int page) {
+        List<Competition> pageList = getPage(competitions, page, COMPETITIONS_PAGE_SIZE);
 
-        SendMessage message = SERVICE.getSendMessage(
-                chatId,
-                text,
-                null,
-                true
-        );
-        message.disableWebPagePreview();
-        return message;
+        int totalCompetitions = competitions.size();
+        String text = getText(pageList, page, totalCompetitions);
+        InlineKeyboardMarkup keyboard = getKeyboard(pageList, page, totalCompetitions);
+
+        if (messageId == null) {
+            SendMessage message = SERVICE.getSendMessage(
+                    chatId,
+                    text,
+                    keyboard,
+                    true
+            );
+            message.disableWebPagePreview();
+            return new SendMessageEvent(this, message, SEND_MESSAGE);
+        } else {
+            EditMessageText editMessageText = SERVICE.getEditMessageText(
+                    chatId,
+                    messageId,
+                    text,
+                    keyboard,
+                    true);
+            editMessageText.disableWebPagePreview();
+            return new SendMessageEvent(this, editMessageText, EDIT_MESSAGE);
+        }
+    }
+
+    private InlineKeyboardMarkup getKeyboard(List<Competition> competitions, int page, int totalSize) {
+        InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
+
+        rows.add(getRowWithPages(page, totalSize));
+        // todo rows.addAll(getRowsWithCompetitions(competitions));
+
+        keyboard.setKeyboard(rows);
+        return keyboard;
+    }
+
+    private List<InlineKeyboardButton> getRowWithPages(int page, int totalSize) {
+        List<InlineKeyboardButton> row = new ArrayList<>();
+// todo ПРОВЕРИТЬ!!! на последней странице есть кнопка вперед
+
+        if (page > 0) {
+            InlineKeyboardButton leftPage = SERVICE.getKeyboardButton(
+                    "⬅️",
+                    "/competitions " + (page - 1)
+            );
+            row.add(leftPage);
+        }
+        if (page < getTotalPages(totalSize) - 1) {
+            InlineKeyboardButton rightPage = SERVICE.getKeyboardButton(
+                    "➡️",
+                    "/competitions " + (page + 1)
+            );
+            row.add(rightPage);
+        }
+        return row;
+    }
+
+    private static int getTotalPages(int totalSize) {
+        return (int) Math.ceil((double) totalSize / COMPETITIONS_PAGE_SIZE);
     }
 
 
-    private String getText(List<Competition> competitions) {
+    private String getText(List<Competition> competitions, int page, int totalCompetitions) {
+        StringBuilder result = new StringBuilder();
+        result
+                .append(BOLD)
+                .append("Список змагань:")
+                .append(BOLD)
+                .append(END_LINE)
+                .append(END_LINE);
 
-        String result = BOLD + "Список змагань:" + BOLD + END_LINE +
+        result.append(
                 IntStream.range(0, competitions.size())
                         .mapToObj(i -> {
                             StringBuilder sb = new StringBuilder();
@@ -105,9 +165,19 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                             return sb.toString();
                         })
                         .reduce((s1, s2) -> s1 + END_LINE + s2)
-                        .orElse("Список пустий");
+                        .orElse("Список пустий")
+        );
 
-        return result;
+        result.append(END_LINE).append(END_LINE);
+        result
+                .append("Сторінка ")
+                .append(BOLD)
+                .append(page + 1)
+                .append(BOLD)
+                .append(" з ")
+                .append(getTotalPages(totalCompetitions));
+
+        return result.toString();
     }
 
     private static String getShortName(String text) {
