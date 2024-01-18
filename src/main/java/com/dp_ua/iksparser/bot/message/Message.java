@@ -14,6 +14,12 @@ public interface Message {
 
     Type getType();
 
+    boolean hasCallbackQuery();
+
+    String getCallBackQueryId();
+
+    Integer getEditMessageId();
+
     enum Type {
         RECEIVE, SELF
     }

@@ -20,6 +20,9 @@ public class ReceivedMessage implements Message {
         if (update.hasMessage()) {
             return update.getMessage().getChatId().toString();
         }
+        if (update.hasCallbackQuery()) {
+            return update.getCallbackQuery().getMessage().getChatId().toString();
+        }
         return "";
     }
 
@@ -27,6 +30,9 @@ public class ReceivedMessage implements Message {
     public String getUserId() {
         if (update.hasMessage()) {
             return update.getMessage().getFrom().getId().toString();
+        }
+        if (update.hasCallbackQuery()) {
+            return update.getCallbackQuery().getFrom().getId().toString();
         }
         return "";
     }
@@ -37,9 +43,30 @@ public class ReceivedMessage implements Message {
     }
 
     @Override
+    public boolean hasCallbackQuery() {
+        return update.hasCallbackQuery();
+    }
+
+    @Override
+    public String getCallBackQueryId() {
+        return update.getCallbackQuery().getId();
+    }
+
+    @Override
+    public Integer getEditMessageId() {
+        if (update.hasCallbackQuery()) {
+            return update.getCallbackQuery().getMessage().getMessageId();
+        }
+        return null;
+    }
+
+    @Override
     public String getMessageText() {
         if (update.hasMessage()) {
             return update.getMessage().getText();
+        }
+        if (update.hasCallbackQuery()) {
+            return update.getCallbackQuery().getData();
         }
         return "";
     }

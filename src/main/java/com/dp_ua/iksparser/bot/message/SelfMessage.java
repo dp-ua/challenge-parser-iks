@@ -20,4 +20,19 @@ public class SelfMessage implements Message{
     public Type getType() {
         return Type.SELF;
     }
+
+    @Override
+    public boolean hasCallbackQuery() {
+        return false;
+    }
+
+    @Override
+    public String getCallBackQueryId() {
+        return null;
+    }
+
+    @Override
+    public Integer getEditMessageId() {
+        return null;
+    }
 }
