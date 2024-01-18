@@ -12,3 +12,6 @@ target/
 # Spring Boot
 # settings
 application-dev.yml
+
+#logs
+logs/
