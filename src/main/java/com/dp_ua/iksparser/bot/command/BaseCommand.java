@@ -32,4 +32,12 @@ public abstract class BaseCommand implements CommandInterface {
     protected abstract String getTextForCallBackAnswer(Message message);
 
     protected abstract void perform(Message message);
+
+    public int getCommandArgument(String text) {
+        if (text.startsWith("/" + command())) {
+            String argument = text.substring(command().length() + 1).trim();
+            return argument.isEmpty() ? 0 : Integer.parseInt(argument);
+        }
+        return 0;
+    }
 }

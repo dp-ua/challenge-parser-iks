@@ -31,15 +31,6 @@ public class CommandCompetitions extends BaseCommand {
     protected void perform(Message message) {
         String chatId = message.getChatId();
         int commandArgument = getCommandArgument(message.getMessageText());
-        if (message.hasCallbackQuery())
-            competitionFacade.showCompetitions(chatId, commandArgument, message.getEditMessageId());
-    }
-
-    private int getCommandArgument(String text) {
-        if (text.startsWith("/" + command)) {
-            String argument = text.substring(command.length() + 1).trim();
-            return argument.isEmpty() ? 0 : Integer.parseInt(argument);
-        }
-        return 0;
+        competitionFacade.showCompetitions(chatId, commandArgument, message.getEditMessageId());
     }
 }
