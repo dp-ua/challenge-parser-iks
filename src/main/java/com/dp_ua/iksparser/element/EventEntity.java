@@ -2,6 +2,7 @@ package com.dp_ua.iksparser.element;
 
 import jakarta.persistence.Entity;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.util.ArrayList;
@@ -10,14 +11,15 @@ import java.util.List;
 @ToString
 @Getter
 @Entity
+@NoArgsConstructor
 public class EventEntity extends DomainElement {
-    private final String time;
-    private final String eventName;
-    private final String category;
-    private final String round;
-    private final String startListUrl;
+    private String time;
+    private String eventName;
+    private String category;
+    private String round;
+    private String startListUrl;
 
-    private final List<Heat> heats;
+    private List<HeatEntity> heats;
 
     public EventEntity(String time, String eventName, String category, String round, String startListUrl) {
         this.time = time;
@@ -28,7 +30,7 @@ public class EventEntity extends DomainElement {
         heats = new ArrayList<>();
     }
 
-    public void addHeat(Heat heat) {
+    public void addHeat(HeatEntity heat) {
         heats.add(heat);
     }
 }

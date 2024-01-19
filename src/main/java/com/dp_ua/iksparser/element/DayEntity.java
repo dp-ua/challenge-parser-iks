@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
@@ -16,16 +17,17 @@ import java.util.List;
 @Setter
 @Slf4j
 @Entity
+@NoArgsConstructor
 public class DayEntity extends DomainElement {
-    private final String date;
-    private final String dateId;
-    private final String dayName;
-    private final String dayNameEn;
+    private String date;
+    private String dateId;
+    private String dayName;
+    private String dayNameEn;
     @ManyToOne
     @JoinColumn(name = "competition_id")
     private CompetitionEntity competition;
 
-    private final List<EventEntity> events;
+    private List<EventEntity> events;
 
     public DayEntity(String date, String dateId, String dayName, String dayNameEn) {
         this.date = date;
@@ -44,7 +46,7 @@ public class DayEntity extends DomainElement {
         String strToMatch = surname.toLowerCase();
 
         for (EventEntity event : events) {
-            for (Heat heat : event.getHeats()) {
+            for (HeatEntity heat : event.getHeats()) {
                 for (Participant participant : heat.getParticipants()) {
                     if (participant.getSurname().toLowerCase().equals(strToMatch)) {
                         // Найдено совпадение - сохраняем информацию о нем

@@ -11,6 +11,6 @@ import lombok.Setter;
 public class Match {
     private DayEntity day;
     private EventEntity event;
-    private Heat heat;
+    private HeatEntity heat;
     private Participant participant;
 }

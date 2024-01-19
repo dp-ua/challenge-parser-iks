@@ -1,6 +1,6 @@
 package com.dp_ua.iksparser.service;
 
-import com.dp_ua.iksparser.element.Heat;
+import com.dp_ua.iksparser.element.HeatEntity;
 import com.dp_ua.iksparser.element.Participant;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -13,15 +13,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Component
 public class EventPageParser {
 
-    public List<Heat> getHeats(Document document) {
-        List<Heat> heats = new ArrayList<>();
+    public List<HeatEntity> getHeats(Document document) {
+        List<HeatEntity> heats = new ArrayList<>();
         AtomicInteger count = new AtomicInteger();
 
         Elements heatTables = document.select("div.table-responsive table.table");
         heatTables.forEach(heatTable -> {
             String heatName = "Heat " + count.getAndIncrement();
 
-            Heat heat = new Heat(heatName);
+            HeatEntity heat = new HeatEntity(heatName);
 
             Elements rows = heatTable.select("tr");
             rows.forEach(row -> {
