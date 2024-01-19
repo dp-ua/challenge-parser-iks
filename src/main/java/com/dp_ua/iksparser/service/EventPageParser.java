@@ -21,15 +21,15 @@ public class EventPageParser {
         heatTables.forEach(heatTable -> {
             String heatName = "Heat " + count.getAndIncrement();
 
-            HeatEntity heat = new HeatEntity(heatName);
+//            HeatEntity heat = new HeatEntity(heatName);
 
             Elements rows = heatTable.select("tr");
             rows.forEach(row -> {
                 Elements cells = row.select("td");
                 if (cells.size() == 11) {
                     ParticipantEntity participant = new ParticipantEntity();
-                    participant.setLane(cells.get(0).text());
-                    participant.setBib(cells.get(1).text());
+//                    participant.setLane(cells.get(0).text());
+//                    participant.setBib(cells.get(1).text());
 //                    participant.setSb(cells.get(2).text());
 //                    participant.setPb(cells.get(3).text());
 //                    participant.setPhotoUrl(cells.get(4).select("img").attr("src"));
@@ -41,11 +41,11 @@ public class EventPageParser {
 //                    participant.setCoaches(cells.get(10).text());
                     participant.setUrl(cells.get(4).select("a").attr("href"));
 
-                    heat.addParticipant(participant);
+//                    heat.addParticipant(participant);
                 }
             });
 
-            if (!heat.getParticipants().isEmpty()) heats.add(heat);
+//            if (!heat.getParticipants().isEmpty()) heats.add(heat);
         });
 
         return heats;
