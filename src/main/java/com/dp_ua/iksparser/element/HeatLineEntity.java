@@ -1,9 +1,6 @@
 package com.dp_ua.iksparser.element;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,7 +14,9 @@ import java.util.List;
 public class HeatLineEntity extends DomainElement {
     private String lane;
     private String bib;
-    private ParticipantEntity participant; // todo add heatline to participant
+    @ManyToOne
+    @JoinColumn(name = "participant_id")
+    private ParticipantEntity participant;
     @ManyToMany
     @JoinTable(
             name = "heatline_coach",
