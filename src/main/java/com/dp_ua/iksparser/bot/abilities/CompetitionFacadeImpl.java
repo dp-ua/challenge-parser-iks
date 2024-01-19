@@ -31,7 +31,9 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
     public static final String COMPETITIONS_PAGE = "/competitions1/";
     public static final int COMPETITIONS_PAGE_SIZE = 4;
     public static final int COMPETITION_NAME_LIMIT = 55;
+    private static final int COMPETITION_BUTTON_LIMIT = 40;
     public static final int TTL_MINUTES_COMPETITION_UPDATE = 10;
+
     @Autowired
     Downloader downloader = new Downloader();
     @Autowired
@@ -94,7 +96,16 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
 
         rows.add(getRowWithPages(page, totalSize));
-        // todo rows.addAll(getRowsWithCompetitions(competitions));
+        competitions
+                .forEach(c -> {
+                    List<InlineKeyboardButton> row = new ArrayList<>();
+                    InlineKeyboardButton button = SERVICE.getKeyboardButton(
+                            getShortName(c.getName(), COMPETITION_BUTTON_LIMIT),
+                            "/competition " + c.getId()
+                    );
+                    row.add(button);
+                    rows.add(row);
+                });
 
         keyboard.setKeyboard(rows);
         return keyboard;
@@ -102,7 +113,6 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
 
     private List<InlineKeyboardButton> getRowWithPages(int page, int totalSize) {
         List<InlineKeyboardButton> row = new ArrayList<>();
-// todo ПРОВЕРИТЬ!!! на последней странице есть кнопка вперед
 
         if (page > 0) {
             InlineKeyboardButton leftPage = SERVICE.getKeyboardButton(
@@ -143,7 +153,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                             Competition competition = competitions.get(i);
                             sb
                                     .append(ITALIC)
-                                    .append(getShortName(competition.getName()))
+                                    .append(getShortName(competition.getName(), COMPETITION_NAME_LIMIT))
                                     .append(ITALIC);
 
                             sb.append(END_LINE);
@@ -152,7 +162,12 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                                     .append("   з ")
                                     .append(competition.getBeginDate())
                                     .append(" по ") // begin date
-                                    .append(competition.getEndDate()); // e
+                                    .append(competition.getEndDate());
+                            sb
+                                    .append(" ")
+                                    .append(BOLD)
+                                    .append(competition.getCity()) // place
+                                    .append(BOLD);
 
                             sb
                                     .append(LINK)
@@ -180,9 +195,9 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         return result.toString();
     }
 
-    private static String getShortName(String text) {
+    private String getShortName(String text, int limit) {
         return SERVICE.cleanMarkdown(text)
-                .substring(0, Math.min(text.length(), COMPETITION_NAME_LIMIT)) +
+                .substring(0, Math.min(text.length(), limit)) +
                 "...";
     }
 
