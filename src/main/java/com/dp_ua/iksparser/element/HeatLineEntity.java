@@ -24,4 +24,11 @@ public class HeatLineEntity extends DomainElement {
             inverseJoinColumns = @JoinColumn(name = "coach_id")
     )
     private List<CoachEntity> coaches;
+    @ManyToMany
+    @JoinTable(
+            name = "heatline_heat",
+            joinColumns = @JoinColumn(name = "heatline_id"),
+            inverseJoinColumns = @JoinColumn(name = "heat_id")
+    )
+    private List<HeatEntity> heats;
 }
