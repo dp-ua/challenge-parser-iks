@@ -1,9 +1,7 @@
 package com.dp_ua.iksparser.element;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.List;
 
@@ -11,6 +9,8 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
+@EqualsAndHashCode
 @Table(indexes = {
         @Index(name = "idx_name", columnList = "name"),
         @Index(name = "idx_NameDateUrl", columnList = "name,beginDate,url")
@@ -26,7 +26,6 @@ public class CompetitionEntity extends DomainElement {
 
     @OneToMany(mappedBy = "competition", cascade = CascadeType.ALL)
     private List<DayEntity> days;
-
 
     public void fillCompetition(CompetitionEntity competition) {
         this.url = competition.getUrl();

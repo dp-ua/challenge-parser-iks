@@ -1,6 +1,7 @@
 package com.dp_ua.iksparser.element;
 
 import jakarta.persistence.Entity;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -12,6 +13,7 @@ import java.util.List;
 @Getter
 @Entity
 @NoArgsConstructor
+@EqualsAndHashCode
 public class EventEntity extends DomainElement {
     private String time;
     private String eventName;

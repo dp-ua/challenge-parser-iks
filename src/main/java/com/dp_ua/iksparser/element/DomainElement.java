@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public class DomainElement {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

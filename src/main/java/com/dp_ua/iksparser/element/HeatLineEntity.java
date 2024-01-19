@@ -8,9 +8,9 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 @Getter
-@EqualsAndHashCode
 @Entity
 @NoArgsConstructor
+@EqualsAndHashCode
 public class HeatLineEntity extends DomainElement {
     private String lane;
     private String bib;
