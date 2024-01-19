@@ -9,8 +9,8 @@ import lombok.Setter;
 @Getter@Setter
 @EqualsAndHashCode
 public class Match {
-    private Day day;
-    private Event event;
+    private DayEntity day;
+    private EventEntity event;
     private Heat heat;
     private Participant participant;
 }

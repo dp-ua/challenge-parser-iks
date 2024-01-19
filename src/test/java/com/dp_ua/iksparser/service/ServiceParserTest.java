@@ -1,6 +1,6 @@
 package com.dp_ua.iksparser.service;
 
-import com.dp_ua.iksparser.element.Day;
+import com.dp_ua.iksparser.element.DayEntity;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -25,7 +25,7 @@ public class ServiceParserTest {
 
     @Test
     public void testParse() {
-        Day day = parser.parseDay(INPUT);
+        DayEntity day = parser.parseDay(INPUT);
         assertEquals("15.12.23", day.getDate());
         assertEquals("151223", day.getDateId());
         assertEquals("День 1", day.getDayName());

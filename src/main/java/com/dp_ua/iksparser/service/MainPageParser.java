@@ -1,6 +1,6 @@
 package com.dp_ua.iksparser.service;
 
-import com.dp_ua.iksparser.element.Competition;
+import com.dp_ua.iksparser.element.CompetitionEntity;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
@@ -11,8 +11,8 @@ import java.util.List;
 
 @Component
 public class MainPageParser {
-    public List<Competition> getParsedCompetitions(Document document) {
-        List<Competition> result = new ArrayList<>();
+    public List<CompetitionEntity> getParsedCompetitions(Document document) {
+        List<CompetitionEntity> result = new ArrayList<>();
         Elements results = document.select("div.row.results");
         results.forEach(row -> {
             Elements cols = row.select("div.col-md-12");
@@ -23,7 +23,7 @@ public class MainPageParser {
                     rows.forEach(tr -> {
                         Elements cells = tr.select("td");
                         if (cells.size() == 8) {
-                            Competition competition = new Competition();
+                            CompetitionEntity competition = new CompetitionEntity();
                             competition.setUrl(cells.get(0).select("a").attr("href"));
                             competition.setBeginDate(parseDate(cells.get(1).text()).toString());
                             competition.setEndDate(parseDate(cells.get(2).text()).toString());

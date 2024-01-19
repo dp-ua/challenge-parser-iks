@@ -1,13 +1,13 @@
 package com.dp_ua.iksparser.service;
 
-import com.dp_ua.iksparser.element.Day;
+import com.dp_ua.iksparser.element.DayEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
 public class ServiceParser {
-    public Day parseDay(String input) {
+    public DayEntity parseDay(String input) {
         log.info("parse: " + input);
         String[] parts = input.split(" ");
         checkParts(parts);
@@ -16,7 +16,7 @@ public class ServiceParser {
         String dayName = parts[1].substring(1) + " " + parts[2];
         String dayNameEn = parts[4] + " " + parts[5].substring(0, parts[5].length() - 1);
 
-        return new Day(date, dateId, dayName, dayNameEn);
+        return new DayEntity(date, dateId, dayName, dayNameEn);
     }
 
     private static void checkParts(String[] parts) {

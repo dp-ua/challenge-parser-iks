@@ -1,7 +1,7 @@
 package com.dp_ua.iksparser;
 
 import com.dp_ua.iksparser.bot.controller.ControllerService;
-import com.dp_ua.iksparser.element.Day;
+import com.dp_ua.iksparser.element.DayEntity;
 import com.dp_ua.iksparser.element.Match;
 import com.dp_ua.iksparser.service.CompetitionPageParser;
 import com.dp_ua.iksparser.service.Downloader;
@@ -46,12 +46,12 @@ public class App implements ApplicationListener<ContextRefreshedEvent>, Ordered 
     private void parseURL(String url, String surname) {
         Document document = downloader.getDocument(url);
 
-        List<Day> days = competitionPageParser.getParsedDays(document);
+        List<DayEntity> days = competitionPageParser.getParsedDays(document);
         printCompetitionInfo(days);
         findEventsWithParticipant(days, surname);
     }
 
-    private void findEventsWithParticipant(List<Day> days, String surname) {
+    private void findEventsWithParticipant(List<DayEntity> days, String surname) {
         List<Match> matches = new ArrayList<>();
 
         days.forEach(day -> matches.addAll(day.findMatchesBySurname(surname)));
@@ -69,7 +69,7 @@ public class App implements ApplicationListener<ContextRefreshedEvent>, Ordered 
         });
     }
 
-    private static void printCompetitionInfo(List<Day> days) {
+    private static void printCompetitionInfo(List<DayEntity> days) {
         days.forEach(day -> {
             String dayString = "(" + day.getDayName() + ") " + day.getDate();
             System.out.println("Day: " + dayString);
