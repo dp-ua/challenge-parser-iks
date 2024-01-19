@@ -1,8 +1,6 @@
 package com.dp_ua.iksparser.element;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,6 +22,8 @@ public class DayEntity extends DomainElement {
     @ManyToOne
     @JoinColumn(name = "competition_id")
     private CompetitionEntity competition;
+    @OneToMany(mappedBy = "day", cascade = CascadeType.ALL)
+    private List<HeatEntity> heats;
 
     private List<EventEntity> events;
 
