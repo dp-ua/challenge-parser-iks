@@ -1,21 +1,21 @@
 package com.dp_ua.iksparser.dba;
 
-import com.dp_ua.iksparser.element.Competition;
+import com.dp_ua.iksparser.element.CompetitionEntity;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface CompetitionRepo extends CrudRepository<Competition, Long> {
-    Competition findByName(String name);
+public interface CompetitionRepo extends CrudRepository<CompetitionEntity, Long> {
+    CompetitionEntity findByName(String name);
 
-    Competition findByNameAndBeginDateAndUrl(String name, String beginDate, String url);
+    CompetitionEntity findByNameAndBeginDateAndUrl(String name, String beginDate, String url);
 
-    List<Competition> findAllByOrderByUpdated();
+    List<CompetitionEntity> findAllByOrderByUpdated();
 
-    List<Competition> findAllByOrderByBeginDate();
+    List<CompetitionEntity> findAllByOrderByBeginDate();
 
-    List<Competition> findAllByOrderByBeginDateDesc();
+    List<CompetitionEntity> findAllByOrderByBeginDateDesc();
 }
 

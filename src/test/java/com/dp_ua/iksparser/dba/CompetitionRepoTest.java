@@ -1,7 +1,7 @@
 package com.dp_ua.iksparser.dba;
 
 import com.dp_ua.iksparser.MockBotControllerTest;
-import com.dp_ua.iksparser.element.Competition;
+import com.dp_ua.iksparser.element.CompetitionEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,7 +22,7 @@ public class CompetitionRepoTest extends MockBotControllerTest {
     @Test
     public void shouldSaveAndRetrieveCompetition() {
 // given
-        Competition competition = new Competition();
+        CompetitionEntity competition = new CompetitionEntity();
         String expectedName = "Test competition";
         String expectedBegin = LocalDate.of(2020, 1, 1).toString();
         String expectedEnd = LocalDate.of(2020, 1, 2).toString();
@@ -35,11 +35,11 @@ public class CompetitionRepoTest extends MockBotControllerTest {
         log.info("competition before save: " + competition);
 
         // when
-        Competition savedCompetition = repo.save(competition);
+        CompetitionEntity savedCompetition = repo.save(competition);
         log.info("competition after save: " + savedCompetition);
 
         // then
-        Competition competitionFromDb = repo.findByName("Test competition");
+        CompetitionEntity competitionFromDb = repo.findByName("Test competition");
         log.info("competitionFromDb: " + competitionFromDb);
 
         assert competitionFromDb != null;

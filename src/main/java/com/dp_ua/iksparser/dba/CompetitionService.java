@@ -1,6 +1,6 @@
 package com.dp_ua.iksparser.dba;
 
-import com.dp_ua.iksparser.element.Competition;
+import com.dp_ua.iksparser.element.CompetitionEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -16,33 +16,33 @@ public class CompetitionService {
         this.repo = repo;
     }
 
-    public List<Competition> findAllOrderByUpdated() {
+    public List<CompetitionEntity> findAllOrderByUpdated() {
         return repo.findAllByOrderByUpdated();
     }
 
-    public List<Competition> findAllOrderByBeginDate(boolean reverse) {
+    public List<CompetitionEntity> findAllOrderByBeginDate(boolean reverse) {
         if (reverse) {
             return repo.findAllByOrderByBeginDateDesc();
         }
         return repo.findAllByOrderByBeginDate();
     }
 
-    public Competition getFreshestCompetition() {
-        List<Competition> competitions = findAllOrderByUpdated();
+    public CompetitionEntity getFreshestCompetition() {
+        List<CompetitionEntity> competitions = findAllOrderByUpdated();
         if (competitions.isEmpty()) {
             return null;
         }
         return competitions.get(0);
     }
 
-    public List<Competition> findAll() {
-        List<Competition> competitions = new ArrayList<>();
+    public List<CompetitionEntity> findAll() {
+        List<CompetitionEntity> competitions = new ArrayList<>();
         repo.findAll().forEach(competitions::add);
         return competitions;
     }
 
-    public Competition saveOrUpdate(Competition competition) {
-        Competition competitionFromDb = repo.findByNameAndBeginDateAndUrl(
+    public CompetitionEntity saveOrUpdate(CompetitionEntity competition) {
+        CompetitionEntity competitionFromDb = repo.findByNameAndBeginDateAndUrl(
                 competition.getName(),
                 competition.getBeginDate(),
                 competition.getUrl()
@@ -54,5 +54,9 @@ public class CompetitionService {
             repo.save(competitionFromDb);
         }
         return competitionFromDb;
+    }
+
+    public CompetitionEntity findById(long commandArgument) {
+        return repo.findById(commandArgument).orElse(null);
     }
 }
