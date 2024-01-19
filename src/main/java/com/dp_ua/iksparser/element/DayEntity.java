@@ -23,8 +23,6 @@ public class DayEntity extends DomainElement {
     @JoinColumn(name = "competition_id")
     private CompetitionEntity competition;
     @OneToMany(mappedBy = "day", cascade = CascadeType.ALL)
-    private List<HeatEntity> heats;
-
     private List<EventEntity> events;
 
     public DayEntity(String date, String dateId, String dayName, String dayNameEn) {

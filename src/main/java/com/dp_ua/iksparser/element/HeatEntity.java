@@ -17,7 +17,7 @@ public class HeatEntity extends DomainElement {
     @OneToMany(mappedBy = "heat", cascade = CascadeType.ALL)
     private List<HeatLineEntity> heatLines;
     @ManyToOne
-    @JoinColumn(name = "day_id")
-    private DayEntity day;
+    @JoinColumn(name = "event_id")
+    private EventEntity event;
 
 }
