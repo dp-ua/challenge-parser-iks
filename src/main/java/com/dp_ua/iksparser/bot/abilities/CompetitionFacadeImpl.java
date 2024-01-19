@@ -174,7 +174,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                                     .append("\uD83D\uDD17")
                                     .append(LINK_END)
                                     .append(LINK_SEPARATOR)
-                                    .append(URL).append(competition.getUrl()) // URL;
+                                    .append(competition.getUrl()) // URL;
                                     .append(LINK_SEPARATOR_END);
 
                             return sb.toString();
@@ -228,6 +228,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         List<Competition> competitions = mainPageParser.getParsedCompetitions(document);
         competitions
                 .forEach(c -> {
+                    c.setUrl(URL + c.getUrl());
                     Competition competition = competitionService.saveOrUpdate(c);
                     log.info("Competition: " + competition);
                 });
