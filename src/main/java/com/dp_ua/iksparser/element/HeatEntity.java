@@ -14,14 +14,14 @@ import java.util.List;
 @NoArgsConstructor
 public class HeatEntity extends DomainElement {
     private String name;
-    private List<Participant> participants;
+    private List<ParticipantEntity> participants;
 
     public HeatEntity(String heatName) {
         this.name = heatName;
         participants = new ArrayList<>();
     }
 
-    public void addParticipant(Participant participant) {
+    public void addParticipant(ParticipantEntity participant) {
         participants.add(participant);
     }
 }

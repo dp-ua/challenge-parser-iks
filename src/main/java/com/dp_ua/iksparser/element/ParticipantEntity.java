@@ -1,5 +1,6 @@
 package com.dp_ua.iksparser.element;
 
+import jakarta.persistence.Entity;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,7 +10,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @EqualsAndHashCode
-public class Participant {
+@Entity
+public class ParticipantEntity extends DomainElement {
     private String lane;
     private String bib;
     private String surname;

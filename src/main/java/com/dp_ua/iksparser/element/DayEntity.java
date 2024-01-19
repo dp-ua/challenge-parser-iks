@@ -47,7 +47,7 @@ public class DayEntity extends DomainElement {
 
         for (EventEntity event : events) {
             for (HeatEntity heat : event.getHeats()) {
-                for (Participant participant : heat.getParticipants()) {
+                for (ParticipantEntity participant : heat.getParticipants()) {
                     if (participant.getSurname().toLowerCase().equals(strToMatch)) {
                         // Найдено совпадение - сохраняем информацию о нем
                         matches.add(new Match(this, event, heat, participant));

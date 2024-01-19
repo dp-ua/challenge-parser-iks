@@ -1,7 +1,7 @@
 package com.dp_ua.iksparser.service;
 
 import com.dp_ua.iksparser.element.HeatEntity;
-import com.dp_ua.iksparser.element.Participant;
+import com.dp_ua.iksparser.element.ParticipantEntity;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
@@ -27,7 +27,7 @@ public class EventPageParser {
             rows.forEach(row -> {
                 Elements cells = row.select("td");
                 if (cells.size() == 11) {
-                    Participant participant = new Participant();
+                    ParticipantEntity participant = new ParticipantEntity();
                     participant.setLane(cells.get(0).text());
                     participant.setBib(cells.get(1).text());
 //                    participant.setSb(cells.get(2).text());

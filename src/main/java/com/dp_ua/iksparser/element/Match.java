@@ -12,5 +12,5 @@ public class Match {
     private DayEntity day;
     private EventEntity event;
     private HeatEntity heat;
-    private Participant participant;
+    private ParticipantEntity participant;
 }
