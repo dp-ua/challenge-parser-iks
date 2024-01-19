@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
 @ToString
 @Entity
@@ -15,10 +15,7 @@ import java.time.LocalDateTime;
         @Index(name = "idx_name", columnList = "name"),
         @Index(name = "idx_NameDateUrl", columnList = "name,beginDate,url")
 })
-public class Competition {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+public class CompetitionEntity extends DomainElement {
 
     private String url;
     private String beginDate;
@@ -27,27 +24,11 @@ public class Competition {
     private String country;
     private String city;
 
-    @Column(updatable = false)
-    private String created;
+    @OneToMany(mappedBy = "competition", cascade = CascadeType.ALL)
+    private List<DayEntity> days;
 
-    private String updated;
 
-    @PrePersist
-    protected void onCreate() {
-        created = LocalDateTime.now().toString();
-        updated = LocalDateTime.now().toString();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updated = LocalDateTime.now().toString();
-    }
-
-    public LocalDateTime getUpdatedTime() {
-        return LocalDateTime.parse(updated);
-    }
-
-    public void fillCompetition(Competition competition) {
+    public void fillCompetition(CompetitionEntity competition) {
         this.url = competition.getUrl();
         this.beginDate = competition.getBeginDate();
         this.endDate = competition.getEndDate();
