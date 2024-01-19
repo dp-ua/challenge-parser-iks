@@ -1,7 +1,7 @@
 package com.dp_ua.iksparser.service;
 
-import com.dp_ua.iksparser.element.Day;
-import com.dp_ua.iksparser.element.Event;
+import com.dp_ua.iksparser.element.DayEntity;
+import com.dp_ua.iksparser.element.EventEntity;
 import com.dp_ua.iksparser.element.Heat;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Document;
@@ -25,19 +25,19 @@ public class CompetitionPageParser {
         this.pageParser = pageParser;
     }
 
-    public List<Day> getParsedDays(Document document) {
-        List<Day> days = getUnfilledDays(document);
+    public List<DayEntity> getParsedDays(Document document) {
+        List<DayEntity> days = getUnfilledDays(document);
         days.forEach(day -> {
-            List<Event> events = getEvents(document, day.getDateId());
+            List<EventEntity> events = getEvents(document, day.getDateId());
             events.forEach(day::addEvent);
         });
         return days;
     }
 
-    public List<Day> getUnfilledDays(Document document) {
+    public List<DayEntity> getUnfilledDays(Document document) {
         Elements days = document.select("ul#timetable li a");
         checkDays(days);
-        List<Day> result = new ArrayList<>();
+        List<DayEntity> result = new ArrayList<>();
         for (Element day : days) {
             String dayText = day.text();
             String dayId = day.attr("href").substring(1);
@@ -53,21 +53,21 @@ public class CompetitionPageParser {
         }
     }
 
-    private List<Event> getUnfilledEvents(Document document, String dayId) {
-        List<Event> events = new ArrayList<>();
+    private List<EventEntity> getUnfilledEvents(Document document, String dayId) {
+        List<EventEntity> events = new ArrayList<>();
         Elements rows = document.select("div#timetable-" + dayId + " table tbody tr");
         checkEvents(rows);
         for (Element row : rows) {
-            Event event = parseEvent(row);
+            EventEntity event = parseEvent(row);
             events.add(event);
         }
         log.info("For day[" + dayId + "] Events count: " + events.size());
         return events;
     }
 
-    public List<Event> getEvents(Document document, String dayId) {
+    public List<EventEntity> getEvents(Document document, String dayId) {
 
-        List<Event> events = getUnfilledEvents(document, dayId);
+        List<EventEntity> events = getUnfilledEvents(document, dayId);
 
         events.forEach(event -> {
             String url = event.getStartListUrl();
@@ -91,7 +91,7 @@ public class CompetitionPageParser {
         }
     }
 
-    public Event parseEvent(Element row) {
+    public EventEntity parseEvent(Element row) {
         Elements columns = row.select("td");
         String time = columns.get(0).text();
         String eventName = columns.get(1).childNodes().get(0).childNodes().get(0).toString();
@@ -105,6 +105,6 @@ public class CompetitionPageParser {
             log.info("No start list url for event: " + eventName);
         }
 
-        return new Event(time, eventName, category, round, startListUrl);
+        return new EventEntity(time, eventName, category, round, startListUrl);
     }
 }
