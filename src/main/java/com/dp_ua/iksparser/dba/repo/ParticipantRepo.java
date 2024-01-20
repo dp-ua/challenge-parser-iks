@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ParticipantRepo extends CrudRepository<ParticipantEntity, Long> {
+    ParticipantEntity findByUrl(String url);
 }

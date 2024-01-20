@@ -19,4 +19,18 @@ public class ParticipantService {
     public ParticipantEntity save(ParticipantEntity participant) {
         return repo.save(participant);
     }
+
+    public ParticipantEntity saveOrUpdate(ParticipantEntity participant) {
+        ParticipantEntity existingParticipant = repo.findByUrl(participant.getUrl());
+        if (existingParticipant == null) {
+            return repo.save(participant);
+        } else {
+            existingParticipant.setSurname(participant.getSurname());
+            existingParticipant.setName(participant.getName());
+            existingParticipant.setTeam(participant.getTeam());
+            existingParticipant.setRegion(participant.getRegion());
+            existingParticipant.setBorn(participant.getBorn());
+            return repo.save(existingParticipant);
+        }
+    }
 }
