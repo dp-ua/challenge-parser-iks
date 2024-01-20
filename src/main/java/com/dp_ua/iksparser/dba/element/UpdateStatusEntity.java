@@ -11,7 +11,8 @@ import lombok.Setter;
 @NoArgsConstructor
 public class UpdateStatusEntity extends DomainElement{
     private String chatId;
-    private String editMessageId;
-    private String competitionId;
+    private int editMessageId;
+    private long competitionId;
     private String status;
+    private String reason;
 }
