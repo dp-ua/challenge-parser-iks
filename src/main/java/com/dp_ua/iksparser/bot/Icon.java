@@ -11,6 +11,8 @@ public enum Icon {
     WARNING("⚠️"),
     ERROR("❗"),
     QUESTION("❓"),
+    URL("🌐"),
+    CHAIN("🔗"),
     ;
 
     private final String icon;
