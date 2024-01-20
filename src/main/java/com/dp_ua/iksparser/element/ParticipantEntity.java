@@ -2,19 +2,15 @@ package com.dp_ua.iksparser.element;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@EqualsAndHashCode
 @Entity
 public class ParticipantEntity extends DomainElement {
     private String surname;
@@ -25,4 +21,12 @@ public class ParticipantEntity extends DomainElement {
     private String url;
     @OneToMany(mappedBy = "participant", cascade = CascadeType.ALL)
     private List<HeatLineEntity> heatLines;
+
+    public ParticipantEntity() {
+        heatLines = new ArrayList<>();
+    }
+
+    public void addHeatLine(HeatLineEntity heatLine) {
+        heatLines.add(heatLine);
+    }
 }

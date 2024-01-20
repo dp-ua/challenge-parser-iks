@@ -1,5 +1,6 @@
 package com.dp_ua.iksparser.dba;
 
+import com.dp_ua.iksparser.element.ParticipantEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -10,5 +11,9 @@ public class ParticipantService {
     @Autowired
     public ParticipantService(ParticipantRepo repo) {
         this.repo = repo;
+    }
+
+    public ParticipantEntity save(ParticipantEntity participant) {
+        return repo.save(participant);
     }
 }
