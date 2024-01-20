@@ -59,4 +59,12 @@ public class CompetitionService {
     public CompetitionEntity findById(long commandArgument) {
         return repo.findById(commandArgument).orElse(null);
     }
+
+    public CompetitionEntity save(CompetitionEntity competition) {
+        return repo.save(competition);
+    }
+
+    public CompetitionEntity findByName(String name) {
+        return repo.findByName(name);
+    }
 }
