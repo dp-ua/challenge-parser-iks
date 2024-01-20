@@ -1,4 +1,4 @@
-package com.dp_ua.iksparser.element;
+package com.dp_ua.iksparser.dba.element;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -13,4 +13,6 @@ public class Match {
     private EventEntity event;
     private HeatEntity heat;
     private ParticipantEntity participant;
+    // I think this is not needed
+    // todo remove when sure
 }

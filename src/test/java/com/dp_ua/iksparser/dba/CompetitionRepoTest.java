@@ -1,7 +1,7 @@
 package com.dp_ua.iksparser.dba;
 
 import com.dp_ua.iksparser.MockBotControllerTest;
-import com.dp_ua.iksparser.element.CompetitionEntity;
+import com.dp_ua.iksparser.dba.element.CompetitionEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;

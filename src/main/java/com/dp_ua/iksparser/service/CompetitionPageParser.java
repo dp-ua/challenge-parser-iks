@@ -1,8 +1,8 @@
 package com.dp_ua.iksparser.service;
 
-import com.dp_ua.iksparser.element.DayEntity;
-import com.dp_ua.iksparser.element.EventEntity;
-import com.dp_ua.iksparser.element.Heat;
+import com.dp_ua.iksparser.dba.element.DayEntity;
+import com.dp_ua.iksparser.dba.element.EventEntity;
+import com.dp_ua.iksparser.dba.element.HeatEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -76,7 +76,7 @@ public class CompetitionPageParser {
                 return;
             }
             Document eventDocument = downloader.getDocument(url);
-            List<Heat> heats = pageParser.getHeats(eventDocument);
+            List<HeatEntity> heats = pageParser.getHeats(eventDocument);
             heats.forEach(event::addHeat);
             log.debug("For event[" + event.getEventName() + "] Heats count: " + heats.size());
         });

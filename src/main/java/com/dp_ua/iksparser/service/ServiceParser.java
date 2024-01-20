@@ -1,6 +1,6 @@
 package com.dp_ua.iksparser.service;
 
-import com.dp_ua.iksparser.element.DayEntity;
+import com.dp_ua.iksparser.dba.element.DayEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

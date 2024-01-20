@@ -1,6 +1,6 @@
 package com.dp_ua.iksparser.dba;
 
-import com.dp_ua.iksparser.element.EventEntity;
+import com.dp_ua.iksparser.dba.element.EventEntity;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

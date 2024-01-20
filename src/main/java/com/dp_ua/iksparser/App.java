@@ -1,8 +1,8 @@
 package com.dp_ua.iksparser;
 
 import com.dp_ua.iksparser.bot.controller.ControllerService;
-import com.dp_ua.iksparser.element.DayEntity;
-import com.dp_ua.iksparser.element.Match;
+import com.dp_ua.iksparser.dba.element.DayEntity;
+import com.dp_ua.iksparser.dba.element.Match;
 import com.dp_ua.iksparser.service.CompetitionPageParser;
 import com.dp_ua.iksparser.service.Downloader;
 import lombok.extern.slf4j.Slf4j;

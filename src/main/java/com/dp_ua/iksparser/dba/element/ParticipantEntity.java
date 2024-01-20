@@ -1,4 +1,4 @@
-package com.dp_ua.iksparser.element;
+package com.dp_ua.iksparser.dba.element;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;

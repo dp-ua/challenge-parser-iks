@@ -1,6 +1,6 @@
 package com.dp_ua.iksparser.service;
 
-import com.dp_ua.iksparser.element.CompetitionEntity;
+import com.dp_ua.iksparser.dba.element.CompetitionEntity;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
