@@ -13,10 +13,6 @@ public class HeatService {
         this.repo = repo;
     }
 
-    public HeatEntity saveHeat(HeatEntity heat) {
-        return repo.save(heat);
-    }
-
     public HeatEntity save(HeatEntity heat) {
         return repo.save(heat);
     }
