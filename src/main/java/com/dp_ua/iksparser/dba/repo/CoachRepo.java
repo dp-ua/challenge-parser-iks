@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CoachRepo extends CrudRepository<CoachEntity, Long> {
+    CoachEntity findByName(String name);
 }
