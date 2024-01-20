@@ -1,4 +1,4 @@
-package com.dp_ua.iksparser.dba;
+package com.dp_ua.iksparser.dba.repo;
 
 import com.dp_ua.iksparser.dba.element.HeatEntity;
 import org.springframework.data.repository.CrudRepository;

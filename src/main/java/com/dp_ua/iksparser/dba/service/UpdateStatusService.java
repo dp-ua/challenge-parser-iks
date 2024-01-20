@@ -1,5 +1,6 @@
-package com.dp_ua.iksparser.dba;
+package com.dp_ua.iksparser.dba.service;
 
+import com.dp_ua.iksparser.dba.repo.UpdateStatusRepo;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

@@ -1,4 +1,4 @@
-package com.dp_ua.iksparser.dba;
+package com.dp_ua.iksparser.dba.repo;
 
 import com.dp_ua.iksparser.dba.element.EventEntity;
 import org.springframework.data.repository.CrudRepository;
