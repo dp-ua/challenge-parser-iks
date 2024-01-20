@@ -1,16 +1,15 @@
 package com.dp_ua.iksparser.element;
 
 import jakarta.persistence.*;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@Setter
 @Entity
-@NoArgsConstructor
-@EqualsAndHashCode
 public class HeatLineEntity extends DomainElement {
     private String lane;
     private String bib;
@@ -27,4 +26,12 @@ public class HeatLineEntity extends DomainElement {
     @ManyToOne
     @JoinColumn(name = "heat_id")
     private HeatEntity heat;
+
+    public HeatLineEntity() {
+        coaches = new ArrayList<>();
+    }
+
+    public void addCoach(CoachEntity coach) {
+        coaches.add(coach);
+    }
 }

@@ -1,5 +1,6 @@
 package com.dp_ua.iksparser.dba;
 
+import com.dp_ua.iksparser.element.HeatLineEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -10,5 +11,9 @@ public class HeatLineService {
     @Autowired
     public HeatLineService(HeatLineRepo repo) {
         this.repo = repo;
+    }
+
+    public HeatLineEntity save(HeatLineEntity heatLineEntity) {
+        return repo.save(heatLineEntity);
     }
 }
