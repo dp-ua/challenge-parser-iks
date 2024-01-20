@@ -1,10 +1,12 @@
 package com.dp_ua.iksparser.dba;
 
 import com.dp_ua.iksparser.element.CoachEntity;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+@Transactional
 public class CoachService {
     private final CoachRepo repo;
 

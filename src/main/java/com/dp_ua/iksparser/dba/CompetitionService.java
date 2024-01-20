@@ -1,6 +1,7 @@
 package com.dp_ua.iksparser.dba;
 
 import com.dp_ua.iksparser.element.CompetitionEntity;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -8,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
+@Transactional
 public class CompetitionService {
     private final CompetitionRepo repo;
 
