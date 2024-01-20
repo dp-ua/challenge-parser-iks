@@ -1,19 +1,17 @@
 package com.dp_ua.iksparser.element;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@ToString
 @Getter
 @Setter
 @Slf4j
 @Entity
-@NoArgsConstructor
-@EqualsAndHashCode
 public class DayEntity extends DomainElement {
     private String date;
     private String dateId;
@@ -24,6 +22,10 @@ public class DayEntity extends DomainElement {
     private CompetitionEntity competition;
     @OneToMany(mappedBy = "day", cascade = CascadeType.ALL)
     private List<EventEntity> events;
+
+    public DayEntity() {
+        events = new ArrayList<>();
+    }
 
     public DayEntity(String date, String dateId, String dayName, String dayNameEn) {
         this.date = date;

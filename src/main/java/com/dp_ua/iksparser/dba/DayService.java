@@ -1,6 +1,5 @@
 package com.dp_ua.iksparser.dba;
 
-import com.dp_ua.iksparser.element.CompetitionEntity;
 import com.dp_ua.iksparser.element.DayEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -14,11 +13,7 @@ public class DayService {
         this.repo = repo;
     }
 
-    public DayEntity findByCompetitionAndDayNumber(CompetitionEntity competition, int dayNumber) {
-        return repo.findByCompetitionAndDayNumber(competition, dayNumber);
-    }
-
-    public void save(DayEntity day) {
-        repo.save(day);
+    public DayEntity save(DayEntity day) {
+        return repo.save(day);
     }
 }
