@@ -1,4 +1,4 @@
-package com.dp_ua.iksparser.dba;
+package com.dp_ua.iksparser.dba.repo;
 
 import com.dp_ua.iksparser.MockBotControllerTest;
 import com.dp_ua.iksparser.dba.element.CompetitionEntity;
