@@ -1,6 +1,6 @@
 package com.dp_ua.iksparser.dba;
 
-import com.dp_ua.iksparser.MockBotControllerTest;
+import com.dp_ua.iksparser.App;
 import com.dp_ua.iksparser.dba.element.*;
 import com.dp_ua.iksparser.dba.service.*;
 import lombok.extern.slf4j.Slf4j;
@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
@@ -15,7 +16,9 @@ import java.util.List;
 @Slf4j
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class ComplexDBATest extends MockBotControllerTest {
+public class ComplexDBATest {
+    @MockBean
+    App app;
     @Autowired
     private CompetitionService competitionService;
     @Autowired
@@ -106,7 +109,7 @@ public class ComplexDBATest extends MockBotControllerTest {
         assert participantFromDb.getSurname().equals("surname");
         assert participantFromDb.getName().equals("firstName");
         assert participantFromDb.getTeam().equals("team");
-        assert participantFromDb.getCity().equals("city");
+        assert participantFromDb.getRegion().equals("region");
         assert participantFromDb.getBorn().equals("born");
         assert participantFromDb.getUrl().equals("url");
 
@@ -134,7 +137,7 @@ public class ComplexDBATest extends MockBotControllerTest {
         ParticipantEntity participant = new ParticipantEntity();
         participant.setSurname("surname");
         participant.setName("firstName");
-        participant.setCity("city");
+        participant.setRegion("region");
         participant.setTeam("team");
         participant.setBorn("born");
         participant.setUrl("url");
@@ -166,10 +169,5 @@ public class ComplexDBATest extends MockBotControllerTest {
         competition.setCity("city");
         competition.setUrl("url");
         return competitionService.save(competition);
-    }
-
-    @Override
-    public void additionalSetUp() {
-
     }
 }

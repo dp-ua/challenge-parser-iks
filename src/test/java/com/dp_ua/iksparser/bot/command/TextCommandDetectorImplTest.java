@@ -1,10 +1,12 @@
 package com.dp_ua.iksparser.bot.command;
 
-import com.dp_ua.iksparser.MockBotControllerTest;
+import com.dp_ua.iksparser.App;
 import com.dp_ua.iksparser.bot.Bot;
 import com.dp_ua.iksparser.exeption.NotForMeException;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,16 +21,17 @@ import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
-public class TextCommandDetectorImplTest extends MockBotControllerTest {
+public class TextCommandDetectorImplTest {
     @MockBean
     CommandProvider commandProvider;
-
+    @MockBean
+    App app;
     @Autowired
     TextCommandDetectorImpl textCmdDetector;
     @MockBean
     Bot bot;
 
-    @Override
+    @Before
     public void additionalSetUp() {
         when(commandProvider.getCommands()).thenReturn(new ArrayList<>() {{
             add(new TestCommand());

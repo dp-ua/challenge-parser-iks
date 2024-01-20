@@ -16,7 +16,7 @@ public class ParticipantEntity extends DomainElement {
     private String surname;
     private String name;
     private String team;
-    private String city;
+    private String region;
     private String born;
     private String url;
     @OneToMany(mappedBy = "participant", cascade = CascadeType.ALL)

@@ -1,13 +1,13 @@
 package com.dp_ua.iksparser.dba.repo;
 
-import com.dp_ua.iksparser.MockBotControllerTest;
+import com.dp_ua.iksparser.App;
 import com.dp_ua.iksparser.dba.element.CompetitionEntity;
-import com.dp_ua.iksparser.dba.repo.CompetitionRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.LocalDate;
@@ -16,9 +16,11 @@ import java.time.LocalDate;
 @Slf4j
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class CompetitionRepoTest extends MockBotControllerTest {
+public class CompetitionRepoTest {
     @Autowired
     private CompetitionRepo repo;
+    @MockBean
+    App app;
 
     @Test
     public void shouldSaveAndRetrieveCompetition() {
@@ -48,10 +50,5 @@ public class CompetitionRepoTest extends MockBotControllerTest {
         assert competitionFromDb.getBeginDate().equals(expectedBegin);
         assert competitionFromDb.getEndDate().equals(expectedEnd);
         assert competitionFromDb.getUrl().equals(expectedUrl);
-    }
-
-    @Override
-    public void additionalSetUp() {
-        // nothing to do
     }
 }
