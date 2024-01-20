@@ -23,6 +23,16 @@ public class DayEntity extends DomainElement {
     @OneToMany(mappedBy = "day", cascade = CascadeType.ALL)
     private List<EventEntity> events;
 
+    @Override
+    public String toString() {
+        return "DayEntity{" +
+                "date='" + date + '\'' +
+                ", dateId='" + dateId + '\'' +
+                ", dayName='" + dayName + '\'' +
+                ", dayNameEn='" + dayNameEn + '\'' +
+                '}';
+    }
+
     public DayEntity() {
         events = new ArrayList<>();
     }
