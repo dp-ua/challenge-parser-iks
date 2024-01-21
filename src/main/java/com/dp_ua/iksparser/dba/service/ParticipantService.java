@@ -20,17 +20,28 @@ public class ParticipantService {
         return repo.save(participant);
     }
 
-    public ParticipantEntity saveOrUpdate(ParticipantEntity participant) {
-        ParticipantEntity existingParticipant = repo.findByUrl(participant.getUrl());
-        if (existingParticipant == null) {
-            return repo.save(participant);
-        } else {
-            existingParticipant.setSurname(participant.getSurname());
-            existingParticipant.setName(participant.getName());
-            existingParticipant.setTeam(participant.getTeam());
-            existingParticipant.setRegion(participant.getRegion());
-            existingParticipant.setBorn(participant.getBorn());
-            return repo.save(existingParticipant);
-        }
+    // find by this fields
+//    private String surname;
+//    private String name;
+//    private String team;
+//    private String region;
+//    private String born;
+    public ParticipantEntity findBySurnameAndNameAndTeamAndRegionAndBorn(
+            String surname,
+            String name,
+            String team,
+            String region,
+            String born
+    ) {
+        return repo.findBySurnameAndNameAndTeamAndRegionAndBorn(
+                surname,
+                name,
+                team,
+                region,
+                born
+        );
     }
+//    public ParticipantEntity findByUrl(String url) {
+//        return repo.findByUrl(url);
+//    }
 }

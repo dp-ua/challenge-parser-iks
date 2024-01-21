@@ -25,4 +25,12 @@ public class UpdateStatusService {
     public List<UpdateStatusEntity> findAllByCompetitionIdAndStatus(long competitionId, String name) {
         return repo.findAllByCompetitionIdAndStatus(competitionId, name);
     }
+
+    public void saveAll(List<UpdateStatusEntity> allByCompetitionId) {
+        repo.saveAll(allByCompetitionId);
+    }
+
+    public void flush() {
+        repo.flush();
+    }
 }

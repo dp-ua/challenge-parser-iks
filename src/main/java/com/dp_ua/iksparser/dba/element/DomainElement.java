@@ -26,13 +26,13 @@ public class DomainElement {
     protected void onCreate() {
         created = LocalDateTime.now().toString();
         updated = LocalDateTime.now().toString();
-        log.info("created: {}, {}", this.getClass().getSimpleName(), this);
+        log.debug("created: {}, {}", this.getClass().getSimpleName(), this);
     }
 
     @PreUpdate
     protected void onUpdate() {
         updated = LocalDateTime.now().toString();
-        log.info("updated: {}, {}", this.getClass().getSimpleName(), this);
+        log.debug("updated: {}, {}", this.getClass().getSimpleName(), this);
     }
 
     public LocalDateTime getUpdatedTime() {

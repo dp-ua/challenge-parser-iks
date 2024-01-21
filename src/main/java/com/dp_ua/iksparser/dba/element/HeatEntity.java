@@ -18,6 +18,13 @@ public class HeatEntity extends DomainElement {
     @JoinColumn(name = "event_id")
     private EventEntity event;
 
+    @Override
+    public String toString() {
+        return "HeatEntity{" +
+                "name='" + name + '\'' +
+                '}';
+    }
+
     public HeatEntity() {
         heatLines = new ArrayList<>();
     }

@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface UpdateStatusRepo extends CrudRepository<UpdateStatusEntity, Long> {
     List<UpdateStatusEntity> findAllByCompetitionIdAndStatus(long competitionId, String name);
+
+    void flush();
 }

@@ -23,4 +23,11 @@ public class CoachEntity extends DomainElement {
     public void addHeatLine(HeatLineEntity heatLine) {
         heatLines.add(heatLine);
     }
+
+    @Override
+    public String toString() {
+        return "CoachEntity{" +
+                "name='" + name + '\'' +
+                '}';
+    }
 }

@@ -17,5 +17,7 @@ public interface CompetitionRepo extends CrudRepository<CompetitionEntity, Long>
     List<CompetitionEntity> findAllByOrderByBeginDate();
 
     List<CompetitionEntity> findAllByOrderByBeginDateDesc();
+
+    void flush();
 }
 

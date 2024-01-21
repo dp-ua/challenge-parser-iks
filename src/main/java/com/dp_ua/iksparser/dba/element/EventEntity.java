@@ -23,6 +23,18 @@ public class EventEntity extends DomainElement {
     @JoinColumn(name = "day_id")
     private DayEntity day;
 
+    @Override
+    public String toString() {
+        return "EventEntity{" +
+                "time='" + time + '\'' +
+                ", eventName='" + eventName + '\'' +
+                ", category='" + category + '\'' +
+                ", round='" + round + '\'' +
+                ", startListUrl='" + startListUrl + '\'' +
+                ", ResultUrl='" + ResultUrl + '\'' +
+                '}';
+    }
+
     public EventEntity() {
         heats = new ArrayList<>();
     }

@@ -5,6 +5,7 @@ import com.dp_ua.iksparser.dba.element.DayEntity;
 import com.dp_ua.iksparser.dba.element.Match;
 import com.dp_ua.iksparser.service.CompetitionPageParser;
 import com.dp_ua.iksparser.service.Downloader;
+import com.dp_ua.iksparser.service.MessageCreator;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,7 @@ public class App implements ApplicationListener<ContextRefreshedEvent>, Ordered 
         BotSession botSession = botController.botConnect();
         // todo save botSession to memory
         log.info("BotSession: " + botSession);
+
     }
 
     @Override

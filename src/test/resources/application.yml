@@ -9,6 +9,7 @@ telegram:
     token: 1234567890:abcdefghijklmnopqrstuvwxyz
     name: MyBotT
     reconnectTimeout: 10000
+    adminId: 1234567890
 
 logging:
   level:

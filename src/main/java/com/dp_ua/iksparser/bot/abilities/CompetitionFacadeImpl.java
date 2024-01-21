@@ -1,10 +1,14 @@
 package com.dp_ua.iksparser.bot.abilities;
 
+import com.dp_ua.iksparser.bot.Icon;
 import com.dp_ua.iksparser.bot.performer.event.SendMessageEvent;
-import com.dp_ua.iksparser.dba.CompetitionService;
-import com.dp_ua.iksparser.element.Competition;
+import com.dp_ua.iksparser.dba.element.CompetitionEntity;
+import com.dp_ua.iksparser.dba.element.UpdateStatusEntity;
+import com.dp_ua.iksparser.dba.service.CompetitionService;
 import com.dp_ua.iksparser.service.Downloader;
 import com.dp_ua.iksparser.service.MainPageParser;
+import com.dp_ua.iksparser.service.UpdateCompetitionEvent;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,18 +23,20 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static com.dp_ua.iksparser.bot.Icon.*;
 import static com.dp_ua.iksparser.bot.performer.event.SendMessageEvent.MsgType.*;
 import static com.dp_ua.iksparser.service.MessageCreator.*;
 
 @Component
 @Slf4j
 public class CompetitionFacadeImpl implements CompetitionFacade {
-    public static final String URL = "https://iks.org.ua/";
+    public static final String URL = "https://iks.org.ua";
     public static final String COMPETITIONS_PAGE = "/competitions1/";
     public static final int COMPETITIONS_PAGE_SIZE = 4;
-    public static final int COMPETITION_NAME_LIMIT = 55;
+    public static final int COMPETITION_NAME_LIMIT = 100;
     private static final int COMPETITION_BUTTON_LIMIT = 40;
     public static final int TTL_MINUTES_COMPETITION_UPDATE = 10;
 
@@ -51,10 +57,190 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         log.info("showCompetitions. Page {}, chatId:{} ", pageNumber, chatId);
         sendTypingAction(chatId);
 
-        List<Competition> competitions = getCompetitions();
+        List<CompetitionEntity> competitions = getCompetitions();
 
-        SendMessageEvent sendMessageEvent = getSendMessageEvent(competitions, chatId, editMessageId, pageNumber);
+        publishEvent(getMessageForCompetitions(competitions, chatId, editMessageId, pageNumber));
+    }
+
+    @Override
+    @Transactional
+    public void showCompetition(String chatId, int commandArgument, Integer editMessageId) {
+        log.info("showCompetition. CommandArgument {}, chatId:{} ", commandArgument, chatId);
+        sendTypingAction(chatId);
+
+        CompetitionEntity competition = competitionService.findById(commandArgument);
+
+        if (competition == null) {
+            log.warn("Competition[{}] not found", commandArgument);
+            publishEvent(prepareSendMessageEvent(
+                    chatId, editMessageId,
+                    "Змагання не знайдено", getBackToCompetitionsKeyboard()));
+            return;
+        }
+
+        boolean competitionFilled = isCompetitionFilled(competition);
+        String text = getCompetitionDetailsText(competition, competitionFilled);
+        InlineKeyboardMarkup keyboard = getCompetitionDetailsKeyboard(competition, competitionFilled);
+
+        publishEvent(prepareSendMessageEvent(
+                chatId,
+                editMessageId,
+                text,
+                keyboard
+        ));
+        if (!competitionFilled) {
+            log.info("Competition[{}] is not filled. Going to update", competition.getId());
+            publishUpdateCompetitionMessage(chatId, editMessageId, competition);
+        }
+    }
+
+    private void publishUpdateCompetitionMessage(String chatId, Integer editMessageId, CompetitionEntity competition) {
+        UpdateStatusEntity message = new UpdateStatusEntity();
+        message.setChatId(chatId);
+        message.setCompetitionId(competition.getId());
+        message.setEditMessageId(editMessageId);
+        UpdateCompetitionEvent updateCompetitionEvent = new UpdateCompetitionEvent(this, message);
+        publisher.publishEvent(updateCompetitionEvent);
+    }
+
+    private InlineKeyboardMarkup getBackToCompetitionsKeyboard() {
+        InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
+
+        List<InlineKeyboardButton> row = getBackButton();
+        rows.add(row);
+
+        keyboard.setKeyboard(rows);
+        return keyboard;
+    }
+
+    private void publishEvent(SendMessageEvent chatId) {
+        SendMessageEvent sendMessageEvent = chatId;
         publisher.publishEvent(sendMessageEvent);
+    }
+
+    private boolean isCompetitionFilled(CompetitionEntity competition) {
+        return !competition.getDays().isEmpty();
+    }
+
+    private SendMessageEvent prepareSendMessageEvent(String chatId, Integer editMessageId, String text, InlineKeyboardMarkup keyboard) {
+        SendMessageEvent sendMessageEvent;
+        if (editMessageId == null) {
+            SendMessage message = SERVICE.getSendMessage(
+                    chatId,
+                    text,
+                    keyboard,
+                    true
+            );
+            message.disableWebPagePreview();
+            sendMessageEvent = new SendMessageEvent(this, message, SEND_MESSAGE);
+        } else {
+            EditMessageText editMessageText = SERVICE.getEditMessageText(
+                    chatId,
+                    editMessageId,
+                    text,
+                    keyboard,
+                    true);
+            editMessageText.disableWebPagePreview();
+            sendMessageEvent = new SendMessageEvent(this, editMessageText, EDIT_MESSAGE);
+        }
+        return sendMessageEvent;
+    }
+
+    private InlineKeyboardMarkup getCompetitionDetailsKeyboard(CompetitionEntity competition, boolean competitionFilled) {
+        InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
+
+        List<InlineKeyboardButton> row = getBackButton();
+        rows.add(row);
+
+        keyboard.setKeyboard(rows);
+        return keyboard;
+    }
+
+    private static List<InlineKeyboardButton> getBackButton() {
+        List<InlineKeyboardButton> row = new ArrayList<>();
+        InlineKeyboardButton button = SERVICE.getKeyboardButton(
+                "⬅️ Назад",
+                "/competitions"
+        );
+        row.add(button);
+        return row;
+    }
+
+    private String getCompetitionDetailsText(CompetitionEntity competition, boolean competitionFilled) {
+        StringBuilder sb = new StringBuilder();
+        sb
+                .append(BOLD)
+                .append(competition.getName())
+                .append(BOLD)
+                .append(END_LINE)
+                .append(END_LINE);
+        sb.append(competition.getBeginDate())
+                .append(" - ")
+                .append(competition.getEndDate())
+                .append(END_LINE)
+                .append(END_LINE);
+        sb.append(competition.getCountry())
+                .append(", ")
+                .append(competition.getCity())
+                .append(END_LINE)
+                .append(END_LINE);
+
+        sb
+                .append(LINK)
+                .append("Посилання на сайт змагань ")
+                .append(Icon.URL)
+                .append(LINK_END)
+                .append(LINK_SEPARATOR)
+                .append(competition.getUrl())
+                .append(LINK_SEPARATOR_END)
+                .append(END_LINE)
+                .append(END_LINE);
+
+        if (competitionFilled) {
+            sb
+                    .append("Тривалість днів: ")
+                    .append(BOLD)
+                    .append(competition.getDays().size())
+                    .append(BOLD)
+                    .append(END_LINE);
+
+            int participantsCount = competition.getDays().stream()
+                    .flatMap(day -> day.getEvents().stream())
+                    .flatMap(event -> event.getHeats().stream())
+                    .flatMap(heap -> heap.getHeatLines().stream())
+                    .map(heatLine -> heatLine.getParticipant())
+                    .collect(Collectors.toSet()).size();
+            sb
+                    .append("Кількість учасників: ")
+                    .append(BOLD)
+                    .append(participantsCount)
+                    .append(BOLD)
+                    .append(END_LINE);
+
+            int heatCount = competition.getDays().stream()
+                    .flatMap(day -> day.getEvents().stream())
+                    .flatMap(event -> event.getHeats().stream())
+                    .collect(Collectors.toSet()).size();
+            sb
+                    .append("Кількість стартів: ")
+                    .append(BOLD)
+                    .append(heatCount)
+                    .append(BOLD)
+                    .append(END_LINE);
+        } else {
+            sb
+                    .append(WARNING)
+                    .append(" Інформація про змагання оновлюється ")
+                    .append(WARNING)
+                    .append(END_LINE)
+                    .append(INFO)
+                    .append(" Ви отримаєете повідомлення, коли інформація буде готова ")
+                    .append(INFO)
+                    .append(END_LINE);
+        }
+        return sb.toString();
     }
 
     private void sendTypingAction(String chatId) {
@@ -63,35 +249,18 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         publisher.publishEvent(new SendMessageEvent(this, chatAction, CHAT_ACTION));
     }
 
-    private SendMessageEvent getSendMessageEvent(List<Competition> competitions, String chatId, Integer messageId, int page) {
-        List<Competition> pageList = getPage(competitions, page, COMPETITIONS_PAGE_SIZE);
+    private SendMessageEvent getMessageForCompetitions(List<CompetitionEntity> competitions, String
+            chatId, Integer messageId, int page) {
+        List<CompetitionEntity> pageList = getPage(competitions, page, COMPETITIONS_PAGE_SIZE);
 
         int totalCompetitions = competitions.size();
         String text = getText(pageList, page, totalCompetitions);
         InlineKeyboardMarkup keyboard = getKeyboard(pageList, page, totalCompetitions);
 
-        if (messageId == null) {
-            SendMessage message = SERVICE.getSendMessage(
-                    chatId,
-                    text,
-                    keyboard,
-                    true
-            );
-            message.disableWebPagePreview();
-            return new SendMessageEvent(this, message, SEND_MESSAGE);
-        } else {
-            EditMessageText editMessageText = SERVICE.getEditMessageText(
-                    chatId,
-                    messageId,
-                    text,
-                    keyboard,
-                    true);
-            editMessageText.disableWebPagePreview();
-            return new SendMessageEvent(this, editMessageText, EDIT_MESSAGE);
-        }
+        return prepareSendMessageEvent(chatId, messageId, text, keyboard);
     }
 
-    private InlineKeyboardMarkup getKeyboard(List<Competition> competitions, int page, int totalSize) {
+    private InlineKeyboardMarkup getKeyboard(List<CompetitionEntity> competitions, int page, int totalSize) {
         InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
 
@@ -116,14 +285,14 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
 
         if (page > 0) {
             InlineKeyboardButton leftPage = SERVICE.getKeyboardButton(
-                    "⬅️",
+                    PREVIOUS.toString(),
                     "/competitions " + (page - 1)
             );
             row.add(leftPage);
         }
         if (page < getTotalPages(totalSize) - 1) {
             InlineKeyboardButton rightPage = SERVICE.getKeyboardButton(
-                    "➡️",
+                    NEXT.toString(),
                     "/competitions " + (page + 1)
             );
             row.add(rightPage);
@@ -136,7 +305,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
     }
 
 
-    private String getText(List<Competition> competitions, int page, int totalCompetitions) {
+    private String getText(List<CompetitionEntity> competitions, int page, int totalCompetitions) {
         StringBuilder result = new StringBuilder();
         result
                 .append(BOLD)
@@ -150,7 +319,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                         .mapToObj(i -> {
                             StringBuilder sb = new StringBuilder();
                             sb.append(BOLD).append(i + 1).append(". ").append(BOLD); // number
-                            Competition competition = competitions.get(i);
+                            CompetitionEntity competition = competitions.get(i);
                             sb
                                     .append(ITALIC)
                                     .append(getShortName(competition.getName(), COMPETITION_NAME_LIMIT))
@@ -171,7 +340,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
 
                             sb
                                     .append(LINK)
-                                    .append("\uD83D\uDD17")
+                                    .append(CHAIN)
                                     .append(LINK_END)
                                     .append(LINK_SEPARATOR)
                                     .append(competition.getUrl()) // URL;
@@ -196,12 +365,18 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
     }
 
     private String getShortName(String text, int limit) {
+        if (limit==0) {
+            return text;
+        }
+        if (text.length() <= limit) {
+            return text;
+        }
         return SERVICE.cleanMarkdown(text)
                 .substring(0, Math.min(text.length(), limit)) +
                 "...";
     }
 
-    private List<Competition> getPage(List<Competition> competitions, int pageNumber, int pageSize) {
+    private List<CompetitionEntity> getPage(List<CompetitionEntity> competitions, int pageNumber, int pageSize) {
         int fromIndex = pageNumber * pageSize;
         int toIndex = Math.min((pageNumber + 1) * pageSize, competitions.size());
 
@@ -212,8 +387,8 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
     }
 
 
-    private List<Competition> getCompetitions() {
-        Competition competition = competitionService.getFreshestCompetition();
+    private List<CompetitionEntity> getCompetitions() {
+        CompetitionEntity competition = competitionService.getFreshestCompetition();
 
         if (isNeedToUpdate(competition)) {
             log.info("Need to update competitions");
@@ -225,16 +400,16 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
 
     private void updateCompetitions() {
         Document document = downloader.getDocument(URL + COMPETITIONS_PAGE);
-        List<Competition> competitions = mainPageParser.getParsedCompetitions(document);
+        List<CompetitionEntity> competitions = mainPageParser.getParsedCompetitions(document);
         competitions
                 .forEach(c -> {
                     c.setUrl(URL + c.getUrl());
-                    Competition competition = competitionService.saveOrUpdate(c);
+                    CompetitionEntity competition = competitionService.saveOrUpdate(c);
                     log.info("Competition: " + competition);
                 });
     }
 
-    private boolean isNeedToUpdate(Competition competition) {
+    private boolean isNeedToUpdate(CompetitionEntity competition) {
         if (competition == null) {
             return true;
         }

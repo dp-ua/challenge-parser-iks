@@ -76,12 +76,14 @@ public enum MessageCreator {
     }
 
     public SendMessageEvent getAnswerCallbackQuery(String callBackQueryId, String message) {
+        if (message == null) return null;
+        if (callBackQueryId == null) return null;
         if (!"".equals(message)) {
             AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery();
             answerCallbackQuery.setCallbackQueryId(callBackQueryId);
             answerCallbackQuery.setText(message);
             return
-                    new SendMessageEvent(this,answerCallbackQuery, ANSWER_CALLBACK_QUERY);
+                    new SendMessageEvent(this, answerCallbackQuery, ANSWER_CALLBACK_QUERY);
         }
         return null;
     }

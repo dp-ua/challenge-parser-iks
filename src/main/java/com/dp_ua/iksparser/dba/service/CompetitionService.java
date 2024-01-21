@@ -70,4 +70,8 @@ public class CompetitionService {
     public CompetitionEntity findByName(String name) {
         return repo.findByName(name);
     }
+
+    public void flush() {
+        repo.flush();
+    }
 }

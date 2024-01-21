@@ -27,6 +27,14 @@ public class HeatLineEntity extends DomainElement {
     @JoinColumn(name = "heat_id")
     private HeatEntity heat;
 
+    @Override
+    public String toString() {
+        return "HeatLineEntity{" +
+                "lane='" + lane + '\'' +
+                ", bib='" + bib + '\'' +
+                '}';
+    }
+
     public HeatLineEntity() {
         coaches = new ArrayList<>();
     }

@@ -20,14 +20,7 @@ public class CoachService {
         return repo.save(coach);
     }
 
-    public CoachEntity saveOrUpdate(String name) {
-        CoachEntity existingCoach = repo.findByName(name);
-        if (existingCoach == null) {
-            CoachEntity coach = new CoachEntity();
-            coach.setName(name);
-            return repo.save(coach);
-        } else {
-            return existingCoach;
-        }
+    public CoachEntity findByName(String name) {
+        return repo.findByName(name);
     }
 }

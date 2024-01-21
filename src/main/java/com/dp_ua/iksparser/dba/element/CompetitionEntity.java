@@ -15,7 +15,6 @@ import java.util.List;
         @Index(name = "idx_NameDateUrl", columnList = "name,beginDate,url")
 })
 public class CompetitionEntity extends DomainElement {
-
     private String name;
     private String beginDate;
     private String endDate;

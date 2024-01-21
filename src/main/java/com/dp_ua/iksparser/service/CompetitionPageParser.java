@@ -3,10 +3,13 @@ package com.dp_ua.iksparser.service;
 import com.dp_ua.iksparser.dba.element.DayEntity;
 import com.dp_ua.iksparser.dba.element.EventEntity;
 import com.dp_ua.iksparser.dba.element.HeatEntity;
+import com.dp_ua.iksparser.dba.service.DayService;
+import com.dp_ua.iksparser.dba.service.EventService;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -18,6 +21,10 @@ public class CompetitionPageParser {
     private final ServiceParser serviceParser;
     private final Downloader downloader;
     private final EventPageParser pageParser;
+    @Autowired
+    private EventService eventService;
+    @Autowired
+    private DayService dayService;
 
     public CompetitionPageParser(ServiceParser serviceParser, Downloader downloader, EventPageParser pageParser) {
         this.serviceParser = serviceParser;
@@ -29,7 +36,11 @@ public class CompetitionPageParser {
         List<DayEntity> days = getUnfilledDays(document);
         days.forEach(day -> {
             List<EventEntity> events = getEvents(document, day.getDateId());
-            events.forEach(day::addEvent);
+            events.forEach(event -> {
+                day.addEvent(event);
+                event.setDay(day);
+                dayService.save(day);
+            });
         });
         return days;
     }
@@ -41,7 +52,9 @@ public class CompetitionPageParser {
         for (Element day : days) {
             String dayText = day.text();
             String dayId = day.attr("href").substring(1);
-            result.add(serviceParser.parseDay(dayText + " (" + dayId + ")"));
+            DayEntity dayEntity = serviceParser.parseDay(dayText + " (" + dayId + ")");
+            dayService.save(dayEntity);
+            result.add(dayEntity);
         }
         log.info("Days count: " + result.size());
         return result;
@@ -59,9 +72,10 @@ public class CompetitionPageParser {
         checkEvents(rows);
         for (Element row : rows) {
             EventEntity event = parseEvent(row);
+            eventService.save(event);
             events.add(event);
         }
-        log.info("For day[" + dayId + "] Events count: " + events.size());
+        log.debug("For day[" + dayId + "] Events count: " + events.size());
         return events;
     }
 
@@ -77,12 +91,14 @@ public class CompetitionPageParser {
             }
             Document eventDocument = downloader.getDocument(url);
             List<HeatEntity> heats = pageParser.getHeats(eventDocument);
-            heats.forEach(event::addHeat);
+            heats.forEach(heat -> {
+                event.addHeat(heat);
+                heat.setEvent(event);
+                eventService.save(event);
+            });
             log.debug("For event[" + event.getEventName() + "] Heats count: " + heats.size());
         });
-
         return events;
-
     }
 
     private void checkEvents(Elements rows) {

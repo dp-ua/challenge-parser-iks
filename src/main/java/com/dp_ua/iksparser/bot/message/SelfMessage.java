@@ -1,15 +1,18 @@
 package com.dp_ua.iksparser.bot.message;
 
-public class SelfMessage implements Message{
-    @Override
-    public String getMessageText() {
-        return null;
-    }
+import lombok.Getter;
+import lombok.Setter;
 
-    @Override
-    public String getChatId() {
-        return null;
-    }
+public class SelfMessage implements Message {
+    @Getter
+    @Setter
+    private String messageText;
+    @Getter
+    @Setter
+    private String chatId;
+    @Getter
+    @Setter
+    private Integer editMessageId;
 
     @Override
     public String getUserId() {
@@ -23,16 +26,11 @@ public class SelfMessage implements Message{
 
     @Override
     public boolean hasCallbackQuery() {
-        return false;
+        return editMessageId != null;
     }
 
     @Override
     public String getCallBackQueryId() {
-        return null;
-    }
-
-    @Override
-    public Integer getEditMessageId() {
         return null;
     }
 }
