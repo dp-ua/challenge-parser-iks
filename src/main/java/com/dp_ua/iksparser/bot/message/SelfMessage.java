@@ -3,14 +3,12 @@ package com.dp_ua.iksparser.bot.message;
 import lombok.Getter;
 import lombok.Setter;
 
+@Getter
 public class SelfMessage implements Message {
-    @Getter
     @Setter
     private String messageText;
-    @Getter
     @Setter
     private String chatId;
-    @Getter
     @Setter
     private Integer editMessageId;
 
