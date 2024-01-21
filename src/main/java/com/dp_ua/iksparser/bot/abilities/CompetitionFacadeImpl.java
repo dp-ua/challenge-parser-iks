@@ -3,6 +3,7 @@ package com.dp_ua.iksparser.bot.abilities;
 import com.dp_ua.iksparser.bot.Icon;
 import com.dp_ua.iksparser.bot.performer.event.SendMessageEvent;
 import com.dp_ua.iksparser.dba.element.CompetitionEntity;
+import com.dp_ua.iksparser.dba.element.HeatLineEntity;
 import com.dp_ua.iksparser.dba.element.UpdateStatusEntity;
 import com.dp_ua.iksparser.dba.service.CompetitionService;
 import com.dp_ua.iksparser.service.Downloader;
@@ -115,8 +116,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
     }
 
     private void publishEvent(SendMessageEvent chatId) {
-        SendMessageEvent sendMessageEvent = chatId;
-        publisher.publishEvent(sendMessageEvent);
+        publisher.publishEvent(chatId);
     }
 
     private boolean isCompetitionFilled(CompetitionEntity competition) {
@@ -210,7 +210,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                     .flatMap(day -> day.getEvents().stream())
                     .flatMap(event -> event.getHeats().stream())
                     .flatMap(heap -> heap.getHeatLines().stream())
-                    .map(heatLine -> heatLine.getParticipant())
+                    .map(HeatLineEntity::getParticipant)
                     .collect(Collectors.toSet()).size();
             sb
                     .append("Кількість учасників: ")
@@ -365,7 +365,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
     }
 
     private String getShortName(String text, int limit) {
-        if (limit==0) {
+        if (limit == 0) {
             return text;
         }
         if (text.length() <= limit) {
@@ -385,7 +385,6 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         }
         return competitions.subList(fromIndex, toIndex);
     }
-
 
     private List<CompetitionEntity> getCompetitions() {
         CompetitionEntity competition = competitionService.getFreshestCompetition();

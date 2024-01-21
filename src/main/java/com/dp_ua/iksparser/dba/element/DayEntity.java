@@ -23,16 +23,6 @@ public class DayEntity extends DomainElement {
     @OneToMany(mappedBy = "day", cascade = CascadeType.ALL)
     private List<EventEntity> events;
 
-    @Override
-    public String toString() {
-        return "DayEntity{" +
-                "date='" + date + '\'' +
-                ", dateId='" + dateId + '\'' +
-                ", dayName='" + dayName + '\'' +
-                ", dayNameEn='" + dayNameEn + '\'' +
-                '}';
-    }
-
     public DayEntity() {
         events = new ArrayList<>();
     }
@@ -49,20 +39,13 @@ public class DayEntity extends DomainElement {
         events.add(event);
     }
 
-    public List<Match> findMatchesBySurname(String surname) {
-        List<Match> matches = new ArrayList<>();
-//        String strToMatch = surname.toLowerCase();
-//
-//        for (EventEntity event : events) {
-//            for (HeatEntity heat : event.getHeats()) {
-//                for (ParticipantEntity participant : heat.getParticipants()) {
-//                    if (participant.getSurname().toLowerCase().equals(strToMatch)) {
-//                        // Найдено совпадение - сохраняем информацию о нем
-//                        matches.add(new Match(this, event, heat, participant));
-//                    }
-//                }
-//            }
-//        }
-        return matches;
+    @Override
+    public String toString() {
+        return "DayEntity{" +
+                "date='" + date + '\'' +
+                ", dateId='" + dateId + '\'' +
+                ", dayName='" + dayName + '\'' +
+                ", dayNameEn='" + dayNameEn + '\'' +
+                '}';
     }
 }

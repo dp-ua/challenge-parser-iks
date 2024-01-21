@@ -100,8 +100,7 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
     private GetMessageEvent getGetMessageEvent(long competitionId, UpdateStatusEntity updateStatusEntity) {
         SelfMessage selfMessage = getSelfMessage(competitionId, updateStatusEntity);
 
-        GetMessageEvent messageEvent = new GetMessageEvent(this, selfMessage);
-        return messageEvent;
+        return new GetMessageEvent(this, selfMessage);
     }
 
     private SelfMessage getSelfMessage(long competitionId, UpdateStatusEntity updateStatusEntity) {

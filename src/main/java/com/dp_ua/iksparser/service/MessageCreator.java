@@ -14,14 +14,14 @@ import static com.dp_ua.iksparser.bot.performer.event.SendMessageEvent.MsgType.A
 
 public enum MessageCreator {
     SERVICE;
-    public static String END_LINE = "\n";
-    public static String BOLD = "*";
-    public static String ITALIC = "_";
-    public static String CODE = "`";
-    public static String LINK = "[";
-    public static String LINK_END = "]";
-    public static String LINK_SEPARATOR = "(";
-    public static String LINK_SEPARATOR_END = ")";
+    public static final String END_LINE = "\n";
+    public static final String BOLD = "*";
+    public static final String ITALIC = "_";
+    public static final String CODE = "`";
+    public static final String LINK = "[";
+    public static final String LINK_END = "]";
+    public static final String LINK_SEPARATOR = "(";
+    public static final String LINK_SEPARATOR_END = ")";
 
     public SendChatAction getChatAction(String chatId) {
         SendChatAction sendChatAction = new SendChatAction();
@@ -64,8 +64,7 @@ public enum MessageCreator {
     }
 
     public String cleanMarkdown(String input) {
-        String cleanedText = input.replaceAll("[*_`\\[\\]]", "");
-        return cleanedText;
+        return input.replaceAll("[*_`\\[\\]]", "");
     }
 
     public InlineKeyboardButton getKeyboardButton(String text, String callbackData) {
@@ -78,7 +77,7 @@ public enum MessageCreator {
     public SendMessageEvent getAnswerCallbackQuery(String callBackQueryId, String message) {
         if (message == null) return null;
         if (callBackQueryId == null) return null;
-        if (!"".equals(message)) {
+        if (!message.isEmpty()) {
             AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery();
             answerCallbackQuery.setCallbackQueryId(callBackQueryId);
             answerCallbackQuery.setText(message);

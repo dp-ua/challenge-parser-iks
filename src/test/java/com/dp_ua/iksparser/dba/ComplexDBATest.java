@@ -39,7 +39,6 @@ public class ComplexDBATest {
     @Autowired
     private CoachService coachService;
 
-
     @Test
     @Transactional
     public void shouldSaveAndLoadFullCompetition_withEntities() {
@@ -71,12 +70,9 @@ public class ComplexDBATest {
 
         competitionService.save(competition);
         competitionService.flush();
-        log.info("Competition saved: {}", competition);
-        competition = new CompetitionEntity(); // erase all data from competition
 
         // when load competition by name
         CompetitionEntity competitionFromDb = competitionService.findByName("name");
-        log.info("Competition from DB: {}", competitionFromDb);
 
         // then
         assert competitionFromDb != null;
