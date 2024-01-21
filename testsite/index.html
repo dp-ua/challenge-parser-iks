@@ -1,0 +1,511 @@
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+            
+<meta property="og:url" content="http://iks.org.ua/competitions1/en/2024.01.18_odesa" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Odeska Regional Indoor U18 Championships" />
+<meta property="og:description" content="Competition results, regulations, statistics, as well as other useful information." />
+<meta property="og:image" content="http://iks.org.ua/competitions1/competitions/2024.01.18_odesa/images/logo_competitions.png" />
+<meta property="og:image:width" content="200" />
+<meta property="og:image:height" content="100" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:locale:alternate" content="uk_UA" />
+
+        <link rel="shortcut icon" href="/competitions1/images/favicon.ico">
+    <meta name="csrf-param" content="_csrf">
+<meta name="csrf-token" content="a2Btu-jFQdoLSUT_T3bNYd4BIqCzk77KxG7BnktcTq46Nyf2u78ko0IwFaB3D7UVp3hk2en4io-JDZnNASYg_Q==">
+
+    <link href="css/bootstrap.css" rel="stylesheet">
+<link href="css/custom.css" rel="stylesheet">
+<link href="css/font-awesome.min.css" rel="stylesheet">
+<link href="css/bg.css" rel="stylesheet">
+<script src="js/jquery.js"></script>
+<script src="js/yii.js"></script>
+<script src="js/bootstrap.js"></script>
+<script src="js/bg.js"></script>
+    <title>Results by schedule - Odeska Regional Indoor U18 Championships</title>
+</head>
+<body>
+
+<header id="container-header">
+            <div class="container" id="header-logo">
+            <div class="col-xs-5 col-md-3 col-lg-3 vcenter">
+                <img src='/competitions1/images/brand.png' class="img-responsive" alt=""/>
+            </div>
+                
+<!--
+    --><div class="col-xs-6 col-md-8 col-lg-8 vcenter">
+    <img src='/competitions1/competitions/2024.01.18_odesa/images/logo_competitions.png' class="pull-right img-responsive" alt="Odeska Regional Indoor U18 Championships"/>
+</div>
+
+        </div>
+            
+<div class="header-menu">
+    <div class="navbar navbar-default">
+        <div class="container">
+            <div class="navbar-header">
+                <a href="/competitions1/" class="navbar-brand">All results</a>
+                <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            </div>
+            <div class="navbar-collapse collapse" id="navbar-main">
+                <ul class="nav navbar-nav">
+                        
+    <li class="dropdown active">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Results <span class="caret"></span></a>
+        <ul class="dropdown-menu" role="menu">
+                                
+    <li class="active"><a href="/en/competitions1/2024.01.18_odesa/live?s=3A662771-3502-45D0-A4E7-64F42A8B2BB1">Results by day <span class="sr-only">(current)</span></a></li>
+                            
+    <li class=""><a href="/en/competitions1/2024.01.18_odesa/results?s=96E7A83D-8885-4AD4-957F-B15F86431B06">Results by discipline <span class="sr-only">(current)</span></a></li>
+                    </ul>
+    </li>
+    </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li>        <a href="/competitions1/ua/2024.01.18_odesa/live?s=1C1DF1E0-6ED2-48E1-82D2-0FF5F814DC10">УКР</a>
+
+
+
+</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+    </header>
+
+    
+    <img id="bg" src="/competitions1/images/bg.jpg" alt="">
+
+
+<div class="container" id="container-body">
+    <div id="content">
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" charset="utf-8">
+    var currentDay = '18.01.24';
+    var currentTabHref = '180124';
+
+    var timetableChecksum = "";
+    var summaryChecksum = "";
+
+    function updateTimetable(ttday, data)
+    {
+       $("#timetable-" + ttday).html(
+           "<div>"+ data +"</div>"
+       );
+    }
+
+    function updateSummary(data)
+    {
+       $("#summary").html(
+           "<div>"+ data +"</div>"
+       );
+    }
+
+    function waitForChanges()
+    {
+        $.ajax({
+           type: "GET",
+           url: "https://iks.org.ua/competitions1/competitions/2024.01.18_odesa/chk/timetable.chk",
+           async: true,
+           cache: false,
+           timeout:50000,
+
+           success: function(timetableChecksumNew)
+           {
+               if (timetableChecksum.toLowerCase() !== timetableChecksumNew.toLowerCase())
+               {
+                   $.ajax({
+                       type: "GET",
+                       url: "live-timetable-async?day="+currentDay+"",
+                       async: true,
+                       cache: false,
+                       timeout:50000,
+
+                       success: function(data){
+                            updateTimetable(currentTabHref, data);
+                            timetableChecksum = timetableChecksumNew;
+                       },
+                       error: function(XMLHttpRequest, textStatus, errorThrown){
+                       }
+                   });
+               }
+           },
+           error: function(XMLHttpRequest, textStatus, errorThrown){
+           }
+        });
+
+        setTimeout(
+           waitForChanges,
+           5000
+        );
+    }
+
+    function waitForChangesSummary()
+    {
+        $.ajax({
+            type: "GET",
+            url: "https://iks.org.ua/competitions1/competitions/2024.01.18_odesa/chk/summary.chk",
+            async: true,
+            cache: false,
+            timeout:50000,
+
+            success: function(summaryChecksumNew){
+                if (summaryChecksum.toLowerCase() !== summaryChecksumNew.toLowerCase())
+                {
+                    $.ajax({
+                        type: "GET",
+                        url: "live-summary-async",
+                        async: true,
+                        cache: false,
+                        timeout:50000,
+
+                        success: function(data){
+                            updateSummary(data);
+                            summaryChecksum = summaryChecksumNew;
+                        },
+                        error: function(XMLHttpRequest, textStatus, errorThrown){
+                        }
+                    });
+                }
+
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown){
+            }
+        });
+
+        setTimeout(
+           waitForChangesSummary,
+           5000
+        );
+    }
+
+    $(document).ready(function(){
+        waitForChanges();
+        waitForChangesSummary();
+    });
+
+    function updateTab(ttday, tabHref){
+        currentDay = ttday;
+        currentTabHref = tabHref;
+        $.ajax({
+            type: "GET",
+            url: "live-timetable-async?day=" + ttday + "",
+            async: true,
+            cache: false,
+            timeout:50000,
+
+            success: function(data){
+                updateTimetable(tabHref, data);
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown){
+                setTimeout(
+                updateTab(ttday, tabHref),
+                15000);
+            }
+       });
+    }
+</script>
+
+
+<h3>
+    <div style="display: table;">
+        <span style="display: table-cell; vertical-align: middle;">
+            21.01.2024
+        </span> &nbsp;<canvas id="clock-canvas" width="40vmin" height="40vmin"></canvas>&nbsp;
+        <span id="clock-text" style="display: table-cell; vertical-align: middle;">
+            22:32
+        </span>
+    </div>
+</h3>
+<script>
+    function startTime() {
+        var today = new Date();
+        var h = today.getHours();
+        var m = today.getMinutes();
+        var s = today.getSeconds();
+        h = checkTime(h);
+        m = checkTime(m);
+        s = checkTime(s);
+        document.getElementById('clock-text').innerHTML = h + ":" + m + ":" + s;
+        var t = setTimeout(startTime, 500);
+    }
+    function checkTime(i) {
+        if (i == 0) {
+            i = "00";
+        } else if (i < 10) {  // add zero in front of numbers < 10
+            i = "0" + i
+        }
+        return i;
+    }
+    startTime();
+</script>
+<script>
+    var canvas = document.getElementById("clock-canvas");
+    var ctx = canvas.getContext("2d");
+    var radius = canvas.height / 2;
+    ctx.translate(radius, radius);
+    radius = radius * 0.9
+    setInterval(drawClock, 1000);
+
+    function drawClock() {
+        drawFace(ctx, radius);
+        drawNumbers(ctx, radius);
+        drawTime(ctx, radius);
+    }
+
+    function drawFace(ctx, radius) {
+        var grad;
+        ctx.beginPath();
+        ctx.arc(0, 0, radius, 0, 2*Math.PI);
+        ctx.fillStyle = 'white';
+        ctx.fill();
+        grad = ctx.createRadialGradient(0,0,radius*0.95, 0,0,radius*1.05);
+        grad.addColorStop(0, '#333');
+        grad.addColorStop(0.5, 'white');
+        grad.addColorStop(1, '#333');
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = radius*0.1;
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(0, 0, radius*0.1, 0, 2*Math.PI);
+        ctx.fillStyle = '#333';
+        ctx.fill();
+    }
+
+    function drawNumbers(ctx, radius) {
+        var ang;
+        var num;
+        ctx.font = radius*0.15 + "px arial";
+        ctx.textBaseline="middle";
+        ctx.textAlign="center";
+        for(num = 1; num < 13; num++){
+            ang = num * Math.PI / 6;
+            ctx.rotate(ang);
+            ctx.translate(0, -radius*0.85);
+            ctx.rotate(-ang);
+            ctx.fillText(num.toString(), 0, 0);
+            ctx.rotate(ang);
+            ctx.translate(0, radius*0.85);
+            ctx.rotate(-ang);
+        }
+    }
+
+    function drawTime(ctx, radius){
+        var now = new Date();
+        var hour = now.getHours();
+        var minute = now.getMinutes();
+        var second = now.getSeconds();
+        //hour
+        hour=hour%12;
+        hour=(hour*Math.PI/6)+
+            (minute*Math.PI/(6*60))+
+            (second*Math.PI/(360*60));
+        drawHand(ctx, hour, radius*0.5, radius*0.07);
+        //minute
+        minute=(minute*Math.PI/30)+(second*Math.PI/(30*60));
+        drawHand(ctx, minute, radius*0.8, radius*0.07);
+        // second
+        second=(second*Math.PI/30);
+        drawHand(ctx, second, radius*0.9, radius*0.02);
+    }
+
+    function drawHand(ctx, pos, length, width) {
+        ctx.beginPath();
+        ctx.lineWidth = width;
+        ctx.lineCap = "round";
+        ctx.moveTo(0,0);
+        ctx.rotate(pos);
+        ctx.lineTo(0, -length);
+        ctx.stroke();
+        ctx.rotate(-pos);
+    }
+</script><br>
+
+<ul class="nav nav-tabs" role="tablist" id="timetable">
+    
+                                    <li class=""><a href="#180124" role="tab" data-toggle="tab" onclick="updateTab('18.01.24','180124')">18.01.24 (День 1 | Day 1)</a></li>
+            </ul>
+
+ <div class="tab-content">
+
+        	<div class="tab-pane" id="180124">
+    
+		<div id="timetable-180124">
+            <div class="table-responsive"><table class="table"><thead><tr><th>Час<br><small>Time</small></th><th>Вид<br><small>Event</small></th><th>Категорія<br><small>Category</small></th><th>Коло<br><small>Round</small></th><th>Стартовий<br><small>Start List</small></th><th>Результати<br><small>Results</small></th><th>Звіти<br><small>Reports</small></th></tr></thead><tr bgcolor="#eeeeee"><td><b>13:00</b></td><td><b>Біг на 60 м з/б (0.914)<br><small>60 m hurdles (0.914)</small></b></td><td>Юнаки U18<br><small>Boys U18</small></td><td><b>Фінал<br><small>Final</small></b></td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/start?id_entry=707ffa21-b5e4-11ee-8faa-a4f933ec044f&amp;s=F71D142A-D844-4F08-9F90-5657EBD4366B')">Start</button>&nbsp;20.01.2024 19:18:35</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/result?id_entry=707ffa21-b5e4-11ee-8faa-a4f933ec044f&amp;s=9CA581B7-2CEC-46A4-9566-57A9DBFDC1C4')">Results</button>&nbsp;20.01.2024 19:18:37</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/view?id_entry=707ffa21-b5e4-11ee-8faa-a4f933ec044f&amp;s=7598AD14-3C83-4326-8A7F-10C5CC6F366B')"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>&nbsp;
+                <button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/download?id_entry=707ffa21-b5e4-11ee-8faa-a4f933ec044f&amp;s=498C0434-C454-4C69-A3EA-ECFE772831A9')"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></button>&nbsp;
+                20.01.2024 19:18:38
+                        </tr><tr bgcolor="#eeeeee"><td><b>13:00</b></td><td><b>Стрибки з жердиною<br><small>Pole Vault</small></b></td><td>Чоловіки<br><small>Men</small></td><td><b>Виставкові<br><small>Exhibition</small></b></td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/start?id_entry=1f79790f-b61b-11ee-8faa-a4f933ec044f&amp;s=CA9662F4-8D6D-4F5F-8AD0-5BC00D7E7B5B')">Start</button>&nbsp;20.01.2024 19:18:36</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/result?id_entry=1f79790f-b61b-11ee-8faa-a4f933ec044f&amp;s=8A3EC3F5-2A8D-44F1-B778-C264E0659E6E')">Results</button>&nbsp;20.01.2024 19:18:36</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/view?id_entry=1f79790f-b61b-11ee-8faa-a4f933ec044f&amp;s=4AB584B7-16DE-4BF9-8024-848267C4C11D')"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>&nbsp;
+                <button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/download?id_entry=1f79790f-b61b-11ee-8faa-a4f933ec044f&amp;s=4D3D1B14-2918-48AB-9DC0-7904BEE57D21')"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></button>&nbsp;
+                20.01.2024 19:18:38
+                        </tr><tr bgcolor="#eeeeee"><td><b>13:00</b></td><td><b>Стрибки з жердиною<br><small>Pole Vault</small></b></td><td>Юнаки U18<br><small>Boys U18</small></td><td><b>Фінал<br><small>Final</small></b></td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/start?id_entry=1f797911-b61b-11ee-8faa-a4f933ec044f&amp;s=C6543368-9077-4EAC-88E2-0AE3A6593FC6')">Start</button>&nbsp;20.01.2024 19:18:35</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/result?id_entry=1f797911-b61b-11ee-8faa-a4f933ec044f&amp;s=0CA7E632-12F7-42E3-BDE7-A97C9387FF46')">Results</button>&nbsp;20.01.2024 19:18:36</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/view?id_entry=1f797911-b61b-11ee-8faa-a4f933ec044f&amp;s=40D80266-152C-4C88-AE08-6A211A8AC4A1')"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>&nbsp;
+                <button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/download?id_entry=1f797911-b61b-11ee-8faa-a4f933ec044f&amp;s=0BBED55D-AC7A-421B-B08B-E3B99F1314E8')"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></button>&nbsp;
+                20.01.2024 19:18:38
+                        </tr><tr bgcolor="#eeeeee"><td><b>13:00</b></td><td><b>Стрибки з жердиною<br><small>Pole Vault</small></b></td><td>Дівчата U18<br><small>Girls U18</small></td><td><b>Фінал<br><small>Final</small></b></td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/start?id_entry=1f797913-b61b-11ee-8faa-a4f933ec044f&amp;s=91B5F921-45D0-4969-85C9-839A44BD58B9')">Start</button>&nbsp;20.01.2024 19:18:36</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/result?id_entry=1f797913-b61b-11ee-8faa-a4f933ec044f&amp;s=A2E8CF55-B398-43A7-8F70-A3051A6A5E11')">Results</button>&nbsp;20.01.2024 19:18:37</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/view?id_entry=1f797913-b61b-11ee-8faa-a4f933ec044f&amp;s=C99B92C9-F3B5-44AA-9488-5DFE8B421A44')"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>&nbsp;
+                <button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/download?id_entry=1f797913-b61b-11ee-8faa-a4f933ec044f&amp;s=ED977AE9-962F-49D5-83A4-A17578BDA271')"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></button>&nbsp;
+                20.01.2024 19:18:38
+                        </tr><tr bgcolor="#eeeeee"><td><b>13:00</b></td><td><b>Стрибки у довжину<br><small>Long Jump</small></b></td><td>Жінки<br><small>Women</small></td><td><b>Виставкові<br><small>Exhibition</small></b></td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/start?id_entry=1f797915-b61b-11ee-8faa-a4f933ec044f&amp;s=18D1924D-8201-4814-938B-FAF9CC9056D8')">Start</button>&nbsp;20.01.2024 19:18:35</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/result?id_entry=1f797915-b61b-11ee-8faa-a4f933ec044f&amp;s=FE53B4D7-AF6E-42CF-B853-87C5B1A4CF54')">Results</button>&nbsp;20.01.2024 19:18:37</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/view?id_entry=1f797915-b61b-11ee-8faa-a4f933ec044f&amp;s=194E86AB-D62F-4CCF-8F8C-C780F6C7E448')"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>&nbsp;
+                <button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/download?id_entry=1f797915-b61b-11ee-8faa-a4f933ec044f&amp;s=249D5916-042D-4249-949B-8AD3DFCA6133')"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></button>&nbsp;
+                20.01.2024 19:18:39
+                        </tr><tr bgcolor="#eeeeee"><td><b>13:00</b></td><td><b>Стрибки у довжину<br><small>Long Jump</small></b></td><td>Дівчата U18<br><small>Girls U18</small></td><td><b>Фінал<br><small>Final</small></b></td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/start?id_entry=707ffa0a-b5e4-11ee-8faa-a4f933ec044f&amp;s=C2F550AD-0B90-49EE-B9FD-BDD9DE3C6831')">Start</button>&nbsp;20.01.2024 19:18:35</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/result?id_entry=707ffa0a-b5e4-11ee-8faa-a4f933ec044f&amp;s=6449A95E-E6D9-45C4-9C6C-23A99CCADD20')">Results</button>&nbsp;20.01.2024 19:18:37</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/view?id_entry=707ffa0a-b5e4-11ee-8faa-a4f933ec044f&amp;s=4FF73D88-E337-4545-A740-3F7FB7E5C698')"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>&nbsp;
+                <button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/download?id_entry=707ffa0a-b5e4-11ee-8faa-a4f933ec044f&amp;s=D5A8C8D0-44B9-426D-8819-E8CFB61B8435')"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></button>&nbsp;
+                20.01.2024 19:18:39
+                        </tr><tr bgcolor="#eeeeee"><td><b>13:00</b></td><td><b>Штовхання ядра 5 кг<br><small>Shot Put 5 kg</small></b></td><td>Юнаки U18<br><small>Boys U18</small></td><td><b>Фінал<br><small>Final</small></b></td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/start?id_entry=707ffa12-b5e4-11ee-8faa-a4f933ec044f&amp;s=99F48780-4E5B-47D0-A8DB-8DF1BFA0A4AA')">Start</button>&nbsp;20.01.2024 19:18:35</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/result?id_entry=707ffa12-b5e4-11ee-8faa-a4f933ec044f&amp;s=C677A422-E797-43DB-9857-A4859D203B2F')">Results</button>&nbsp;20.01.2024 19:18:36</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/view?id_entry=707ffa12-b5e4-11ee-8faa-a4f933ec044f&amp;s=5E042157-DCCC-4026-BE15-84FA8B174B19')"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>&nbsp;
+                <button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/download?id_entry=707ffa12-b5e4-11ee-8faa-a4f933ec044f&amp;s=44A4492B-7340-4DD2-A75F-15B49CC09626')"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></button>&nbsp;
+                20.01.2024 19:18:38
+                        </tr><tr bgcolor="#eeeeee"><td><b>13:00</b></td><td><b>Штовхання ядра 3 кг<br><small>Shot Put 3 kg</small></b></td><td>Дівчата U18<br><small>Girls U18</small></td><td><b>Фінал<br><small>Final</small></b></td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/start?id_entry=707ffa14-b5e4-11ee-8faa-a4f933ec044f&amp;s=F1A1E20D-9D2D-4BFD-9A8C-6DA437D0FCED')">Start</button>&nbsp;20.01.2024 19:18:35</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/result?id_entry=707ffa14-b5e4-11ee-8faa-a4f933ec044f&amp;s=696FFFF2-1BCB-4C67-A7BC-DCD962BB8081')">Results</button>&nbsp;20.01.2024 19:18:37</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/view?id_entry=707ffa14-b5e4-11ee-8faa-a4f933ec044f&amp;s=FAACCEC4-44DB-4418-9372-60ABFD57EC79')"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>&nbsp;
+                <button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/download?id_entry=707ffa14-b5e4-11ee-8faa-a4f933ec044f&amp;s=B7A27752-577F-4AE9-83BD-9B0DEF3729A6')"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></button>&nbsp;
+                20.01.2024 19:18:38
+                        </tr><tr bgcolor="#eeeeee"><td><b>13:10</b></td><td><b>Біг на 60 м з/б (0.762)<br><small>60 m hurdles (0.762)</small></b></td><td>Дівчата U18<br><small>Girls U18</small></td><td><b>Фінал<br><small>Final</small></b></td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/start?id_entry=707ffa22-b5e4-11ee-8faa-a4f933ec044f&amp;s=EBFE6B27-4153-47AC-9E70-E36C60DC3817')">Start</button>&nbsp;20.01.2024 19:18:35</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/result?id_entry=707ffa22-b5e4-11ee-8faa-a4f933ec044f&amp;s=A068C9B5-7BD3-412E-8A8A-F2B26E3236A2')">Results</button>&nbsp;20.01.2024 19:18:37</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/view?id_entry=707ffa22-b5e4-11ee-8faa-a4f933ec044f&amp;s=31EEAE19-1A02-4830-87E2-0ECAA21C1CF5')"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>&nbsp;
+                <button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/download?id_entry=707ffa22-b5e4-11ee-8faa-a4f933ec044f&amp;s=3C1DC134-1107-496E-AD06-0418BF9EB5B2')"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></button>&nbsp;
+                20.01.2024 19:18:39
+                        </tr><tr bgcolor="#eeeeee"><td><b>13:20</b></td><td><b>Біг на 800 м<br><small>800 m</small></b></td><td>Дівчата U18<br><small>Girls U18</small></td><td><b>Фінал<br><small>Final</small></b></td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/start?id_entry=707ffa23-b5e4-11ee-8faa-a4f933ec044f&amp;s=2851C16D-8183-4A32-B094-21036580A1F1')">Start</button>&nbsp;20.01.2024 19:18:35</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/result?id_entry=707ffa23-b5e4-11ee-8faa-a4f933ec044f&amp;s=A7D4809F-BF72-4093-A4F2-DD99D324A0D0')">Results</button>&nbsp;20.01.2024 19:18:37</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/view?id_entry=707ffa23-b5e4-11ee-8faa-a4f933ec044f&amp;s=0D3A9DA1-E1EF-4B58-A8B2-49ACD7455562')"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>&nbsp;
+                <button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/download?id_entry=707ffa23-b5e4-11ee-8faa-a4f933ec044f&amp;s=712152C2-D4DE-4D2F-BC9B-22DC3134538F')"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></button>&nbsp;
+                20.01.2024 19:18:39
+                        </tr><tr bgcolor="#eeeeee"><td><b>13:20</b></td><td><b>Біг на 800 м<br><small>800 m</small></b></td><td>Жінки<br><small>Women</small></td><td><b>Виставкові<br><small>Exhibition</small></b></td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/start?id_entry=707ffa24-b5e4-11ee-8faa-a4f933ec044f&amp;s=99A1B9A8-2FCA-4C13-A73E-1070B7DF2BB7')">Start</button>&nbsp;20.01.2024 19:18:35</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/result?id_entry=707ffa24-b5e4-11ee-8faa-a4f933ec044f&amp;s=66C9822A-F597-4A67-B17C-F887189AA73E')">Results</button>&nbsp;20.01.2024 19:18:37</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/view?id_entry=707ffa24-b5e4-11ee-8faa-a4f933ec044f&amp;s=5496B0ED-8A3F-42BE-9E3A-D715F098D4C7')"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>&nbsp;
+                <button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/download?id_entry=707ffa24-b5e4-11ee-8faa-a4f933ec044f&amp;s=5A477A4B-997C-4666-8379-9DC256D193FA')"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></button>&nbsp;
+                20.01.2024 19:18:39
+                        </tr><tr bgcolor="#eeeeee"><td><b>13:40</b></td><td><b>Біг на 800 м<br><small>800 m</small></b></td><td>Юнаки U18<br><small>Boys U18</small></td><td><b>Фінал<br><small>Final</small></b></td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/start?id_entry=1f79790c-b61b-11ee-8faa-a4f933ec044f&amp;s=D54FDADA-73E3-4917-886E-24348D391313')">Start</button>&nbsp;20.01.2024 19:18:35</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/result?id_entry=1f79790c-b61b-11ee-8faa-a4f933ec044f&amp;s=29F201E9-E533-4176-8FE9-4EBCB89B0F4E')">Results</button>&nbsp;20.01.2024 19:18:36</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/view?id_entry=1f79790c-b61b-11ee-8faa-a4f933ec044f&amp;s=ABDB2317-E21C-4E6D-AF37-D4D719D627BD')"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>&nbsp;
+                <button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/download?id_entry=1f79790c-b61b-11ee-8faa-a4f933ec044f&amp;s=D0F29B95-44A2-4D37-8AC7-53820C57F78D')"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></button>&nbsp;
+                20.01.2024 19:18:38
+                        </tr><tr bgcolor="#eeeeee"><td><b>13:40</b></td><td><b>Біг на 800 м<br><small>800 m</small></b></td><td>Чоловіки<br><small>Men</small></td><td><b>Виставкові<br><small>Exhibition</small></b></td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/start?id_entry=707ffa2d-b5e4-11ee-8faa-a4f933ec044f&amp;s=62F85D13-11D6-467A-80B2-D87592773B48')">Start</button>&nbsp;20.01.2024 19:18:36</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/result?id_entry=707ffa2d-b5e4-11ee-8faa-a4f933ec044f&amp;s=7EBACAEC-8DC4-45F6-AA52-8A11ED0142A4')">Results</button>&nbsp;20.01.2024 19:18:37</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/view?id_entry=707ffa2d-b5e4-11ee-8faa-a4f933ec044f&amp;s=E1F4319F-DF25-486E-9499-9962006247A7')"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>&nbsp;
+                <button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/download?id_entry=707ffa2d-b5e4-11ee-8faa-a4f933ec044f&amp;s=735E73FD-4DD9-45C6-95C7-5D139A1BFC90')"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></button>&nbsp;
+                20.01.2024 19:18:39
+                        </tr><tr bgcolor="#eeeeee"><td><b>14:00</b></td><td><b>Біг на 60 м<br><small>60 m</small></b></td><td>Дівчата U18<br><small>Girls U18</small></td><td><b>Забіги<br><small>Heats</small></b></td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/start?id_entry=707ffa26-b5e4-11ee-8faa-a4f933ec044f&amp;s=6B28AD64-2D67-44CC-9122-671ED276B5E0')">Start</button>&nbsp;20.01.2024 19:18:35</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/result?id_entry=707ffa26-b5e4-11ee-8faa-a4f933ec044f&amp;s=25DABE29-9ED1-4EC6-AB7E-46F1FCD9C706')">Results</button>&nbsp;20.01.2024 19:18:37</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/view?id_entry=707ffa26-b5e4-11ee-8faa-a4f933ec044f&amp;s=8B53C4B0-344B-4C95-9C41-67278D41347C')"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>&nbsp;
+                <button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/download?id_entry=707ffa26-b5e4-11ee-8faa-a4f933ec044f&amp;s=7D26C0F1-2F5E-45BB-B7C1-D75117991F82')"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></button>&nbsp;
+                20.01.2024 19:18:39
+                        </tr><tr bgcolor="#eeeeee"><td><b>14:00</b></td><td><b>Стрибки у висоту<br><small>High Jump</small></b></td><td>Дівчата U18<br><small>Girls U18</small></td><td><b>Фінал<br><small>Final</small></b></td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/start?id_entry=1f797907-b61b-11ee-8faa-a4f933ec044f&amp;s=C6313E83-0910-4EEB-B32A-E9E884DE25CC')">Start</button>&nbsp;20.01.2024 19:18:34</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/result?id_entry=1f797907-b61b-11ee-8faa-a4f933ec044f&amp;s=F024C290-2B16-4F37-B420-D151D7281A58')">Results</button>&nbsp;20.01.2024 19:18:36</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/view?id_entry=1f797907-b61b-11ee-8faa-a4f933ec044f&amp;s=20671405-D78D-4676-8AF6-A2AD26CA1EE6')"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>&nbsp;
+                <button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/download?id_entry=1f797907-b61b-11ee-8faa-a4f933ec044f&amp;s=291D44C9-B250-4C01-AE52-FA8A12974439')"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></button>&nbsp;
+                20.01.2024 19:18:38
+                        </tr><tr bgcolor="#eeeeee"><td><b>14:00</b></td><td><b>Стрибки у висоту<br><small>High Jump</small></b></td><td>Юнаки U18<br><small>Boys U18</small></td><td><b>Фінал<br><small>Final</small></b></td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/start?id_entry=1f797909-b61b-11ee-8faa-a4f933ec044f&amp;s=BB2ED530-2916-47F4-A2AA-549EB3B0AB2A')">Start</button>&nbsp;20.01.2024 19:18:35</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/result?id_entry=1f797909-b61b-11ee-8faa-a4f933ec044f&amp;s=3F4D0BDA-D9B2-4D5A-A23E-4059303D8402')">Results</button>&nbsp;20.01.2024 19:18:36</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/view?id_entry=1f797909-b61b-11ee-8faa-a4f933ec044f&amp;s=17BD889F-073E-40CF-9D3C-D84BD1BA0624')"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>&nbsp;
+                <button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/download?id_entry=1f797909-b61b-11ee-8faa-a4f933ec044f&amp;s=A8C44BBA-5DDF-4A53-BF4C-8AF0D64CB36A')"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></button>&nbsp;
+                20.01.2024 19:18:38
+                        </tr><tr bgcolor="#eeeeee"><td><b>14:00</b></td><td><b>Стрибки у висоту<br><small>High Jump</small></b></td><td>Жінки<br><small>Women</small></td><td><b>Виставкові<br><small>Exhibition</small></b></td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/start?id_entry=707ffa1a-b5e4-11ee-8faa-a4f933ec044f&amp;s=092310EE-A065-4ED5-BA5D-04F8779B07DB')">Start</button>&nbsp;20.01.2024 19:18:35</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/result?id_entry=707ffa1a-b5e4-11ee-8faa-a4f933ec044f&amp;s=DD520C56-8716-4E58-A2D9-38C578161CE8')">Results</button>&nbsp;20.01.2024 19:18:37</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/view?id_entry=707ffa1a-b5e4-11ee-8faa-a4f933ec044f&amp;s=74A50855-2DEF-4B90-8B98-3B6276712379')"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>&nbsp;
+                <button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/download?id_entry=707ffa1a-b5e4-11ee-8faa-a4f933ec044f&amp;s=FD6FF5AB-F956-4DE6-9D52-57814B2FF82C')"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></button>&nbsp;
+                20.01.2024 19:18:38
+                        </tr><tr bgcolor="#eeeeee"><td><b>14:00</b></td><td><b>Стрибки у довжину<br><small>Long Jump</small></b></td><td>Юнаки U18<br><small>Boys U18</small></td><td><b>Фінал<br><small>Final</small></b></td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/start?id_entry=707ffa0c-b5e4-11ee-8faa-a4f933ec044f&amp;s=292C0168-668B-449D-BEA1-120B566CB97B')">Start</button>&nbsp;20.01.2024 19:18:35</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/result?id_entry=707ffa0c-b5e4-11ee-8faa-a4f933ec044f&amp;s=FE9FBFD0-D8EB-4714-AFA3-847F28541728')">Results</button>&nbsp;20.01.2024 19:18:37</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/view?id_entry=707ffa0c-b5e4-11ee-8faa-a4f933ec044f&amp;s=5A98589F-D1DD-4A9F-9622-8DF898770592')"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>&nbsp;
+                <button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/download?id_entry=707ffa0c-b5e4-11ee-8faa-a4f933ec044f&amp;s=0DC8A143-577F-4543-BD59-FD8E5D2A759E')"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></button>&nbsp;
+                20.01.2024 19:18:40
+                        </tr><tr bgcolor="#eeeeee"><td><b>14:30</b></td><td><b>Біг на 60 м<br><small>60 m</small></b></td><td>Юнаки U18<br><small>Boys U18</small></td><td><b>Забіги<br><small>Heats</small></b></td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/start?id_entry=707ffa29-b5e4-11ee-8faa-a4f933ec044f&amp;s=FDF850D0-A21B-4B14-BF25-C92F5E50E852')">Start</button>&nbsp;20.01.2024 19:18:35</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/result?id_entry=707ffa29-b5e4-11ee-8faa-a4f933ec044f&amp;s=0C27AD03-779C-4C12-9082-D0FEF7943E20')">Results</button>&nbsp;20.01.2024 19:18:37</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/view?id_entry=707ffa29-b5e4-11ee-8faa-a4f933ec044f&amp;s=4A13F335-29BD-4615-BE09-24B21E65B6A9')"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>&nbsp;
+                <button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/download?id_entry=707ffa29-b5e4-11ee-8faa-a4f933ec044f&amp;s=3715B31A-B12C-4B0C-83EF-464052170BC9')"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></button>&nbsp;
+                20.01.2024 19:18:39
+                        </tr><tr bgcolor="#eeeeee"><td><b>14:30</b></td><td><b>Біг на 60 м<br><small>60 m</small></b></td><td>Чоловіки<br><small>Men</small></td><td><b>Виставкові<br><small>Exhibition</small></b></td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/start?id_entry=707ffa2c-b5e4-11ee-8faa-a4f933ec044f&amp;s=AF05FA54-5482-472C-ADCF-C201B0F99491')">Start</button>&nbsp;20.01.2024 19:18:35</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/result?id_entry=707ffa2c-b5e4-11ee-8faa-a4f933ec044f&amp;s=7A212A0A-5AD0-4E6B-AE12-54D7A767A24A')">Results</button>&nbsp;20.01.2024 19:18:37</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/view?id_entry=707ffa2c-b5e4-11ee-8faa-a4f933ec044f&amp;s=8FD318AD-28B7-46CC-AAE7-EF64B17471C1')"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>&nbsp;
+                <button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/download?id_entry=707ffa2c-b5e4-11ee-8faa-a4f933ec044f&amp;s=EAC63B11-B0CA-4D7E-8FBC-EA8062E2505E')"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></button>&nbsp;
+                20.01.2024 19:18:39
+                        </tr><tr bgcolor="#eeeeee"><td><b>15:00</b></td><td><b>Біг на 1500 м<br><small>1500 m</small></b></td><td>Дівчата U18<br><small>Girls U18</small></td><td><b>Фінал<br><small>Final</small></b></td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/start?id_entry=707ffa31-b5e4-11ee-8faa-a4f933ec044f&amp;s=41D11BCD-85CE-4E53-B4AB-8280C0E61E33')">Start</button>&nbsp;20.01.2024 19:18:36</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/result?id_entry=707ffa31-b5e4-11ee-8faa-a4f933ec044f&amp;s=526AA8BC-8DF4-4D59-A85B-C23EB82C67B7')">Results</button>&nbsp;20.01.2024 19:18:37</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/view?id_entry=707ffa31-b5e4-11ee-8faa-a4f933ec044f&amp;s=FF57A4E5-A03E-4168-876E-38159BC6B337')"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>&nbsp;
+                <button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/download?id_entry=707ffa31-b5e4-11ee-8faa-a4f933ec044f&amp;s=505FEE78-0AE1-4331-8C3B-84B340451837')"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></button>&nbsp;
+                20.01.2024 19:18:39
+                        </tr><tr bgcolor="#eeeeee"><td><b>15:00</b></td><td><b>Біг на 1500 м<br><small>1500 m</small></b></td><td>Жінки<br><small>Women</small></td><td><b>Виставкові<br><small>Exhibition</small></b></td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/start?id_entry=707ffa32-b5e4-11ee-8faa-a4f933ec044f&amp;s=6C796536-C92A-496D-9F43-35405711AAF2')">Start</button>&nbsp;20.01.2024 19:18:36</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/result?id_entry=707ffa32-b5e4-11ee-8faa-a4f933ec044f&amp;s=62ECF501-E969-425B-9B74-6A86ED09B0E9')">Results</button>&nbsp;20.01.2024 19:18:37</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/view?id_entry=707ffa32-b5e4-11ee-8faa-a4f933ec044f&amp;s=C8BD724D-8999-4826-A283-C44F5618A4D9')"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>&nbsp;
+                <button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/download?id_entry=707ffa32-b5e4-11ee-8faa-a4f933ec044f&amp;s=FC757E6C-8BF9-454B-ACA9-54620999AD71')"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></button>&nbsp;
+                20.01.2024 19:18:39
+                        </tr><tr bgcolor="#eeeeee"><td><b>15:10</b></td><td><b>Біг на 1500 м<br><small>1500 m</small></b></td><td>Юнаки U18<br><small>Boys U18</small></td><td><b>Фінал<br><small>Final</small></b></td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/start?id_entry=707ffa30-b5e4-11ee-8faa-a4f933ec044f&amp;s=36498377-137B-4D0B-8FC4-1922DDC8FA7A')">Start</button>&nbsp;20.01.2024 19:18:36</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/result?id_entry=707ffa30-b5e4-11ee-8faa-a4f933ec044f&amp;s=AC4BF199-267F-4DD7-8EB4-E766D744FD1E')">Results</button>&nbsp;20.01.2024 19:18:37</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/view?id_entry=707ffa30-b5e4-11ee-8faa-a4f933ec044f&amp;s=E4341F08-BEFA-470B-A624-DD198AEF0E2D')"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>&nbsp;
+                <button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/download?id_entry=707ffa30-b5e4-11ee-8faa-a4f933ec044f&amp;s=97A9998E-E369-47CA-9497-65931A10D9A8')"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></button>&nbsp;
+                20.01.2024 19:18:40
+                        </tr><tr bgcolor="#eeeeee"><td><b>15:10</b></td><td><b>Потрійний стрибок<br><small>Triple Jump</small></b></td><td>Дівчата U18<br><small>Girls U18</small></td><td><b>Фінал<br><small>Final</small></b></td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/start?id_entry=707ffa0e-b5e4-11ee-8faa-a4f933ec044f&amp;s=754BEFE2-A3C6-4475-9B63-8429127C6A21')">Start</button>&nbsp;20.01.2024 19:18:34</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/result?id_entry=707ffa0e-b5e4-11ee-8faa-a4f933ec044f&amp;s=1211CECD-AF0B-4C6D-96DE-524FC55BEFA5')">Results</button>&nbsp;20.01.2024 19:18:36</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/view?id_entry=707ffa0e-b5e4-11ee-8faa-a4f933ec044f&amp;s=8B3E0435-717A-4C57-996F-092E6870C318')"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>&nbsp;
+                <button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/download?id_entry=707ffa0e-b5e4-11ee-8faa-a4f933ec044f&amp;s=C13E58BA-99A2-4FF2-8A39-97A57F131811')"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></button>&nbsp;
+                20.01.2024 19:18:38
+                        </tr><tr bgcolor="#eeeeee"><td><b>15:10</b></td><td><b>Потрійний стрибок<br><small>Triple Jump</small></b></td><td>Юнаки U18<br><small>Boys U18</small></td><td><b>Фінал<br><small>Final</small></b></td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/start?id_entry=707ffa10-b5e4-11ee-8faa-a4f933ec044f&amp;s=10F0AE0D-439C-4D4B-BD90-138DFA492DC6')">Start</button>&nbsp;20.01.2024 19:18:35</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/result?id_entry=707ffa10-b5e4-11ee-8faa-a4f933ec044f&amp;s=92E96382-415D-4889-A4D2-C03F50235120')">Results</button>&nbsp;20.01.2024 19:18:36</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/view?id_entry=707ffa10-b5e4-11ee-8faa-a4f933ec044f&amp;s=442BB3BA-BAC2-4833-992D-C0E56056E66A')"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>&nbsp;
+                <button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/download?id_entry=707ffa10-b5e4-11ee-8faa-a4f933ec044f&amp;s=F5781955-FFBC-4D37-B754-053DAEAA4E5F')"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></button>&nbsp;
+                20.01.2024 19:18:38
+                        </tr><tr bgcolor="#eeeeee"><td><b>15:20</b></td><td><b>Біг на 60 м<br><small>60 m</small></b></td><td>Дівчата U18<br><small>Girls U18</small></td><td><b>Фінал<br><small>Final</small></b></td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/start?id_entry=707ffa28-b5e4-11ee-8faa-a4f933ec044f&amp;s=B2DB87FF-D849-4664-BDEA-5BB3C27E8524')">Start</button>&nbsp;20.01.2024 19:18:35</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/result?id_entry=707ffa28-b5e4-11ee-8faa-a4f933ec044f&amp;s=970E0C2A-2E3A-411D-9B61-58B61089717C')">Results</button>&nbsp;20.01.2024 19:18:37</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/view?id_entry=707ffa28-b5e4-11ee-8faa-a4f933ec044f&amp;s=954A33DF-B94A-45CE-8E08-D60D30494136')"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>&nbsp;
+                <button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/download?id_entry=707ffa28-b5e4-11ee-8faa-a4f933ec044f&amp;s=DC5A9445-A4C1-4A5B-8329-25EDBA505FA3')"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></button>&nbsp;
+                20.01.2024 19:18:39
+                        </tr><tr bgcolor="#eeeeee"><td><b>15:25</b></td><td><b>Біг на 60 м<br><small>60 m</small></b></td><td>Юнаки U18<br><small>Boys U18</small></td><td><b>Фінал<br><small>Final</small></b></td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/start?id_entry=707ffa2b-b5e4-11ee-8faa-a4f933ec044f&amp;s=24725699-BE6B-4E41-87DB-79360BBC9B01')">Start</button>&nbsp;20.01.2024 19:18:35</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/result?id_entry=707ffa2b-b5e4-11ee-8faa-a4f933ec044f&amp;s=CF4FC73F-27D6-472B-B459-B4D8818EFE99')">Results</button>&nbsp;20.01.2024 19:18:37</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/view?id_entry=707ffa2b-b5e4-11ee-8faa-a4f933ec044f&amp;s=38C02009-D946-4C41-ADC0-1E4619A1B972')"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>&nbsp;
+                <button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/download?id_entry=707ffa2b-b5e4-11ee-8faa-a4f933ec044f&amp;s=7B02F483-B141-4041-B094-6F67A12DD5C9')"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></button>&nbsp;
+                20.01.2024 19:18:39
+                        </tr><tr bgcolor="#eeeeee"><td><b>15:35</b></td><td><b>Біг на 400 м<br><small>400 m</small></b></td><td>Дівчата U18<br><small>Girls U18</small></td><td><b>Фінал<br><small>Final</small></b></td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/start?id_entry=707ffa34-b5e4-11ee-8faa-a4f933ec044f&amp;s=76808251-B22D-45E2-A634-5BAFDD108DE3')">Start</button>&nbsp;20.01.2024 19:18:36</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/result?id_entry=707ffa34-b5e4-11ee-8faa-a4f933ec044f&amp;s=383D27F8-0CDF-4D94-99DF-B718627E1005')">Results</button>&nbsp;20.01.2024 19:18:37</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/view?id_entry=707ffa34-b5e4-11ee-8faa-a4f933ec044f&amp;s=5FB0ABF1-4299-4C18-8B43-503E732C0401')"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>&nbsp;
+                <button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/download?id_entry=707ffa34-b5e4-11ee-8faa-a4f933ec044f&amp;s=7D67DB20-17B8-484D-B49C-0DBCE0599F4A')"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></button>&nbsp;
+                20.01.2024 19:18:40
+                        </tr><tr bgcolor="#eeeeee"><td><b>15:35</b></td><td><b>Біг на 400 м<br><small>400 m</small></b></td><td>Жінки<br><small>Women</small></td><td><b>Виставкові<br><small>Exhibition</small></b></td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/start?id_entry=707ffa35-b5e4-11ee-8faa-a4f933ec044f&amp;s=EBD6F705-BF01-41B5-9DC9-D1498157D495')">Start</button>&nbsp;20.01.2024 19:18:36</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/result?id_entry=707ffa35-b5e4-11ee-8faa-a4f933ec044f&amp;s=5956BCEC-05FD-4D66-A6F0-19B558B2EC22')">Results</button>&nbsp;20.01.2024 19:18:37</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/view?id_entry=707ffa35-b5e4-11ee-8faa-a4f933ec044f&amp;s=FC903944-6DEE-4032-A06D-C5681BF45B06')"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>&nbsp;
+                <button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/download?id_entry=707ffa35-b5e4-11ee-8faa-a4f933ec044f&amp;s=FEEFBE12-3433-4EE9-9F02-CB9843FD62C5')"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></button>&nbsp;
+                20.01.2024 19:18:40
+                        </tr><tr bgcolor="#eeeeee"><td><b>15:50</b></td><td><b>Біг на 400 м<br><small>400 m</small></b></td><td>Юнаки U18<br><small>Boys U18</small></td><td><b>Фінал<br><small>Final</small></b></td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/start?id_entry=707ffa36-b5e4-11ee-8faa-a4f933ec044f&amp;s=B2C5755C-F8B4-478A-99FB-42D29DB249A7')">Start</button>&nbsp;20.01.2024 19:18:36</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/result?id_entry=707ffa36-b5e4-11ee-8faa-a4f933ec044f&amp;s=ADC6655B-2910-4AC0-8682-0BE75FDCB143')">Results</button>&nbsp;20.01.2024 19:18:37</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/view?id_entry=707ffa36-b5e4-11ee-8faa-a4f933ec044f&amp;s=738ED9FF-9D20-4682-A470-32440C446FAB')"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>&nbsp;
+                <button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/download?id_entry=707ffa36-b5e4-11ee-8faa-a4f933ec044f&amp;s=0CE5D360-6FC0-43AA-B027-B867106D3C89')"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></button>&nbsp;
+                20.01.2024 19:18:40
+                        </tr><tr bgcolor="#eeeeee"><td><b>16:05</b></td><td><b>Біг на 200 м<br><small>200 m</small></b></td><td>Жінки<br><small>Women</small></td><td><b>Виставкові<br><small>Exhibition</small></b></td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/start?id_entry=1f797916-b61b-11ee-8faa-a4f933ec044f&amp;s=8AA489CC-7128-48F0-823B-FBA330A9226A')">Start</button>&nbsp;20.01.2024 19:18:36</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/result?id_entry=1f797916-b61b-11ee-8faa-a4f933ec044f&amp;s=8817D056-58FC-4438-9B9F-73EC110CD8E1')">Results</button>&nbsp;20.01.2024 19:18:37</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/view?id_entry=1f797916-b61b-11ee-8faa-a4f933ec044f&amp;s=95ABA4D2-8EDC-4572-B3A7-8E12A2934D64')"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>&nbsp;
+                <button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/download?id_entry=1f797916-b61b-11ee-8faa-a4f933ec044f&amp;s=BE19DC6F-DE4F-4F38-A3D5-CCB63DD2437C')"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></button>&nbsp;
+                20.01.2024 19:18:39
+                        </tr><tr bgcolor="#eeeeee"><td><b>16:05</b></td><td><b>Біг на 200 м<br><small>200 m</small></b></td><td>Дівчата U18<br><small>Girls U18</small></td><td><b>Фінал<br><small>Final</small></b></td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/start?id_entry=707ffa37-b5e4-11ee-8faa-a4f933ec044f&amp;s=A9152D3B-31B7-4E9F-B5F9-DDD661E52676')">Start</button>&nbsp;20.01.2024 19:18:36</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/result?id_entry=707ffa37-b5e4-11ee-8faa-a4f933ec044f&amp;s=D21325B8-EAF8-4D77-89C7-A8D2C9AD82A0')">Results</button>&nbsp;20.01.2024 19:18:37</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/view?id_entry=707ffa37-b5e4-11ee-8faa-a4f933ec044f&amp;s=554E6761-225D-487C-A936-71EEDAA71F8D')"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>&nbsp;
+                <button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/download?id_entry=707ffa37-b5e4-11ee-8faa-a4f933ec044f&amp;s=4C5DF636-2243-4DB5-A359-CBD2E04FB579')"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></button>&nbsp;
+                20.01.2024 19:18:40
+                        </tr><tr bgcolor="#eeeeee"><td><b>16:35</b></td><td><b>Біг на 200 м<br><small>200 m</small></b></td><td>Юнаки U18<br><small>Boys U18</small></td><td><b>Фінал<br><small>Final</small></b></td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/start?id_entry=707ffa39-b5e4-11ee-8faa-a4f933ec044f&amp;s=80C69DAC-85F2-4737-B15E-07758955249C')">Start</button>&nbsp;20.01.2024 19:18:36</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/result?id_entry=707ffa39-b5e4-11ee-8faa-a4f933ec044f&amp;s=2DA899FD-A6BA-40AC-A15E-D39E2C125533')">Results</button>&nbsp;20.01.2024 19:18:37</td><td style="white-space: nowrap"><button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/view?id_entry=707ffa39-b5e4-11ee-8faa-a4f933ec044f&amp;s=C97D05B7-756A-490B-A096-B10D4B40234D')"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>&nbsp;
+                <button type="button" class="btn btn-primary" onclick="window.open('http://iks.org.ua/competitions1/en/2024.01.18_odesa/results/download?id_entry=707ffa39-b5e4-11ee-8faa-a4f933ec044f&amp;s=E837FCFC-E85B-4800-ADC0-392804300722')"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></button>&nbsp;
+                20.01.2024 19:18:40
+                        </tr></table></div>        </div>
+    </div>
+    </div>
+
+<div id="summary">
+    <h1>Підсумок | Summary</h1>
+<div class="table-responsive"><table class="table"><tr><td><b>Підсумкові данні<br><small>Summary</small></b></td><td>Не опубліковано<br><small>Not ready</small></td><td>Не опубліковано<br><small>Not ready</small></td></tr></table></div></div>
+
+<script>
+    $(document).ready(function(){
+                                                        
+                    $('#timetable a:first').tab('show');
+            })
+</script>
+    </div>
+    <footer id="container-footer">
+        <div class="row">
+            <div class="col-lg-12">
+                <p class="pull-left">2024 &copy; <a href="https://www.iks.org.ua/">IKS RESULTS & DATA SERVICES <sup>&reg;</sup></a></p>
+                <p class="pull-right"><a href="https://www.iks.org.ua/calendar/">Результати</a> &nbsp; <a href="https://www.iks.org.ua/iks-rank/">Рейтинг</a> &nbsp; <a href="https://www.iks.org.ua/services/">Послуги</a> &nbsp; <a href="https://www.iks.org.ua/#contactus">Контакти</a></p>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-44855334-6"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-44855334-6');
+</script>
+
+
+<script> (function(ss,ex){ window.ldfdr=window.ldfdr||function(){(ldfdr._q=ldfdr._q||[]).push([].slice.call(arguments));}; (function(d,s){ fs=d.getElementsByTagName(s)[0]; function ce(src){ var cs=d.createElement(s); cs.src=src; cs.async=1; fs.parentNode.insertBefore(cs,fs); }; ce('https://sc.lfeeder.com/lftracker_v1_'+ss+(ex?'_'+ex:'')+'.js'); })(document,'script'); })('Xbp1oaErmDX8EdVj'); </script>
+<!--[if lte IE9]>
+<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+<![endif]-->
+<!--[if lte IE9]>
+<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+</body>
+</html>
+

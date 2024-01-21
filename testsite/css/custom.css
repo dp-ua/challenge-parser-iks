@@ -1,0 +1,205 @@
+.img-thumbnail-center
+{
+    display: block;
+    margin: 0 auto;
+    margin-top: 30px;
+    margin-bottom: 20px;
+}
+
+/* .noTransition {
+    -moz-transition: none;
+    -webkit-transition: none;
+    -o-transition: color 0 ease-in;
+    transition: none;
+}
+
+.hp-slider * {
+    -webkit-backface-visibility: hidden;
+    -webkit-transform: translateZ(0);
+} */
+
+.athlete-photo {
+    display: inline-block;
+    position: relative;
+    width: 35px;
+    height: 35px;
+    overflow: hidden;
+    border-radius: 50%;
+}
+
+.athlete-photo img {
+    width: 100%;
+    height: auto;
+}
+
+.athlete-photo2 {
+    border-radius: 4px;
+}
+
+.athlete-photo2 img {
+    width: 15vmin;
+    height: auto;
+}
+
+.records-pbsb {
+    font-size: 75%;
+}
+
+body {
+    padding-top: 0;
+}
+
+@media (max-width: 1023px)
+{
+    .table-responsive {
+        width: 100%;
+        margin-bottom: 15px;
+        overflow-y: hidden;
+        overflow-x: scroll;
+        -ms-overflow-style: -ms-autohiding-scrollbar;
+        border: 1px solid #ddd;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+#container-footer {
+    padding-top: 25px;
+    padding-bottom: 15px;
+    border-top: 1px solid #e5e5e5;
+}
+
+.white {
+    color: white;
+}
+
+.search {
+    background: #E6E6E6;
+    margin-top: -20px;
+    padding-top: 15px;
+    padding-bottom: 25px;
+}
+
+.vcenter {
+    display: inline-block;
+    vertical-align: middle;
+    float: none;
+}
+
+.page-title {
+    background-color: #f8f9fa;
+    margin-top: -20px;
+    padding-top: 10px;
+    padding-bottom: 25px;
+}
+
+
+/*.results {*/
+/*    padding: 15px;*/
+/*}*/
+
+/*.navbar .navbar-nav {*/
+/*    display: inline-block;*/
+/*    float: none;*/
+/*}*/
+
+/*.navbar .navbar-collapse {*/
+/*    text-align: center;*/
+/*}*/
+
+/*.navbar-inverse{*/
+/*    background-color: #00bff1;*/
+/*    border: none;*/
+/*    margin: 0;*/
+/*    font-size: 18px;*/
+/*}*/
+
+/*.navbar-inverse .navbar-nav>li>a{*/
+/*    color: #ffffff*/
+/*}*/
+
+/*.navbar-inverse .navbar-nav>.active>a,.navbar-inverse .navbar-nav>.active>a:hover,.navbar-inverse .navbar-nav>.active>a:focus{*/
+/*    color: #ffffff;*/
+/*    background-color: #0882a2*/
+/*}*/
+
+#container-body {
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 25px;
+    margin-bottom: 25px;
+}
+
+#container-header {
+    background-color: #003366;
+}
+
+#header-logo {
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+#index-select-year {
+    width: 100px;
+}
+
+.search {
+    background-color: rgba(255, 255, 255, 0.0);
+    margin: 20px 0px 0px 10px;
+}
+
+.navbar-brand {
+    font-size: 14px;
+}
+
+@media (min-width: 300px) {
+    .race_title {
+        font-size: 25px;
+        padding: 200px 50px;
+    }
+}
+
+@media (min-width: 1024px)
+{
+      .container {
+        display: table !important;
+      }
+
+    .race_title {
+        font-size: 35px;
+        padding: 350px 50px;
+    }
+}
+
+.race_title {
+    text-align: center;
+    font-weight: bold;
+    color: #f8f9fa;
+    background-color: #0a73bb;
+}
+
+.auto-resizable-iframe {
+    padding-bottom: 5%;
+    margin: 0 auto;
+}
+
+.auto-resizable-iframe > div {
+    position: relative;
+    height: 0;
+}
+
+.auto-resizable-iframe > div.aspect-16-9 {
+    padding-bottom: 56.25%;
+}
+
+.auto-resizable-iframe > div.aspect-4-3 {
+    padding-bottom: 75%;
+}
+
+
+
+.auto-resizable-iframe iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
