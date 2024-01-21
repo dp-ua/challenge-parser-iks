@@ -22,16 +22,6 @@ public class ParticipantEntity extends DomainElement {
     @OneToMany(mappedBy = "participant", cascade = CascadeType.ALL)
     private List<HeatLineEntity> heatLines;
 
-    public void updateParticipant(ParticipantEntity participant) {
-        this.surname = participant.getSurname();
-        this.name = participant.getName();
-        this.team = participant.getTeam();
-        this.region = participant.getRegion();
-        this.born = participant.getBorn();
-        this.url = participant.getUrl();
-        this.heatLines = participant.getHeatLines();
-    }
-
     @Override
     public String toString() {
         return "ParticipantEntity{" +

@@ -20,12 +20,6 @@ public class ParticipantService {
         return repo.save(participant);
     }
 
-    // find by this fields
-//    private String surname;
-//    private String name;
-//    private String team;
-//    private String region;
-//    private String born;
     public ParticipantEntity findBySurnameAndNameAndTeamAndRegionAndBorn(
             String surname,
             String name,
@@ -41,7 +35,4 @@ public class ParticipantService {
                 born
         );
     }
-//    public ParticipantEntity findByUrl(String url) {
-//        return repo.findByUrl(url);
-//    }
 }
