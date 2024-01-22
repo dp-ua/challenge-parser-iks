@@ -11,7 +11,7 @@ import java.io.IOException;
 @Component
 public class Downloader {
     public Document getDocument(String url) {
-        log.info("getDocument: " + url);
+        log.debug("getDocument: " + url);
         try {
             return Jsoup.connect(url).get();
         } catch (IOException e) {
