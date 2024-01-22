@@ -27,6 +27,7 @@ public class CoachEntity extends DomainElement {
     @Override
     public String toString() {
         return "CoachEntity{" +
+                "id=" + id +
                 "name='" + name + '\'' +
                 '}';
     }

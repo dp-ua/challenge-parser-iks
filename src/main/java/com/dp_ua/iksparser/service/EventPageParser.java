@@ -9,6 +9,7 @@ import com.dp_ua.iksparser.dba.service.HeatLineService;
 import com.dp_ua.iksparser.dba.service.HeatService;
 import com.dp_ua.iksparser.dba.service.ParticipantService;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
+@Slf4j
 public class EventPageParser {
     @Autowired
     private HeatService heatService;
@@ -56,40 +58,42 @@ public class EventPageParser {
                 String team = cells.get(9).text();
                 String region = cells.get(8).text();
                 String born = cells.get(7).text();
-                synchronized (participantService) {
-                    ParticipantEntity participant = participantService.findBySurnameAndNameAndTeamAndRegionAndBorn(
-                            surname,
-                            name,
-                            team,
-                            region,
-                            born
-                    );
-                    if (participant == null) {
-                        participant = new ParticipantEntity();
-                        participant.setUrl(cells.get(4).select("a").attr("href"));
-                        participant.setSurname(surname);
-                        participant.setName(name);
-                        participant.setBorn(born);
-                        participant.setRegion(region);
-                        participant.setTeam(team);
-                        participantService.save(participant);
-                    }
-
-                    heatLine.setParticipant(participant);
-                    participant.addHeatLine(heatLine);
+                ParticipantEntity participant = participantService.findBySurnameAndNameAndTeamAndRegionAndBorn(
+                        surname,
+                        name,
+                        team,
+                        region,
+                        born
+                );
+                if (participant == null) {
+                    participant = new ParticipantEntity();
+                    participant.setUrl(cells.get(4).select("a").attr("href"));
+                    participant.setSurname(surname);
+                    participant.setName(name);
+                    participant.setBorn(born);
+                    participant.setRegion(region);
+                    participant.setTeam(team);
+                    participantService.save(participant);
                 }
+
+                saveRelationBetweenHeatLineAndParticipant(heatLine, participant);
+
                 String[] coaches = cells.get(10).text().split(",");
                 for (String coachName : coaches) {
-                    synchronized (coachService) {
-                        CoachEntity coach = coachService.findByName(coachName.trim());
-                        if (coach == null) {
-                            coach = new CoachEntity();
-                            coach.setName(coachName.trim());
-                            coachService.save(coach);
-                        }
-                        heatLine.addCoach(coach);
-                        coach.addHeatLine(heatLine);
+                    name = coachName.trim();
+                    if (name.isEmpty()) {
+                        continue;
                     }
+                    log.info("working with coach {}", name);
+
+                    CoachEntity coach = coachService.findByName(name);
+                    if (coach == null) {
+                        coach = new CoachEntity();
+                        coach.setName(name);
+                        coachService.save(coach);
+
+                    }
+                    saveRelationsBetweenCoachAndHeatLine(heatLine, coach);
                 }
             });
 
@@ -98,6 +102,22 @@ public class EventPageParser {
             }
         });
         return heats;
+    }
+
+    private void saveRelationBetweenHeatLineAndParticipant(HeatLineEntity heatLine, ParticipantEntity participant) {
+        heatLine.setParticipant(participant);
+        participant.addHeatLine(heatLine);
+
+        heatLineService.save(heatLine);
+        participantService.save(participant);
+    }
+
+    private void saveRelationsBetweenCoachAndHeatLine(HeatLineEntity heatLine, CoachEntity coach) {
+        heatLine.addCoach(coach);
+        coach.addHeatLine(heatLine);
+
+        heatLineService.save(heatLine);
+        coachService.save(coach);
     }
 }
 

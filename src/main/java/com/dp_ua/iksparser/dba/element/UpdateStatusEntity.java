@@ -13,7 +13,7 @@ import lombok.ToString;
 @NoArgsConstructor
 public class UpdateStatusEntity extends DomainElement {
     private String chatId;
-    private int editMessageId;
+    private Integer editMessageId;
     private long competitionId;
     private String status;
     private String reason;

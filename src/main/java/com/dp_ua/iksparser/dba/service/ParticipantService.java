@@ -3,11 +3,15 @@ package com.dp_ua.iksparser.dba.service;
 import com.dp_ua.iksparser.dba.element.ParticipantEntity;
 import com.dp_ua.iksparser.dba.repo.ParticipantRepo;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 @Transactional
+@Slf4j
 public class ParticipantService {
     private final ParticipantRepo repo;
 
@@ -16,6 +20,7 @@ public class ParticipantService {
         this.repo = repo;
     }
 
+    @Transactional
     public ParticipantEntity save(ParticipantEntity participant) {
         return repo.save(participant);
     }
@@ -27,12 +32,19 @@ public class ParticipantService {
             String region,
             String born
     ) {
-        return repo.findBySurnameAndNameAndTeamAndRegionAndBorn(
+        List<ParticipantEntity> participants = repo.findAllBySurnameAndNameAndTeamAndRegionAndBorn(
                 surname,
                 name,
                 team,
                 region,
                 born
         );
+        if (participants.isEmpty()) {
+            return null;
+        }
+        if (participants.size() > 1) {
+            log.warn("Found " + participants.size() + " participants with surname " + surname + " name " + name + " team " + team + " region " + region + " born " + born);
+        }
+        return participants.get(0);
     }
 }

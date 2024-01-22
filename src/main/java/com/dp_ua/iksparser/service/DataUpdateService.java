@@ -20,6 +20,8 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -36,10 +38,15 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
     private Downloader downloader;
     @Autowired
     private CompetitionPageParser parser;
+    @Autowired
+    CommandCompetition commandCompetition;
+    @Autowired
+    ApplicationEventPublisher publisher;
     private static final Set<Long> updating = new ConcurrentSkipListSet<>();
+    Lock lock = new ReentrantLock();
 
     @Override
-    @Async
+    @Async("defaultTaskExecutor")
     @Transactional
     public void onApplicationEvent(UpdateCompetitionEvent event) {
         UpdateStatusEntity message = event.getMessage();
@@ -61,8 +68,8 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
             service.save(message);
             return;
         }
-
         updating.add(competitionId);
+        lock.lock();
         try {
             downloadDataForCompetition(competition);
             changeStatus(competitionId, STARTED, UPDATED);
@@ -70,15 +77,11 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
             log.error("Error updating competition {}", competitionId, e);
             changeStatus(competitionId, STARTED, ERROR);
         } finally {
+            lock.unlock();
             updating.remove(competitionId);
             sendMessages(competitionId);
         }
     }
-
-    @Autowired
-    CommandCompetition commandCompetition;
-    @Autowired
-    ApplicationEventPublisher publisher;
 
     private void sendMessages(long competitionId) {
         List<UpdateStatusEntity> statuses = service.findAllByCompetitionIdAndStatus(competitionId, UPDATED.name());

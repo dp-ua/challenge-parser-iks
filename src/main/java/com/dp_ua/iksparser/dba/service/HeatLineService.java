@@ -16,6 +16,7 @@ public class HeatLineService {
         this.repo = repo;
     }
 
+    @Transactional
     public HeatLineEntity save(HeatLineEntity heatLineEntity) {
         return repo.save(heatLineEntity);
     }

@@ -23,7 +23,7 @@ public class Bot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         ReceivedMessage message = new ReceivedMessage(update);
-        log.info("Message: " + message + " Publish Update: " + update.toString());
+        log.info("Message: " + message + " Publish Update: " + update.toString().replace("\n", " "));
         GetMessageEvent messageEvent = new GetMessageEvent(this, message);
         publisher.publishEvent(messageEvent);
     }
