@@ -13,6 +13,11 @@ public enum Icon {
     QUESTION("❓"),
     URL("🌐"),
     CHAIN("🔗"),
+    PLACE("📍"),
+    AREA("🗺️"),
+    CALENDAR("📅"),
+    CLOCK("🕒"),
+
     ;
 
     private final String icon;
