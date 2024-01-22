@@ -70,11 +70,13 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
         }
         updating.add(competitionId);
         lock.lock();
+        // todo add check. Is need to full update or only black heats
         try {
             downloadDataForCompetition(competition);
             changeStatus(competitionId, STARTED, UPDATED);
         } catch (Exception e) {
             log.error("Error updating competition {}", competitionId, e);
+            // todo add send message to user
             changeStatus(competitionId, STARTED, ERROR);
         } finally {
             lock.unlock();
