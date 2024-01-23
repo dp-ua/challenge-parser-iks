@@ -113,7 +113,7 @@ public class CompetitionPageParser {
         String eventName = columns.get(1).childNodes().get(0).childNodes().get(0).toString();
         String category = columns.get(2).textNodes().get(0).text();
 
-        String round = columns.get(3).text();
+        String round = columns.get(3).text().split(" ")[0].toLowerCase();
         String startListUrl = null;
         try {
             startListUrl = columns.get(4).select("button").attr("onclick").split("'")[1];
