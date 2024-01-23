@@ -35,6 +35,8 @@ public class CommandProviderTest {
                         competition
                         competitions
                         help
+                        searchbyname
+                        searchbynamewithname
                         start""",
                 actual);
     }
