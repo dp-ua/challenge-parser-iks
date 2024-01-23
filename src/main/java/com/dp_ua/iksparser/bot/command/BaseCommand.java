@@ -40,4 +40,11 @@ public abstract class BaseCommand implements CommandInterface {
         }
         return 0;
     }
+    public String getCommandArgumentString(String text) {
+        if (text.startsWith("/" + command())) {
+            String argument = text.substring(command().length() + 1).trim();
+            return argument.isEmpty() ? "" : argument;
+        }
+        return "";
+    }
 }
