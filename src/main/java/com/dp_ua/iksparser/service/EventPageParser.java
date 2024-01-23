@@ -38,7 +38,7 @@ public class EventPageParser {
 
         Elements heatTables = document.select("div.table-responsive table.table");
         heatTables.forEach(heatTable -> {
-            String heatName = "Heat " + count.getAndIncrement();
+            String heatName = "Забіг " + count.getAndIncrement();
             HeatEntity heat = new HeatEntity();
             heat.setName(heatName);
             heatService.save(heat);
