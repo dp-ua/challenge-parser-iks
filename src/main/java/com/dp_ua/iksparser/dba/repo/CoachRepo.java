@@ -13,4 +13,6 @@ public interface CoachRepo extends CrudRepository<CoachEntity, Long> {
     List<CoachEntity> findAllByName(String name);
 
     void flush();
+
+    List<CoachEntity> findByNameContaining(String partialName);
 }
