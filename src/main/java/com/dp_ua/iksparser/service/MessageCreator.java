@@ -86,4 +86,8 @@ public enum MessageCreator {
         }
         return null;
     }
+
+    public String maskApostrof(String text) {
+        return text.replaceAll("'", "\\\\'");
+    }
 }
