@@ -1,6 +1,11 @@
 package com.dp_ua.iksparser.bot;
 
 public enum Icon {
+    BIRTHDAY("🎂"),
+    ATHLETE("🏃"),
+    MARK("🏷️"),
+    FIND("🔍"),
+    LOOK("👀"),
     EVENT("📅"),
     HEAT("🔥"),
     COMPETITION("🏆"),
@@ -45,7 +50,6 @@ public enum Icon {
     NINE("9️⃣"),
     TEN("🔟"),
     ZERO("0️⃣"),
-
     ;
 
     public static Icon getIconForNumber(int number) {
