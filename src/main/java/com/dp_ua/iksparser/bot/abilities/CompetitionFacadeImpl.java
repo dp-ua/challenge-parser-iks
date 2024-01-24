@@ -149,7 +149,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                         .getSurname().toLowerCase()
                         .contains(name.toLowerCase())
                 )
-                .collect(Collectors.toList());
+                .toList();
         if (heatLines.isEmpty()) {
             log.warn("No participants found");
             publishEvent(prepareSendMessageEvent(
@@ -301,7 +301,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                 .flatMap(day -> day.getEvents().stream())
                 .flatMap(event -> event.getHeats().stream())
                 .flatMap(heap -> heap.getHeatLines().stream())
-                .collect(Collectors.toList());
+                .toList();
         Map<CoachEntity, List<HeatLineEntity>> coachHeatLinesMap = new HashMap<>();
         foundCoaches.forEach(coach -> {
             List<HeatLineEntity> coachHeatLines = heatLines.stream()
@@ -316,17 +316,12 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                     "Учасників не знайдено", getBackToCompetitionKeyboard(competitionId)));
             return;
         }
-        coachHeatLinesMap.entrySet().forEach(entry -> {
-            CoachEntity coach = entry.getKey();
-            List<HeatLineEntity> coachHeatLines = entry.getValue();
+        coachHeatLinesMap.forEach((coach, coachHeatLines) -> {
             Map<ParticipantEntity, List<HeatLineEntity>> participantHeatLinesMap = new HashMap<>();
-            coachHeatLines.stream().forEach(heatLine -> {
+            coachHeatLines.forEach(heatLine -> {
                 ParticipantEntity participant = heatLine.getParticipant();
-                List<HeatLineEntity> participantHeatLines = participantHeatLinesMap.get(participant);
-                if (participantHeatLines == null) {
-                    participantHeatLines = new ArrayList<>();
-                    participantHeatLinesMap.put(participant, participantHeatLines);
-                }
+                List<HeatLineEntity> participantHeatLines =
+                        participantHeatLinesMap.computeIfAbsent(participant, k -> new ArrayList<>());
                 participantHeatLines.add(heatLine);
             });
 
@@ -349,9 +344,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                     .append(ITALIC)
                     .append(END_LINE);
 
-            participantHeatLinesMap.entrySet().forEach(participantHeatLinesEntry -> {
-                ParticipantEntity participant = participantHeatLinesEntry.getKey();
-                List<HeatLineEntity> participantHeatLines = participantHeatLinesEntry.getValue();
+            participantHeatLinesMap.forEach((participant, participantHeatLines) -> {
                 sb
                         .append(LINK)
                         .append(ATHLETE)
@@ -832,7 +825,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
             return text;
         }
         return SERVICE.cleanMarkdown(text)
-                .substring(0, Math.min(text.length(), limit)) +
+                .substring(0, limit) +
                 "...";
     }
 
