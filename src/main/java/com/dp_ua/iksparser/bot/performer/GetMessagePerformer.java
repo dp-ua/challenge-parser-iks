@@ -55,7 +55,6 @@ public class GetMessagePerformer implements ApplicationListener<GetMessageEvent>
         SelfMessage selfMessage = new SelfMessage();
         selfMessage.setChatId(message.getChatId());
         selfMessage.setMessageText(textCommand);
-        GetMessageEvent selfMessageEvent = new GetMessageEvent(message.getChatId(), selfMessage);
-        return selfMessageEvent;
+        return new GetMessageEvent(message.getChatId(), selfMessage);
     }
 }
