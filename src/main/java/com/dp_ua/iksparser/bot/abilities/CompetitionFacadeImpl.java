@@ -39,8 +39,8 @@ import static com.dp_ua.iksparser.service.MessageCreator.*;
 public class CompetitionFacadeImpl implements CompetitionFacade {
     public static final String URL = "https://iks.org.ua";
     public static final String COMPETITIONS_PAGE = "/competitions1/";
-    public static final int COMPETITIONS_PAGE_SIZE = 4;
-    public static final int COMPETITION_NAME_LIMIT = 100;
+    public static final int COMPETITIONS_PAGE_SIZE = 3;
+    public static final int COMPETITION_NAME_LIMIT = 0;
     private static final int COMPETITION_BUTTON_LIMIT = 40;
     public static final int TTL_MINUTES_COMPETITION_UPDATE = 10;
     public static final int MAX_PARTICIPANTS_SIZE_TO_FIND = 5;
