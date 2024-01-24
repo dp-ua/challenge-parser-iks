@@ -55,30 +55,19 @@ public enum Icon {
 
     public static Icon getIconForNumber(int number) {
         if (number < 0 || number > 9) throw new IllegalArgumentException("Number must be between 0 and 9");
-        switch (number) {
-            case 0:
-                return ZERO;
-            case 1:
-                return ONE;
-            case 2:
-                return TWO;
-            case 3:
-                return THREE;
-            case 4:
-                return FOUR;
-            case 5:
-                return FIVE;
-            case 6:
-                return SIX;
-            case 7:
-                return SEVEN;
-            case 8:
-                return EIGHT;
-            case 9:
-                return NINE;
-            default:
-                return NUMBER;
-        }
+        return switch (number) {
+            case 0 -> ZERO;
+            case 1 -> ONE;
+            case 2 -> TWO;
+            case 3 -> THREE;
+            case 4 -> FOUR;
+            case 5 -> FIVE;
+            case 6 -> SIX;
+            case 7 -> SEVEN;
+            case 8 -> EIGHT;
+            case 9 -> NINE;
+            default -> NUMBER;
+        };
     }
 
     private final String icon;
