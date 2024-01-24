@@ -11,4 +11,4 @@ FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 COPY --from=builder /app/target/ChallengeParser.jar /app/ChallengeParser.jar
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "/app/ChallengeParser.jar"]
+ENTRYPOINT ["java", "-jar", "/app/ChallengeParser.jar", "--spring.profiles.active=dev"]
