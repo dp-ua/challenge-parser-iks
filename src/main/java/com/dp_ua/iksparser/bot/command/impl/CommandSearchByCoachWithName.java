@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 @ToString
-public class CommandSearchByName extends BaseCommand {
-    public static final String command = "searchbyname";
+public class CommandSearchByCoachWithName extends BaseCommand {
+    private final static String command = "searchbycoachwithname";
     private final boolean isInTextCommand = false;
     @Autowired
     CompetitionFacade competitionFacade;
@@ -24,13 +24,17 @@ public class CommandSearchByName extends BaseCommand {
 
     @Override
     protected String getTextForCallBackAnswer(Message message) {
-        return Icon.INFO + " Будемо шукати дані по атлету " + Icon.INFO;
+        return Icon.INFO + " Шукаємо дані по по тренеру " + Icon.INFO;
     }
 
     @Override
     protected void perform(Message message) {
         String chatId = message.getChatId();
-        int commandArgument = getCommandArgument(message.getMessageText());
-        competitionFacade.startSearchByName(chatId, commandArgument, message.getEditMessageId());
+        String commandArgument = getCommandArgumentString(message.getMessageText());
+        competitionFacade.searchingByCoachWithName(chatId, commandArgument, message.getEditMessageId());
+    }
+
+    public static String getTextForState(String competitionId) {
+        return "/" + command + " {\"id\":\"" + competitionId + "\",\"coachName\":\"{}\"}";
     }
 }

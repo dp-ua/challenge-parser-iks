@@ -8,4 +8,8 @@ public interface CompetitionFacade {
     void startSearchByName(String chatId, int commandArgument, Integer editMessageId);
 
     void searchingByName(String chatId, String commandArgument, Integer editMessageId);
+
+    void startSearchByCoach(String chatId, int commandArgument, Integer editMessageId);
+
+    void searchingByCoachWithName(String chatId, String commandArgument, Integer editMessageId);
 }

@@ -1,9 +1,13 @@
 package com.dp_ua.iksparser.bot.abilities;
 
 import com.dp_ua.iksparser.bot.Icon;
+import com.dp_ua.iksparser.bot.command.impl.CommandSearchByCoach;
+import com.dp_ua.iksparser.bot.command.impl.CommandSearchByCoachWithName;
+import com.dp_ua.iksparser.bot.command.impl.CommandSearchByName;
 import com.dp_ua.iksparser.bot.command.impl.CommandSearchByNameWithName;
 import com.dp_ua.iksparser.bot.performer.event.SendMessageEvent;
 import com.dp_ua.iksparser.dba.element.*;
+import com.dp_ua.iksparser.dba.service.CoachService;
 import com.dp_ua.iksparser.dba.service.CompetitionService;
 import com.dp_ua.iksparser.service.Downloader;
 import com.dp_ua.iksparser.service.JsonReader;
@@ -22,9 +26,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -49,6 +51,8 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
     MainPageParser mainPageParser;
     @Autowired
     CompetitionService competitionService;
+    @Autowired
+    CoachService coachService;
     @Autowired
     ApplicationEventPublisher publisher;
     @Autowired
@@ -150,7 +154,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
             log.warn("No participants found");
             publishEvent(prepareSendMessageEvent(
                     chatId, editMessageId,
-                    "Учасників не знайдено", getBackToCompetitionsKeyboard()));
+                    "Учасників не знайдено", getBackToCompetitionKeyboard(competitionId)));
             return;
         }
         //collect participants from heatLines to set
@@ -161,7 +165,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
             log.warn("More than one participant found");
             publishEvent(prepareSendMessageEvent(
                     chatId, editMessageId,
-                    "Знайдено забагато спортсменів. Введіть повніше прізвище", getBackToCompetitionsKeyboard()));
+                    "Знайдено забагато спортсменів. Введіть повніше прізвище", getBackToCompetitionKeyboard(competitionId)));
             return;
         }
         participants.forEach(participant -> {
@@ -240,6 +244,173 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
 
     }
 
+    @Override
+    public void startSearchByCoach(String chatId, int commandArgument, Integer editMessageId) {
+        log.info("startSearchByCoach. CommandArgument {}, chatId:{} ", commandArgument, chatId);
+        sendTypingAction(chatId);
+
+        CompetitionEntity competition = competitionService.findById(commandArgument);
+        if (competition == null) {
+            log.warn("Competition[{}] not found", commandArgument);
+            publishEvent(prepareSendMessageEvent(
+                    chatId, editMessageId,
+                    "Змагання не знайдено", getBackToCompetitionsKeyboard()));
+            return;
+        }
+        stateService.setState(chatId, CommandSearchByCoachWithName.getTextForState(competition.getId().toString()));
+        StringBuilder sb = getFindByCoachMessage(competition);
+        publishEvent(prepareSendMessageEvent(
+                chatId,
+                editMessageId,
+                sb.toString(),
+                getBackToCompetitionsKeyboard()
+        ));
+    }
+
+    private StringBuilder getFindByCoachMessage(CompetitionEntity competition) {
+        StringBuilder sb = new StringBuilder();
+        sb
+                .append("Напишіть в чат прізвище тренера(або частину), якого шукаєте")
+                .append(LOOK)
+                .append(END_LINE)
+                .append(FIND)
+                .append(" Пошук спортсменів по тренеру буде проводитись в івенті: ")
+                .append(END_LINE)
+                .append(competitionName(competition))
+                .append(competitionDate(competition))
+                .append(competitionArea(competition));
+        return sb;
+    }
+
+    @Override
+    @Transactional
+    public void searchingByCoachWithName(String chatId, String commandArgument, Integer editMessageId) {
+        log.info("searchingByCoachWithName. CommandArgument {}, chatId:{} ", commandArgument, chatId);
+        sendTypingAction(chatId);
+
+        String competitionId = jSonReader.getVal(commandArgument, "id");
+        String coachName = jSonReader.getVal(commandArgument, "coachName");
+        CompetitionEntity competition = competitionService.findById(Integer.parseInt(competitionId));
+
+        if (!isValidInputNameConditions(chatId, editMessageId, competition, competitionId, coachName)) return;
+
+        List<CoachEntity> foundCoaches = coachService.searchByNamePartialMatch(coachName);
+        if (checkFoundCoaches(chatId, editMessageId, foundCoaches, coachName)) return;
+
+        List<HeatLineEntity> heatLines = competition.getDays().stream()
+                .flatMap(day -> day.getEvents().stream())
+                .flatMap(event -> event.getHeats().stream())
+                .flatMap(heap -> heap.getHeatLines().stream())
+                .collect(Collectors.toList());
+        Map<CoachEntity, List<HeatLineEntity>> coachHeatLinesMap = new HashMap<>();
+        foundCoaches.forEach(coach -> {
+            List<HeatLineEntity> coachHeatLines = heatLines.stream()
+                    .filter(heatLine -> heatLine.getCoaches().contains(coach))
+                    .collect(Collectors.toList());
+            coachHeatLinesMap.put(coach, coachHeatLines);
+        });
+        if (coachHeatLinesMap.isEmpty()) {
+            log.warn("No participants found");
+            publishEvent(prepareSendMessageEvent(
+                    chatId, editMessageId,
+                    "Учасників не знайдено", getBackToCompetitionKeyboard(competitionId)));
+            return;
+        }
+        coachHeatLinesMap.entrySet().forEach(entry -> {
+            CoachEntity coach = entry.getKey();
+            List<HeatLineEntity> coachHeatLines = entry.getValue();
+            Map<ParticipantEntity, List<HeatLineEntity>> participantHeatLinesMap = new HashMap<>();
+            coachHeatLines.stream().forEach(heatLine -> {
+                ParticipantEntity participant = heatLine.getParticipant();
+                List<HeatLineEntity> participantHeatLines = participantHeatLinesMap.get(participant);
+                if (participantHeatLines == null) {
+                    participantHeatLines = new ArrayList<>();
+                    participantHeatLinesMap.put(participant, participantHeatLines);
+                }
+                participantHeatLines.add(heatLine);
+            });
+
+            StringBuilder sb = new StringBuilder();
+            sb
+                    .append(LOOK)
+                    .append(BOLD)
+                    .append("Знайдено тренера: ")
+                    .append(BOLD)
+                    .append(END_LINE)
+                    .append(COACH)
+                    .append(BOLD)
+                    .append(coach.getName())
+                    .append(BOLD)
+                    .append(END_LINE);
+
+            sb
+                    .append(ITALIC)
+                    .append("Заявлені такі спортсмени: ")
+                    .append(ITALIC)
+                    .append(END_LINE);
+
+            participantHeatLinesMap.entrySet().forEach(participantHeatLinesEntry -> {
+                ParticipantEntity participant = participantHeatLinesEntry.getKey();
+                List<HeatLineEntity> participantHeatLines = participantHeatLinesEntry.getValue();
+                sb
+                        .append(LINK)
+                        .append(ATHLETE)
+                        .append(participant.getSurname())
+                        .append(" ")
+                        .append(participant.getName())
+                        .append(" ")
+                        .append(Icon.URL)
+                        .append(LINK_END)
+                        .append(LINK_SEPARATOR)
+                        .append(participant.getUrl())
+                        .append(LINK_SEPARATOR_END)
+                        .append(END_LINE);
+
+                participantHeatLines.forEach(heatLine -> {
+                    HeatEntity heat = heatLine.getHeat();
+                    EventEntity event = heat.getEvent();
+                    DayEntity day = event.getDay();
+                    sb
+                            .append(MARK)
+                            .append(" ")
+                            .append(day.getDayName())
+                            .append(", ")
+                            .append(event.getTime())
+                            .append(", ")
+                            .append(event.getEventName())
+                            .append(", ")
+                            .append(event.getRound())
+                            .append(", ")
+                            .append(heat.getName())
+                            .append(", д.")
+                            .append(heatLine.getLane())
+                            .append(",bib.")
+                            .append(heatLine.getBib())
+                            .append(END_LINE);
+                });
+                sb.append(END_LINE);
+            });
+
+            publishEvent(prepareSendMessageEvent(
+                    chatId,
+                    null,
+                    sb.toString(),
+                    getBackToCompetitionKeyboard(competitionId)
+            ));
+        });
+    }
+
+    private boolean checkFoundCoaches(String chatId, Integer editMessageId, List<CoachEntity> foundCoaches, String coachName) {
+        if (foundCoaches.isEmpty()) {
+            log.warn("No coaches found: {}", coachName);
+            publishEvent(prepareSendMessageEvent(
+                    chatId, editMessageId,
+                    "Тренерів за таким ім'ям не знайдено", getBackToCompetitionsKeyboard()));
+            return true;
+        }
+        return false;
+    }
+
     private boolean isValidInputNameConditions(String chatId, Integer editMessageId, CompetitionEntity competition, String id, String name) {
         if (competition == null) {
             log.warn("Competition[{}] not found", id);
@@ -281,6 +452,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                 .append(END_LINE)
                 .append(FIND)
                 .append("Пошук участі спортсмена буде проводитись в івенті: ")
+                .append(END_LINE)
                 .append(competitionName(competition))
                 .append(competitionDate(competition))
                 .append(competitionArea(competition));
@@ -357,6 +529,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         rows.add(getBackButton("/competitions"));
         if (competitionFilled) {
             rows.add(lookAtCompetitionByNameButton(competition));
+            rows.add(lookAtCompetitionByCoachButton(competition));
         }
         keyboard.setKeyboard(rows);
         return keyboard;
@@ -365,8 +538,18 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
     private List<InlineKeyboardButton> lookAtCompetitionByNameButton(CompetitionEntity competition) {
         List<InlineKeyboardButton> row = new ArrayList<>();
         InlineKeyboardButton button = SERVICE.getKeyboardButton(
-                FIND + " Пошук за прізвищем спортсмена",
-                "/searchbyname " + competition.getId()
+                FIND + " Пошук за прізвищем спортсмена " + ATHLETE,
+                "/" + CommandSearchByName.command + " " + competition.getId()
+        );
+        row.add(button);
+        return row;
+    }
+
+    private List<InlineKeyboardButton> lookAtCompetitionByCoachButton(CompetitionEntity competition) {
+        List<InlineKeyboardButton> row = new ArrayList<>();
+        InlineKeyboardButton button = SERVICE.getKeyboardButton(
+                FIND + " Пошук за прізвищем тренера " + COACH,
+                "/" + CommandSearchByCoach.command + " " + competition.getId()
         );
         row.add(button);
         return row;
