@@ -36,10 +36,6 @@ public class CoachService {
         return coaches.get(0);
     }
 
-    public void flush() {
-        repo.flush();
-    }
-
     public List<CoachEntity> searchByNamePartialMatch(String partialName) {
         return repo.findByNameContaining(partialName);
     }

@@ -8,11 +8,7 @@ import java.util.List;
 
 @Repository
 public interface CoachRepo extends CrudRepository<CoachEntity, Long> {
-    CoachEntity findByName(String name);
-
     List<CoachEntity> findAllByName(String name);
-
-    void flush();
 
     List<CoachEntity> findByNameContaining(String partialName);
 }
