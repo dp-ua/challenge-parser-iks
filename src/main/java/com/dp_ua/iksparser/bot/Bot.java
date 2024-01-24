@@ -2,14 +2,13 @@ package com.dp_ua.iksparser.bot;
 
 import com.dp_ua.iksparser.bot.message.ReceivedMessage;
 import com.dp_ua.iksparser.bot.performer.event.GetMessageEvent;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.objects.Update;
-
-import javax.validation.constraints.NotEmpty;
 
 
 @Slf4j

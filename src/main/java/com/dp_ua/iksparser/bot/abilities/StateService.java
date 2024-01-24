@@ -1,6 +1,8 @@
 package com.dp_ua.iksparser.bot.abilities;
 
+import lombok.Getter;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.generics.BotSession;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,6 +10,8 @@ import java.util.Map;
 @Component
 public class StateService {
     private final Map<String, String> stateMap = new HashMap<>();
+    @Getter
+    private BotSession botSession;
 
     public String getState(String chatId) {
         String entry = stateMap.get(chatId);
@@ -32,5 +36,9 @@ public class StateService {
             result = result.replaceFirst("\\{\\}", arg);
         }
         return result;
+    }
+
+    public void saveBotSession(BotSession botSession) {
+        this.botSession = botSession;
     }
 }
