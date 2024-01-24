@@ -2,6 +2,7 @@ package com.dp_ua.iksparser.bot.command;
 
 import com.dp_ua.iksparser.SpringApp;
 import com.dp_ua.iksparser.exeption.DuplicateCommandException;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +12,6 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 
-import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
