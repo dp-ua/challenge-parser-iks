@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -22,6 +23,19 @@ public class CoachEntity extends DomainElement {
 
     public void addHeatLine(HeatLineEntity heatLine) {
         heatLines.add(heatLine);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CoachEntity coach = (CoachEntity) o;
+        return Objects.equals(name, coach.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
     }
 
     @Override
