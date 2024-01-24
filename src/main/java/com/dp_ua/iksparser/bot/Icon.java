@@ -3,6 +3,7 @@ package com.dp_ua.iksparser.bot;
 public enum Icon {
     BIRTHDAY("🎂"),
     ATHLETE("🏃"),
+    COACH("👨‍🏫"),
     MARK("🏷️"),
     FIND("🔍"),
     LOOK("👀"),
