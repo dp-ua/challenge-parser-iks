@@ -37,6 +37,6 @@ public class CoachService {
     }
 
     public List<CoachEntity> searchByNamePartialMatch(String partialName) {
-        return repo.findByNameContaining(partialName);
+        return repo.findByNameContainingIgnoreCase(partialName);
     }
 }

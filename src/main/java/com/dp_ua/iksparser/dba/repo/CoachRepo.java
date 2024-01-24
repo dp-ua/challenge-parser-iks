@@ -11,4 +11,6 @@ public interface CoachRepo extends CrudRepository<CoachEntity, Long> {
     List<CoachEntity> findAllByName(String name);
 
     List<CoachEntity> findByNameContaining(String partialName);
+
+    List<CoachEntity> findByNameContainingIgnoreCase(String partialName);
 }
