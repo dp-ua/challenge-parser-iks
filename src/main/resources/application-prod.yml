@@ -1,12 +1,13 @@
+#For Docker and Prod server
 spring:
   config:
     activate:
-      on-profile: dev
+      on-profile: prod
   datasource:
     url: jdbc:h2:mem:mydb
     driverClassName: org.h2.Driver
-    username: sa
-    password: password
+    username: ${IKS_DB_USERNAME}
+    password: ${IKS_DB_PASSWORD}
   h2:
     console:
       enabled: true
@@ -22,16 +23,16 @@ spring:
 
 telegram:
   bot:
-    token: 1223334444:55555666666677777788888888888888
-    name: name_bot
+    token: ${IKS_TELEGRAM_BOT_TOKEN}
+    name: ${IKS_TELEGRAM_BOT_NAME}
     reconnectTimeout: 10000
-    adminId: 1223334444
+    adminId: ${IKS_TELEGRAM_ADMIN_ID}
 
 logging:
   level:
     root: INFO
     com.dp_ua: INFO
-    com.dp_ua.iksparser.dba: INFO
+    com.dp_ua.iksparser.dba: WARN
 
   file:
     name: ./logs/file.log
