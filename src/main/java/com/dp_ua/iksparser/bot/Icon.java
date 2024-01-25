@@ -1,6 +1,7 @@
 package com.dp_ua.iksparser.bot;
 
 public enum Icon {
+    ROBOT("🤖"),
     BIRTHDAY("🎂"),
     ATHLETE("🏃"),
     COACH("👨‍🏫"),
