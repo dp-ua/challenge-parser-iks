@@ -118,13 +118,14 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                     "Змагання не знайдено", getBackToCompetitionsKeyboard()));
             return;
         }
-        stateService.setState(chatId, CommandSearchByNameWithName.getTextForState(competition.getId().toString()));
+        String competitionId = competition.getId().toString();
+        stateService.setState(chatId, CommandSearchByNameWithName.getTextForState(competitionId));
         StringBuilder sb = getFindByNameMessage(competition);
         publishEvent(prepareSendMessageEvent(
                 chatId,
                 editMessageId,
                 sb.toString(),
-                getBackToCompetitionsKeyboard()
+                getBackToCompetitionKeyboard(competitionId)
         ));
     }
 
@@ -157,7 +158,6 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                     "Учасників не знайдено", getBackToCompetitionKeyboard(competitionId)));
             return;
         }
-        //collect participants from heatLines to set
         Set<ParticipantEntity> participants = heatLines.stream()
                 .map(HeatLineEntity::getParticipant)
                 .collect(Collectors.toSet());
@@ -171,67 +171,29 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         participants.forEach(participant -> {
             StringBuilder sb = new StringBuilder();
             sb
-
                     .append(LOOK)
                     .append(BOLD)
                     .append("Знайдено спортсмена: ")
                     .append(BOLD)
-                    .append(END_LINE)
-                    .append(LINK)
-                    .append(ATHLETE)
-                    .append(participant.getSurname())
-                    .append(" ")
-                    .append(participant.getName())
-                    .append(" ")
-                    .append(Icon.URL)
-                    .append(LINK_END)
-                    .append(LINK_SEPARATOR)
-                    .append(participant.getUrl())
-                    .append(LINK_SEPARATOR_END)
                     .append(END_LINE);
             sb
-                    .append(participant.getRegion())
-                    .append(", ")
-                    .append(participant.getTeam())
-                    .append(END_LINE);
-            sb
-                    .append(BIRTHDAY)
-                    .append("Дата народження: ")
-                    .append(participant.getBorn())
+                    .append(participantInfo(participant))
                     .append(END_LINE)
                     .append(END_LINE);
 
-
             sb
-                    .append(ITALIC)
-                    .append(competition.getName())
-                    .append(ITALIC)
+                    .append(competitionName(competition))
                     .append(END_LINE)
+                    .append(competitionDate(competition))
+                    .append(END_LINE)
+                    .append(END_LINE);
+            sb
                     .append(HEAT)
                     .append("Приймає участь у змаганнях: ")
                     .append(END_LINE);
 
             heatLines.forEach(heatLine -> {
-                HeatEntity heat = heatLine.getHeat();
-                EventEntity event = heat.getEvent();
-                DayEntity day = event.getDay();
-                sb
-                        .append(MARK)
-                        .append(" ")
-                        .append(day.getDayName())
-                        .append(", ")
-                        .append(event.getTime())
-                        .append(", ")
-                        .append(event.getEventName())
-                        .append(", ")
-                        .append(event.getRound())
-                        .append(", ")
-                        .append(heat.getName())
-                        .append(", д.")
-                        .append(heatLine.getLane())
-                        .append(",bib.")
-                        .append(heatLine.getBib())
-                        .append(END_LINE);
+                sb.append(heatLineInfo(heatLine));
             });
 
             publishEvent(prepareSendMessageEvent(
@@ -257,27 +219,31 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                     "Змагання не знайдено", getBackToCompetitionsKeyboard()));
             return;
         }
-        stateService.setState(chatId, CommandSearchByCoachWithName.getTextForState(competition.getId().toString()));
+        String competitionId = competition.getId().toString();
+        stateService.setState(chatId, CommandSearchByCoachWithName.getTextForState(competitionId));
         StringBuilder sb = getFindByCoachMessage(competition);
         publishEvent(prepareSendMessageEvent(
                 chatId,
                 editMessageId,
                 sb.toString(),
-                getBackToCompetitionsKeyboard()
+                getBackToCompetitionKeyboard(competitionId)
         ));
     }
 
     private StringBuilder getFindByCoachMessage(CompetitionEntity competition) {
         StringBuilder sb = new StringBuilder();
         sb
-                .append("Напишіть в чат прізвище тренера(або частину), якого шукаєте")
                 .append(LOOK)
+                .append("Напишіть в чат прізвище тренера(або частину), якого шукаєте")
+                .append(END_LINE)
                 .append(END_LINE)
                 .append(FIND)
                 .append(" Пошук спортсменів по тренеру буде проводитись в івенті: ")
                 .append(END_LINE)
                 .append(competitionName(competition))
+                .append(END_LINE)
                 .append(competitionDate(competition))
+                .append(END_LINE)
                 .append(competitionArea(competition));
         return sb;
     }
@@ -336,50 +302,25 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                     .append(BOLD)
                     .append(coach.getName())
                     .append(BOLD)
+                    .append(END_LINE)
                     .append(END_LINE);
 
+            sb
+                    .append(competitionDate(competition))
+                    .append(END_LINE);
             sb
                     .append(ITALIC)
                     .append("Заявлені такі спортсмени: ")
                     .append(ITALIC)
+                    .append(END_LINE)
                     .append(END_LINE);
 
             participantHeatLinesMap.forEach((participant, participantHeatLines) -> {
                 sb
-                        .append(LINK)
-                        .append(ATHLETE)
-                        .append(participant.getSurname())
-                        .append(" ")
-                        .append(participant.getName())
-                        .append(" ")
-                        .append(Icon.URL)
-                        .append(LINK_END)
-                        .append(LINK_SEPARATOR)
-                        .append(participant.getUrl())
-                        .append(LINK_SEPARATOR_END)
+                        .append(participantInfo(participant))
                         .append(END_LINE);
-
                 participantHeatLines.forEach(heatLine -> {
-                    HeatEntity heat = heatLine.getHeat();
-                    EventEntity event = heat.getEvent();
-                    DayEntity day = event.getDay();
-                    sb
-                            .append(MARK)
-                            .append(" ")
-                            .append(day.getDayName())
-                            .append(", ")
-                            .append(event.getTime())
-                            .append(", ")
-                            .append(event.getEventName())
-                            .append(", ")
-                            .append(event.getRound())
-                            .append(", ")
-                            .append(heat.getName())
-                            .append(", д.")
-                            .append(heatLine.getLane())
-                            .append(",bib.")
-                            .append(heatLine.getBib())
-                            .append(END_LINE);
+                    sb.append(heatLineInfo(heatLine));
                 });
                 sb.append(END_LINE);
             });
@@ -391,6 +332,63 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                     getBackToCompetitionKeyboard(competitionId)
             ));
         });
+    }
+
+    private String heatLineInfo(HeatLineEntity heatLine) {
+        StringBuilder sb = new StringBuilder();
+        HeatEntity heat = heatLine.getHeat();
+        EventEntity event = heat.getEvent();
+        DayEntity day = event.getDay();
+
+        sb
+                .append(MARK)
+                .append(" ")
+                .append(day.getDayName())
+                .append(", ")
+                .append(event.getTime())
+                .append(", ")
+                .append(event.getEventName())
+                .append(", ")
+                .append(event.getRound())
+                .append(", ")
+                .append(heat.getName())
+                .append(", д.")
+                .append(heatLine.getLane())
+                .append(",bib.")
+                .append(heatLine.getBib())
+                .append(END_LINE);
+        return sb.toString();
+    }
+
+    private String participantInfo(ParticipantEntity participant) {
+        StringBuilder sb = new StringBuilder();
+        sb
+                .append(ATHLETE)
+                .append(participant.getSurname())
+                .append(" ")
+                .append(participant.getName());
+        if (!participant.getUrl().isEmpty()) {
+            sb
+                    .insert(0, LINK);
+            sb
+                    .append(" ")
+                    .append(Icon.URL)
+                    .append(LINK_END)
+                    .append(LINK_SEPARATOR)
+                    .append(participant.getUrl())
+                    .append(LINK_SEPARATOR_END);
+        }
+        sb
+                .append(" ")
+                .append(participant.getBorn())
+                .append(BIRTHDAY);
+        sb
+                .append(END_LINE)
+                .append(AREA)
+                .append(participant.getRegion())
+                .append(", ")
+                .append(participant.getTeam());
+        return sb.toString();
     }
 
     private boolean checkFoundCoaches(String chatId, Integer editMessageId, List<CoachEntity> foundCoaches, String coachName) {
@@ -443,11 +441,14 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                 .append("Напишіть в чат прізвище спортсмена(або частину), якого шукаєте")
                 .append(LOOK)
                 .append(END_LINE)
+                .append(END_LINE)
                 .append(FIND)
                 .append("Пошук участі спортсмена буде проводитись в івенті: ")
                 .append(END_LINE)
                 .append(competitionName(competition))
+                .append(END_LINE)
                 .append(competitionDate(competition))
+                .append(END_LINE)
                 .append(competitionArea(competition));
         return sb;
     }
@@ -561,18 +562,15 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         StringBuilder sb = new StringBuilder();
         sb
                 .append(competitionName(competition))
+                .append(END_LINE)
                 .append(END_LINE);
-
         sb
                 .append(competitionDate(competition))
                 .append(END_LINE);
-
         sb
                 .append(competitionArea(competition))
-                .append(END_LINE);
-
-        sb
                 .append(competitionLink(competition))
+                .append(END_LINE)
                 .append(END_LINE);
 
         if (competitionFilled) {
@@ -641,14 +639,12 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         StringBuilder sb = new StringBuilder();
         sb
                 .append(LINK)
-                .append(Icon.URL)
-                .append(" Посилання на сайт змагань ")
+                .append(" посилання")
                 .append(Icon.URL)
                 .append(LINK_END)
                 .append(LINK_SEPARATOR)
                 .append(competition.getUrl())
-                .append(LINK_SEPARATOR_END)
-                .append(END_LINE);
+                .append(LINK_SEPARATOR_END);
         return sb;
     }
 
@@ -661,8 +657,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                 .append(ITALIC)
                 .append(competition.getCountry())
                 .append(", ")
-                .append(competition.getCity())
-                .append(END_LINE);
+                .append(competition.getCity());
         return sb;
     }
 
@@ -675,18 +670,16 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                 .append(ITALIC)
                 .append(competition.getBeginDate())
                 .append(" - ")
-                .append(competition.getEndDate())
-                .append(END_LINE);
+                .append(competition.getEndDate());
         return sb;
     }
 
     private StringBuilder competitionName(CompetitionEntity competition) {
         StringBuilder sb = new StringBuilder();
         sb
-                .append(BOLD)
+                .append(ITALIC)
                 .append(competition.getName())
-                .append(BOLD)
-                .append(END_LINE);
+                .append(ITALIC);
         return sb;
     }
 
@@ -713,17 +706,17 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
 
         rows.add(getRowWithPages(page, totalSize));
 
-        IntStream.range(0, competitions.size()).forEachOrdered(i -> {
-            List<InlineKeyboardButton> row = new ArrayList<>();
+        List<InlineKeyboardButton> row = new ArrayList<>();
+        IntStream.range(0, competitions.size()).forEach(i -> {
             CompetitionEntity competition = competitions.get(i);
             int count = i + 1;
             InlineKeyboardButton button = SERVICE.getKeyboardButton(
-                    getShortName(Icon.getIconForNumber(count) + "  " + competition.getName(), COMPETITION_BUTTON_LIMIT),
+                    getShortName(Icon.getIconForNumber(count).toString(), COMPETITION_BUTTON_LIMIT),
                     "/competition " + competition.getId()
             );
             row.add(button);
-            rows.add(row);
         });
+        rows.add(row);
 
         keyboard.setKeyboard(rows);
         return keyboard;
@@ -767,36 +760,19 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         result.append(
                 IntStream.range(0, competitions.size())
                         .mapToObj(i -> {
+                            int count = i + 1;
                             StringBuilder sb = new StringBuilder();
-                            sb.append(BOLD).append(i + 1).append(". ").append(BOLD); // number
+                            sb.append(BOLD).append(Icon.getIconForNumber(count)).append(" ").append(BOLD); // number
                             CompetitionEntity competition = competitions.get(i);
                             sb
-                                    .append(ITALIC)
-                                    .append(getShortName(competition.getName(), COMPETITION_NAME_LIMIT))
-                                    .append(ITALIC);
-
-                            sb.append(END_LINE);
-
+                                    .append(competitionName(competition))
+                                    .append(END_LINE);
                             sb
-                                    .append(CALENDAR)
-                                    .append("  з ")
-                                    .append(competition.getBeginDate())
-                                    .append(" по ") // begin date
-                                    .append(competition.getEndDate());
-                            sb
-                                    .append(" ")
-                                    .append(AREA)
-                                    .append(BOLD)
-                                    .append(competition.getCity()) // place
-                                    .append(BOLD);
-
-                            sb
-                                    .append(LINK)
-                                    .append(CHAIN)
-                                    .append(LINK_END)
-                                    .append(LINK_SEPARATOR)
-                                    .append(competition.getUrl()) // URL;
-                                    .append(LINK_SEPARATOR_END);
+                                    .append(competitionDate(competition))
+                                    .append(competitionArea(competition))
+                                    .append("   ")
+                                    .append(competitionLink(competition))
+                                    .append(END_LINE);
 
                             return sb.toString();
                         })
@@ -808,11 +784,21 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         result
                 .append(PAGE_WITH_CURL)
                 .append(" Сторінка ")
+                .append("(")
                 .append(BOLD)
                 .append(page + 1)
                 .append(BOLD)
+                .append(")")
                 .append(" з ")
-                .append(getTotalPages(totalCompetitions));
+                .append(BOLD)
+                .append(getTotalPages(totalCompetitions))
+                .append(BOLD);
+
+        result
+                .append("     ")
+                .append(ITALIC)
+                .append("[оберіть змагання]")
+                .append(ITALIC);
 
         return result.toString();
     }
