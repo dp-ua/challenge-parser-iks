@@ -1,4 +1,9 @@
 #For local test in IDE
+server:
+  port: 8181
+    #  servlet:
+    #    context-path: /iksparser
+
 spring:
   config:
     activate:

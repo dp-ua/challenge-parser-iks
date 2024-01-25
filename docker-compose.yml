@@ -7,11 +7,16 @@ services:
       dockerfile: Dockerfile
     container_name: challenge-parser
     ports:
-      - "8180:8081"
+      - "8181:8181"
     #    depends_on:
     #      - service-db
     environment:
       - SERVER_PORT= 8181
+      - IKS_TELEGRAM_BOT_TOKEN = ${IKS_TELEGRAM_BOT_TOKEN}
+      - IKS_TELEGRAM_BOT_NAME = ${IKS_TELEGRAM_BOT_NAME}
+      - IKS_TELEGRAM_ADMIN_ID = ${IKS_TELEGRAM_ADMIN_ID}
+      - IKS_DB_USERNAME = ${IKS_DB_USERNAME}
+      - IKS_DB_PASSWORD = ${IKS_DB_PASSWORD}
 #      - SPRING_DATASOURCE_URL=jdbc:postgresql://service-db/books_db
 
 #  service-db:

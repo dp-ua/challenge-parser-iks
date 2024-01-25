@@ -1,4 +1,9 @@
 #For Docker and Prod server
+server:
+  port: 8181
+#  servlet:
+#    context-path: /iksparser
+
 spring:
   config:
     activate:
