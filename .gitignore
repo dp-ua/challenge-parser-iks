@@ -9,9 +9,5 @@ target/
 .DS_Store
 .idea/
 
-# Spring Boot
-# settings
-application-dev.yml
-
 #logs
 logs/
