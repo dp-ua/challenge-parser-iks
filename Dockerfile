@@ -10,5 +10,5 @@ RUN mvn -f /app/pom.xml clean package -Dmaven.test.skip=true
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 COPY --from=builder /app/target/ChallengeParser.jar /app/ChallengeParser.jar
-EXPOSE 8080
+EXPOSE 8181
 ENTRYPOINT ["java", "-jar", "/app/ChallengeParser.jar", "--spring.profiles.active=prod"]
