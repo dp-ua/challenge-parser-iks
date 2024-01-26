@@ -666,7 +666,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         sb
                 .append(CALENDAR)
                 .append(ITALIC)
-                .append(" Дати проведення: ")
+                .append(" Дата: ")
                 .append(ITALIC)
                 .append(competition.getBeginDate())
                 .append(" - ")
@@ -769,6 +769,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                                     .append(END_LINE);
                             sb
                                     .append(competitionDate(competition))
+                                    .append(END_LINE)
                                     .append(competitionArea(competition))
                                     .append("   ")
                                     .append(competitionLink(competition))
