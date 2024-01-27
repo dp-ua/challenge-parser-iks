@@ -9,7 +9,6 @@ import com.dp_ua.iksparser.bot.performer.event.SendMessageEvent;
 import com.dp_ua.iksparser.dba.element.*;
 import com.dp_ua.iksparser.dba.service.CoachService;
 import com.dp_ua.iksparser.dba.service.CompetitionService;
-import com.dp_ua.iksparser.service.Downloader;
 import com.dp_ua.iksparser.service.JsonReader;
 import com.dp_ua.iksparser.service.UpdateCompetitionEvent;
 import com.dp_ua.iksparser.service.parser.MainParserService;
@@ -341,18 +340,19 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
             sb
                     .append(LINK)
                     .append(event.getEventName())
-                    .append(Icon.URL)
+                    .append(", ")
+                    .append(event.getRound())
                     .append(LINK_END)
                     .append(LINK_SEPARATOR)
                     .append(event.getStartListUrl())
-                    .append(LINK_SEPARATOR_END)
-                    .append(", ");
+                    .append(LINK_SEPARATOR_END);
         } else {
-            sb.append(event.getEventName());
+            sb.append(event.getEventName())
+                    .append(", ")
+                    .append(event.getRound());
         }
         sb
-                .append(", ")
-                .append(event.getRound())
+
                 .append(", ")
                 .append(heat.getName())
                 .append(", д.")
@@ -375,7 +375,6 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                     .insert(0, LINK);
             sb
                     .append(" ")
-                    .append(Icon.URL)
                     .append(LINK_END)
                     .append(LINK_SEPARATOR)
                     .append(participant.getUrl())
