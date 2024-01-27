@@ -398,7 +398,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
             log.warn("No coaches found: {}", coachName);
             publishEvent(prepareSendMessageEvent(
                     chatId, editMessageId,
-                    "Тренерів за таким ім'ям не знайдено", getBackToCompetitionsKeyboard()));
+                    "Тренера не знайдено.", null));
             return true;
         }
         return false;
