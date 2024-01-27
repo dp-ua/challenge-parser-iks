@@ -877,8 +877,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         List<CompetitionEntity> competitions = mainPageParser.parseCompetitions();
         competitions
                 .forEach(c -> {
-                    CompetitionEntity competition = competitionService.saveOrUpdate(c);
-                    log.info("Competition: " + competition);
+                    competitionService.saveOrUpdate(c);
                 });
     }
 
