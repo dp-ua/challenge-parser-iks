@@ -1,4 +1,4 @@
-package com.dp_ua.iksparser.service;
+package com.dp_ua.iksparser.service.parser;
 
 import com.dp_ua.iksparser.dba.element.CoachEntity;
 import com.dp_ua.iksparser.dba.element.HeatEntity;

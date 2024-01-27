@@ -13,8 +13,4 @@ public class SpringApp {
     public static void main(String[] args) {
         SpringApplication.run(SpringApp.class, args);
     }
-
-    // todo как закончу с парсингом и перенесу в бот,
-    //  то от класса App можно будет избавиться и старт бота делать здесь
-
 }

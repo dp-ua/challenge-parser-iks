@@ -1,10 +1,11 @@
-package com.dp_ua.iksparser.service;
+package com.dp_ua.iksparser.service.parser;
 
 import com.dp_ua.iksparser.dba.element.DayEntity;
 import com.dp_ua.iksparser.dba.element.EventEntity;
 import com.dp_ua.iksparser.dba.element.HeatEntity;
 import com.dp_ua.iksparser.dba.service.DayService;
 import com.dp_ua.iksparser.dba.service.EventService;
+import com.dp_ua.iksparser.service.Downloader;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -110,7 +111,8 @@ public class CompetitionPageParser {
     public EventEntity parseEvent(Element row) {
         Elements columns = row.select("td");
         String time = columns.get(0).text();
-        String eventName = columns.get(1).childNodes().get(0).childNodes().get(0).toString();
+        String eventName = removeTags(columns.get(1).childNodes().get(0).childNodes().get(0).toString());
+
         String category = columns.get(2).textNodes().get(0).text();
 
         String round = columns.get(3).text().split(" ")[0].toLowerCase();
@@ -118,9 +120,13 @@ public class CompetitionPageParser {
         try {
             startListUrl = columns.get(4).select("button").attr("onclick").split("'")[1];
         } catch (Exception e) {
-            log.info("No start list url for event: " + eventName);
+            log.info("No start list url for event:{} {}", eventName, category);
         }
 
         return new EventEntity(time, eventName, category, round, startListUrl);
+    }
+
+    private String removeTags(String string) {
+        return string.replaceAll("<.*?>", "");
     }
 }

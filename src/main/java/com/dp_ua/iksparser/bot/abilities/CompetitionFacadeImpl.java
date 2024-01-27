@@ -11,11 +11,10 @@ import com.dp_ua.iksparser.dba.service.CoachService;
 import com.dp_ua.iksparser.dba.service.CompetitionService;
 import com.dp_ua.iksparser.service.Downloader;
 import com.dp_ua.iksparser.service.JsonReader;
-import com.dp_ua.iksparser.service.MainPageParser;
 import com.dp_ua.iksparser.service.UpdateCompetitionEvent;
+import com.dp_ua.iksparser.service.parser.MainParserService;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
-import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
@@ -26,6 +25,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -37,18 +37,12 @@ import static com.dp_ua.iksparser.service.MessageCreator.*;
 @Component
 @Slf4j
 public class CompetitionFacadeImpl implements CompetitionFacade {
-    public static final String URL = "https://iks.org.ua";
-    public static final String COMPETITIONS_PAGE = "/competitions1/";
     public static final int COMPETITIONS_PAGE_SIZE = 3;
-    public static final int COMPETITION_NAME_LIMIT = 0;
     private static final int COMPETITION_BUTTON_LIMIT = 40;
     public static final int TTL_MINUTES_COMPETITION_UPDATE = 10;
     public static final int MAX_PARTICIPANTS_SIZE_TO_FIND = 5;
-
     @Autowired
-    Downloader downloader;
-    @Autowired
-    MainPageParser mainPageParser;
+    MainParserService mainPageParser;
     @Autowired
     CompetitionService competitionService;
     @Autowired
@@ -192,9 +186,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                     .append("Приймає участь у змаганнях: ")
                     .append(END_LINE);
 
-            heatLines.forEach(heatLine -> {
-                sb.append(heatLineInfo(heatLine));
-            });
+            heatLines.forEach(heatLine -> sb.append(heatLineInfo(heatLine)));
 
             publishEvent(prepareSendMessageEvent(
                     chatId,
@@ -319,9 +311,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                 sb
                         .append(participantInfo(participant))
                         .append(END_LINE);
-                participantHeatLines.forEach(heatLine -> {
-                    sb.append(heatLineInfo(heatLine));
-                });
+                participantHeatLines.forEach(heatLine -> sb.append(heatLineInfo(heatLine)));
                 sb.append(END_LINE);
             });
 
@@ -346,8 +336,21 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                 .append(day.getDayName())
                 .append(", ")
                 .append(event.getTime())
-                .append(", ")
-                .append(event.getEventName())
+                .append(", ");
+        if (!event.getStartListUrl().isEmpty()) {
+            sb
+                    .append(LINK)
+                    .append(event.getEventName())
+                    .append(Icon.URL)
+                    .append(LINK_END)
+                    .append(LINK_SEPARATOR)
+                    .append(event.getStartListUrl())
+                    .append(LINK_SEPARATOR_END)
+                    .append(", ");
+        } else {
+            sb.append(event.getEventName());
+        }
+        sb
                 .append(", ")
                 .append(event.getRound())
                 .append(", ")
@@ -637,9 +640,10 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
 
     private StringBuilder competitionLink(CompetitionEntity competition) {
         StringBuilder sb = new StringBuilder();
+        if (competition.getUrl().isEmpty()) return sb;
         sb
                 .append(LINK)
-                .append(" посилання")
+                .append(", посилання")
                 .append(Icon.URL)
                 .append(LINK_END)
                 .append(LINK_SEPARATOR)
@@ -663,6 +667,8 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
 
     private StringBuilder competitionDate(CompetitionEntity competition) {
         StringBuilder sb = new StringBuilder();
+        CompetitionStatus status = CompetitionStatus.getByName(competition.getStatus());
+        Icon iconForStatus = getIconForStatus(status);
         sb
                 .append(CALENDAR)
                 .append(ITALIC)
@@ -670,8 +676,21 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                 .append(ITALIC)
                 .append(competition.getBeginDate())
                 .append(" - ")
-                .append(competition.getEndDate());
+                .append(competition.getEndDate())
+                .append(" ")
+                .append(iconForStatus);
         return sb;
+    }
+
+    private Icon getIconForStatus(CompetitionStatus status) {
+        if (status == null) return null;
+        return switch (status) {
+            case CANCELED -> GRAY_CIRCLE;
+            case PLANED -> BLUE_CIRCLE;
+            case NOT_STARTED -> GREEN_CIRCLE;
+            case IN_PROGRESS -> RED_CIRCLE;
+            case FINISHED -> GRAY_CIRCLE;
+        };
     }
 
     private StringBuilder competitionName(CompetitionEntity competition) {
@@ -691,6 +710,21 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
 
     private SendMessageEvent getMessageForCompetitions(List<CompetitionEntity> competitions, String
             chatId, Integer messageId, int page) {
+        if (page == 0) {
+            LocalDateTime now = LocalDateTime.now();
+            Map<Integer, Integer> compareMap = new HashMap<>();
+            for (int i = 0; i < competitions.size(); i++) {
+                CompetitionEntity competition = competitions.get(i);
+                LocalDateTime competitionDate = LocalDateTime.parse(
+                        String.format("%s %s",
+                                competition.getBeginDate(), now.format(DateTimeFormatter.ofPattern("HH:mm:ss"))),
+                        DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"));
+                int abs = Math.abs(now.compareTo(competitionDate));
+                compareMap.put(abs, i);
+            }
+            int index = compareMap.get(Collections.min(compareMap.keySet()));
+            page = index / COMPETITIONS_PAGE_SIZE;
+        }
         List<CompetitionEntity> pageList = getPage(competitions, page, COMPETITIONS_PAGE_SIZE);
 
         int totalCompetitions = competitions.size();
@@ -837,12 +871,10 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         return competitionService.findAllOrderByBeginDate(true);
     }
 
-    private void updateCompetitions() {
-        Document document = downloader.getDocument(URL + COMPETITIONS_PAGE);
-        List<CompetitionEntity> competitions = mainPageParser.getParsedCompetitions(document);
+    public void updateCompetitions() {
+        List<CompetitionEntity> competitions = mainPageParser.parseCompetitions();
         competitions
                 .forEach(c -> {
-                    c.setUrl(URL + c.getUrl());
                     CompetitionEntity competition = competitionService.saveOrUpdate(c);
                     log.info("Competition: " + competition);
                 });

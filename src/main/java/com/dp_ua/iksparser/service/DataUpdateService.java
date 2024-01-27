@@ -8,6 +8,7 @@ import com.dp_ua.iksparser.dba.element.DayEntity;
 import com.dp_ua.iksparser.dba.element.UpdateStatusEntity;
 import com.dp_ua.iksparser.dba.service.CompetitionService;
 import com.dp_ua.iksparser.dba.service.UpdateStatusService;
+import com.dp_ua.iksparser.service.parser.CompetitionPageParser;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Document;

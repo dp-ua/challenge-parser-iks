@@ -1,6 +1,7 @@
 package com.dp_ua.iksparser.service;
 
 import com.dp_ua.iksparser.dba.element.DayEntity;
+import com.dp_ua.iksparser.service.parser.ServiceParser;
 import org.junit.Before;
 import org.junit.Test;
 
