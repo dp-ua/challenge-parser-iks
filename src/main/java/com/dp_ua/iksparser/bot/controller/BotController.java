@@ -51,7 +51,7 @@ public class BotController implements ControllerService {
         return null;
     }
 
-    private void sendMessageToAdmin(String text) {
+    public void sendMessageToAdmin(String text) {
         SendMessage message = SERVICE.getSendMessage(adminId, text);
         SendMessageEvent event = new SendMessageEvent(this, message, SendMessageEvent.MsgType.SEND_MESSAGE);
         publisher.publishEvent(event);
