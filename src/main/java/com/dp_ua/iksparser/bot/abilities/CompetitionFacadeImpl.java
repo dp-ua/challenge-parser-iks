@@ -375,7 +375,6 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                     .insert(0, LINK);
             sb
                     .append(" ")
-                    .append(Icon.URL)
                     .append(LINK_END)
                     .append(LINK_SEPARATOR)
                     .append(participant.getUrl())
