@@ -16,3 +16,8 @@ services:
       - IKS_TELEGRAM_ADMIN_ID=${IKS_TELEGRAM_ADMIN_ID}
       - IKS_DB_USERNAME=${IKS_DB_USERNAME}
       - IKS_DB_PASSWORD=${IKS_DB_PASSWORD}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8181/actuator/health"]  # Adjust the URL based on your actual health check endpoint
+      interval: 10s
+      timeout: 5s
+      retries: 3

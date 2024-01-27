@@ -3,6 +3,11 @@ server:
   port: 8181
 #  servlet:
 #    context-path: /iksparser
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
 
 spring:
   config:
