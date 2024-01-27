@@ -1,6 +1,16 @@
 package com.dp_ua.iksparser.bot;
 
 public enum Icon {
+    GREEN_CIRCLE("🟢"),
+    GRAY_CIRCLE("⚪"),
+    RED_CIRCLE("🔴"),
+    BLUE_CIRCLE("🔵"),
+    YELLOW_CIRCLE("🟡"),
+    ORANGE_CIRCLE("🟠"),
+    PURPLE_CIRCLE("🟣"),
+    BROWN_CIRCLE("🟤"),
+    BLACK_CIRCLE("⚫"),
+    WHITE_CIRCLE("⚪"),
     ROBOT("🤖"),
     BIRTHDAY("🎂"),
     ATHLETE("🏃"),

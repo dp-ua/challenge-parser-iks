@@ -1,4 +1,4 @@
-package com.dp_ua.iksparser.service;
+package com.dp_ua.iksparser.service.parser;
 
 import com.dp_ua.iksparser.dba.element.DayEntity;
 import lombok.extern.slf4j.Slf4j;

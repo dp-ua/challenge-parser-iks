@@ -6,12 +6,16 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 @Component
 @Transactional
 public class CompetitionService {
+    public static final String DD_MM_YYYY = "dd.MM.yyyy";
     private final CompetitionRepo repo;
 
     @Autowired
@@ -24,11 +28,20 @@ public class CompetitionService {
     }
 
     public List<CompetitionEntity> findAllOrderByBeginDate(boolean reverse) {
+        List<CompetitionEntity> all = repo.findAll();
+        all.sort((o1, o2) -> dateComparator.compare(o1.getBeginDate(), o2.getBeginDate()));
         if (reverse) {
-            return repo.findAllByOrderByBeginDateDesc();
+            Collections.reverse(all);
         }
-        return repo.findAllByOrderByBeginDate();
+        return all;
     }
+
+    private final Comparator<String> dateComparator = (o1, o2) -> {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DD_MM_YYYY);
+        LocalDate date1 = LocalDate.parse(o1, formatter);
+        LocalDate date2 = LocalDate.parse(o2, formatter);
+        return date1.compareTo(date2);
+    };
 
     public CompetitionEntity getFreshestCompetition() {
         List<CompetitionEntity> competitions = findAllOrderByUpdated();
@@ -36,12 +49,6 @@ public class CompetitionService {
             return null;
         }
         return competitions.get(0);
-    }
-
-    public List<CompetitionEntity> findAll() {
-        List<CompetitionEntity> competitions = new ArrayList<>();
-        repo.findAll().forEach(competitions::add);
-        return competitions;
     }
 
     public CompetitionEntity saveOrUpdate(CompetitionEntity competition) {

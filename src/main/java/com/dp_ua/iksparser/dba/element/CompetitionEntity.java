@@ -16,6 +16,7 @@ import java.util.List;
 })
 public class CompetitionEntity extends DomainElement {
     private String name;
+    private String status;
     private String beginDate;
     private String endDate;
     private String country;
