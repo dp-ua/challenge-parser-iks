@@ -84,8 +84,6 @@ public class EventPageParser {
                     if (name.isEmpty()) {
                         continue;
                     }
-                    log.info("working with coach {}", name);
-
                     CoachEntity coach = coachService.findByName(name);
                     if (coach == null) {
                         coach = new CoachEntity();
