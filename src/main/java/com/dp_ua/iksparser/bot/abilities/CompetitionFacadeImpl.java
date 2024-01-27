@@ -297,7 +297,10 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                     .append(END_LINE);
 
             sb
+                    .append(competitionName(competition))
+                    .append(END_LINE)
                     .append(competitionDate(competition))
+                    .append(END_LINE)
                     .append(END_LINE);
             sb
                     .append(ITALIC)
@@ -874,8 +877,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         List<CompetitionEntity> competitions = mainPageParser.parseCompetitions();
         competitions
                 .forEach(c -> {
-                    CompetitionEntity competition = competitionService.saveOrUpdate(c);
-                    log.info("Competition: " + competition);
+                    competitionService.saveOrUpdate(c);
                 });
     }
 
