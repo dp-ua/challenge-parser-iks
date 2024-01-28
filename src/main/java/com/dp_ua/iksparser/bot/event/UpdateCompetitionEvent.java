@@ -1,4 +1,4 @@
-package com.dp_ua.iksparser.service;
+package com.dp_ua.iksparser.bot.event;
 
 import com.dp_ua.iksparser.dba.element.UpdateStatusEntity;
 import lombok.Getter;

@@ -1,7 +1,7 @@
 package com.dp_ua.iksparser.bot;
 
 import com.dp_ua.iksparser.bot.message.ReceivedMessage;
-import com.dp_ua.iksparser.bot.performer.event.GetMessageEvent;
+import com.dp_ua.iksparser.bot.event.GetMessageEvent;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;

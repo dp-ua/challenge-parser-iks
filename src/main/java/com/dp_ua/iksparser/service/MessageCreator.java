@@ -1,6 +1,6 @@
 package com.dp_ua.iksparser.service;
 
-import com.dp_ua.iksparser.bot.performer.event.SendMessageEvent;
+import com.dp_ua.iksparser.bot.event.SendMessageEvent;
 import org.telegram.telegrambots.meta.api.methods.ActionType;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendChatAction;
@@ -10,7 +10,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
-import static com.dp_ua.iksparser.bot.performer.event.SendMessageEvent.MsgType.ANSWER_CALLBACK_QUERY;
+import static com.dp_ua.iksparser.bot.event.SendMessageEvent.MsgType.ANSWER_CALLBACK_QUERY;
 
 public enum MessageCreator {
     SERVICE;

@@ -5,12 +5,12 @@ import com.dp_ua.iksparser.bot.command.impl.CommandSearchByCoach;
 import com.dp_ua.iksparser.bot.command.impl.CommandSearchByCoachWithName;
 import com.dp_ua.iksparser.bot.command.impl.CommandSearchByName;
 import com.dp_ua.iksparser.bot.command.impl.CommandSearchByNameWithName;
-import com.dp_ua.iksparser.bot.performer.event.SendMessageEvent;
+import com.dp_ua.iksparser.bot.event.SendMessageEvent;
 import com.dp_ua.iksparser.dba.element.*;
 import com.dp_ua.iksparser.dba.service.CoachService;
 import com.dp_ua.iksparser.dba.service.CompetitionService;
 import com.dp_ua.iksparser.service.JsonReader;
-import com.dp_ua.iksparser.service.UpdateCompetitionEvent;
+import com.dp_ua.iksparser.bot.event.UpdateCompetitionEvent;
 import com.dp_ua.iksparser.service.parser.MainParserService;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static com.dp_ua.iksparser.bot.Icon.*;
-import static com.dp_ua.iksparser.bot.performer.event.SendMessageEvent.MsgType.*;
+import static com.dp_ua.iksparser.bot.event.SendMessageEvent.MsgType.*;
 import static com.dp_ua.iksparser.service.MessageCreator.*;
 
 @Component
@@ -38,7 +38,7 @@ import static com.dp_ua.iksparser.service.MessageCreator.*;
 public class CompetitionFacadeImpl implements CompetitionFacade {
     public static final int COMPETITIONS_PAGE_SIZE = 3;
     private static final int COMPETITION_BUTTON_LIMIT = 40;
-    public static final int TTL_MINUTES_COMPETITION_UPDATE = 10;
+    public static final int TTL_MINUTES_COMPETITION_UPDATE = 30;
     public static final int MAX_PARTICIPANTS_SIZE_TO_FIND = 5;
     @Autowired
     MainParserService mainPageParser;
@@ -52,6 +52,9 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
     StateService stateService;
     @Autowired
     JsonReader jSonReader;
+    @Autowired
+    StateService state;
+
 
     @Override
     public void showCompetitions(String chatId, int pageNumber, Integer editMessageId) {
@@ -663,7 +666,9 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                 .append(ITALIC)
                 .append(competition.getCountry())
                 .append(", ")
-                .append(competition.getCity());
+                .append(BOLD)
+                .append(competition.getCity())
+                .append(BOLD);
         return sb;
     }
 
@@ -876,15 +881,18 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
     public void updateCompetitions() {
         List<CompetitionEntity> competitions = mainPageParser.parseCompetitions();
         competitions
-                .forEach(c -> {
-                    competitionService.saveOrUpdate(c);
-                });
+                .forEach(c -> competitionService.saveOrUpdate(c));
+        state.setUpdateCompetitionsTime(LocalDateTime.now());
     }
 
     private boolean isNeedToUpdate(CompetitionEntity competition) {
         if (competition == null) {
             return true;
         }
-        return competition.getUpdatedTime().isBefore(LocalDateTime.now().minusMinutes(TTL_MINUTES_COMPETITION_UPDATE));
+        LocalDateTime time = state.getUpdateCompetitionsTime();
+        if (time == null) {
+            return true;
+        }
+        return time.isBefore(LocalDateTime.now().minusMinutes(TTL_MINUTES_COMPETITION_UPDATE));
     }
 }

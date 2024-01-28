@@ -1,8 +1,9 @@
 package com.dp_ua.iksparser.service;
 
 import com.dp_ua.iksparser.bot.command.impl.CommandCompetition;
+import com.dp_ua.iksparser.bot.event.UpdateCompetitionEvent;
 import com.dp_ua.iksparser.bot.message.SelfMessage;
-import com.dp_ua.iksparser.bot.performer.event.GetMessageEvent;
+import com.dp_ua.iksparser.bot.event.GetMessageEvent;
 import com.dp_ua.iksparser.dba.element.CompetitionEntity;
 import com.dp_ua.iksparser.dba.element.DayEntity;
 import com.dp_ua.iksparser.dba.element.UpdateStatusEntity;

@@ -1,15 +1,20 @@
 package com.dp_ua.iksparser.bot.abilities;
 
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.generics.BotSession;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
 @Component
 public class StateService {
     private final Map<String, String> stateMap = new HashMap<>();
+    @Setter
+    @Getter
+    private LocalDateTime updateCompetitionsTime;
     @Getter
     private BotSession botSession;
 
@@ -33,7 +38,7 @@ public class StateService {
     public static String formatArgs(String template, String... args) {
         String result = template;
         for (String arg : args) {
-            result = result.replaceFirst("\\{\\}", arg);
+            result = result.replaceFirst("\\{}", arg);
         }
         return result;
     }
