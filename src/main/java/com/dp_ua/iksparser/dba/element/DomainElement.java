@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -18,24 +18,20 @@ public class DomainElement {
     protected Long id;
 
     @Column(updatable = false)
-    protected String created;
+    protected Date created;
 
-    protected String updated;
+    protected Date updated;
 
     @PrePersist
     protected void onCreate() {
-        created = LocalDateTime.now().toString();
-        updated = LocalDateTime.now().toString();
+        created = new Date();
+        updated = new Date();
         log.debug("created: {}, {}", this.getClass().getSimpleName(), this);
     }
 
     @PreUpdate
     protected void onUpdate() {
-        updated = LocalDateTime.now().toString();
+        updated = new Date();
         log.debug("updated: {}, {}", this.getClass().getSimpleName(), this);
-    }
-
-    public LocalDateTime getUpdatedTime() {
-        return LocalDateTime.parse(updated);
     }
 }

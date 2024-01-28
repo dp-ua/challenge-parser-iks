@@ -4,12 +4,14 @@ import lombok.Getter;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.generics.BotSession;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
 @Component
 public class StateService {
     private final Map<String, String> stateMap = new HashMap<>();
+    private LocalDateTime updateCompetitionsTime;
     @Getter
     private BotSession botSession;
 
@@ -40,5 +42,13 @@ public class StateService {
 
     public void saveBotSession(BotSession botSession) {
         this.botSession = botSession;
+    }
+
+    public LocalDateTime getUpdateCompetitionsTime() {
+        return updateCompetitionsTime;
+    }
+
+    public void setUpdateCompetitionsTime(LocalDateTime now) {
+        updateCompetitionsTime = now;
     }
 }

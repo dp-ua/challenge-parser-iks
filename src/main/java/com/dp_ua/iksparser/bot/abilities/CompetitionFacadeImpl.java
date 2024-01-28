@@ -38,7 +38,7 @@ import static com.dp_ua.iksparser.service.MessageCreator.*;
 public class CompetitionFacadeImpl implements CompetitionFacade {
     public static final int COMPETITIONS_PAGE_SIZE = 3;
     private static final int COMPETITION_BUTTON_LIMIT = 40;
-    public static final int TTL_MINUTES_COMPETITION_UPDATE = 10;
+    public static final int TTL_MINUTES_COMPETITION_UPDATE = 30;
     public static final int MAX_PARTICIPANTS_SIZE_TO_FIND = 5;
     @Autowired
     MainParserService mainPageParser;
@@ -52,6 +52,9 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
     StateService stateService;
     @Autowired
     JsonReader jSonReader;
+    @Autowired
+    StateService state;
+
 
     @Override
     public void showCompetitions(String chatId, int pageNumber, Integer editMessageId) {
@@ -663,7 +666,9 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                 .append(ITALIC)
                 .append(competition.getCountry())
                 .append(", ")
-                .append(competition.getCity());
+                .append(BOLD)
+                .append(competition.getCity())
+                .append(BOLD);
         return sb;
     }
 
@@ -879,12 +884,17 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                 .forEach(c -> {
                     competitionService.saveOrUpdate(c);
                 });
+        state.setUpdateCompetitionsTime(LocalDateTime.now());
     }
 
     private boolean isNeedToUpdate(CompetitionEntity competition) {
         if (competition == null) {
             return true;
         }
-        return competition.getUpdatedTime().isBefore(LocalDateTime.now().minusMinutes(TTL_MINUTES_COMPETITION_UPDATE));
+        LocalDateTime time = state.getUpdateCompetitionsTime();
+        if (time == null) {
+            return true;
+        }
+        return time.isBefore(LocalDateTime.now().minusMinutes(TTL_MINUTES_COMPETITION_UPDATE));
     }
 }
