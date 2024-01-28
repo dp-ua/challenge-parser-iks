@@ -3,7 +3,7 @@ package com.dp_ua.iksparser.bot.command.impl;
 import com.dp_ua.iksparser.bot.Bot;
 import com.dp_ua.iksparser.bot.command.CommandInterface;
 import com.dp_ua.iksparser.bot.message.Message;
-import com.dp_ua.iksparser.bot.performer.event.SendMessageEvent;
+import com.dp_ua.iksparser.bot.event.SendMessageEvent;
 import com.dp_ua.iksparser.service.MessageCreator;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
 import static com.dp_ua.iksparser.bot.Icon.*;
-import static com.dp_ua.iksparser.bot.performer.event.SendMessageEvent.MsgType.SEND_MESSAGE;
+import static com.dp_ua.iksparser.bot.event.SendMessageEvent.MsgType.SEND_MESSAGE;
 import static com.dp_ua.iksparser.service.MessageCreator.*;
 
 @Component

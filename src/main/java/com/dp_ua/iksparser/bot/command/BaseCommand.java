@@ -1,7 +1,7 @@
 package com.dp_ua.iksparser.bot.command;
 
 import com.dp_ua.iksparser.bot.message.Message;
-import com.dp_ua.iksparser.bot.performer.event.SendMessageEvent;
+import com.dp_ua.iksparser.bot.event.SendMessageEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;

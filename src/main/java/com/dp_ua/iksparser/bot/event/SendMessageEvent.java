@@ -1,4 +1,4 @@
-package com.dp_ua.iksparser.bot.performer.event;
+package com.dp_ua.iksparser.bot.event;
 
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;

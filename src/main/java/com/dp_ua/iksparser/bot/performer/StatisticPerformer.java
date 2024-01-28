@@ -2,7 +2,7 @@ package com.dp_ua.iksparser.bot.performer;
 
 import com.dp_ua.iksparser.bot.controller.BotController;
 import com.dp_ua.iksparser.bot.message.Message;
-import com.dp_ua.iksparser.bot.performer.event.GetMessageEvent;
+import com.dp_ua.iksparser.bot.event.GetMessageEvent;
 import com.dp_ua.iksparser.dba.service.StatisticService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

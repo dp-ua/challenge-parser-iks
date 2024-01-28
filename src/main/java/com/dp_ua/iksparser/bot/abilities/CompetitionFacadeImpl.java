@@ -5,12 +5,12 @@ import com.dp_ua.iksparser.bot.command.impl.CommandSearchByCoach;
 import com.dp_ua.iksparser.bot.command.impl.CommandSearchByCoachWithName;
 import com.dp_ua.iksparser.bot.command.impl.CommandSearchByName;
 import com.dp_ua.iksparser.bot.command.impl.CommandSearchByNameWithName;
-import com.dp_ua.iksparser.bot.performer.event.SendMessageEvent;
+import com.dp_ua.iksparser.bot.event.SendMessageEvent;
 import com.dp_ua.iksparser.dba.element.*;
 import com.dp_ua.iksparser.dba.service.CoachService;
 import com.dp_ua.iksparser.dba.service.CompetitionService;
 import com.dp_ua.iksparser.service.JsonReader;
-import com.dp_ua.iksparser.service.UpdateCompetitionEvent;
+import com.dp_ua.iksparser.bot.event.UpdateCompetitionEvent;
 import com.dp_ua.iksparser.service.parser.MainParserService;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static com.dp_ua.iksparser.bot.Icon.*;
-import static com.dp_ua.iksparser.bot.performer.event.SendMessageEvent.MsgType.*;
+import static com.dp_ua.iksparser.bot.event.SendMessageEvent.MsgType.*;
 import static com.dp_ua.iksparser.service.MessageCreator.*;
 
 @Component
