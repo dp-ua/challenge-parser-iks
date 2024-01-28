@@ -3,10 +3,9 @@ package com.dp_ua.iksparser.bot.event;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
+@Getter
 public class SendMessageEvent extends ApplicationEvent {
-    @Getter
     private final Object message;
-    @Getter
     private final MsgType msgType;
 
     public SendMessageEvent(Object source, Object message, MsgType msgType) {

@@ -4,8 +4,8 @@ import com.dp_ua.iksparser.bot.message.Message;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
+@Getter
 public class GetMessageEvent extends ApplicationEvent {
-    @Getter
     private final Message message;
 
     public GetMessageEvent(Object source, Message message) {
