@@ -881,9 +881,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
     public void updateCompetitions() {
         List<CompetitionEntity> competitions = mainPageParser.parseCompetitions();
         competitions
-                .forEach(c -> {
-                    competitionService.saveOrUpdate(c);
-                });
+                .forEach(c -> competitionService.saveOrUpdate(c));
         state.setUpdateCompetitionsTime(LocalDateTime.now());
     }
 

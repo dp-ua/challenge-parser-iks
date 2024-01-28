@@ -32,7 +32,7 @@ public class StatisticInformer {
     }
 
     private Map<String, Long> getStatMsgsSorted(LocalDate now) {
-        Map<String, Long> msgCountByChatId = service.getAllByDate(now).stream()
+        return service.getAllByDate(now).stream()
                 .collect(Collectors.groupingBy(StatisticEntity::getChatId, Collectors.counting()))
                 .entrySet().stream()
                 .sorted(Map.Entry.comparingByValue())
@@ -42,6 +42,5 @@ public class StatisticInformer {
                         (e1, e2) -> e1,
                         LinkedHashMap::new
                 ));
-        return msgCountByChatId;
     }
 }
