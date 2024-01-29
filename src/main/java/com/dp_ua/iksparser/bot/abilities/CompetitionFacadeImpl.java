@@ -6,11 +6,11 @@ import com.dp_ua.iksparser.bot.command.impl.CommandSearchByCoachWithName;
 import com.dp_ua.iksparser.bot.command.impl.CommandSearchByName;
 import com.dp_ua.iksparser.bot.command.impl.CommandSearchByNameWithName;
 import com.dp_ua.iksparser.bot.event.SendMessageEvent;
+import com.dp_ua.iksparser.bot.event.UpdateCompetitionEvent;
 import com.dp_ua.iksparser.dba.element.*;
 import com.dp_ua.iksparser.dba.service.CoachService;
 import com.dp_ua.iksparser.dba.service.CompetitionService;
 import com.dp_ua.iksparser.service.JsonReader;
-import com.dp_ua.iksparser.bot.event.UpdateCompetitionEvent;
 import com.dp_ua.iksparser.service.parser.MainParserService;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -87,6 +87,9 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
 
         boolean competitionFilled = isCompetitionFilled(competition);
         String text = getCompetitionDetailsText(competition, competitionFilled);
+        if (!competitionFilled) {
+            text = text + updatingMessageText();
+        }
         InlineKeyboardMarkup keyboard = getCompetitionDetailsKeyboard(competition, competitionFilled);
 
         publishEvent(prepareSendMessageEvent(
@@ -327,6 +330,32 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                     getBackToCompetitionKeyboard(competitionId)
             ));
         });
+    }
+
+    @Override
+    public void showNotLoadedInfo(String chatId, int commandArgument, Integer editMessageId) {
+        log.info("showNotLoadedInfo. CommandArgument {}, chatId:{} ", commandArgument, chatId);
+        sendTypingAction(chatId);
+
+        CompetitionEntity competition = competitionService.findById(commandArgument);
+
+        if (competition == null) {
+            log.warn("Competition[{}] not found", commandArgument);
+            publishEvent(prepareSendMessageEvent(
+                    chatId, editMessageId,
+                    "Змагання не знайдено", getBackToCompetitionsKeyboard()));
+            return;
+        }
+
+        String text = getCompetitionDetailsText(competition, false);
+        InlineKeyboardMarkup keyboard = getCompetitionDetailsKeyboard(competition, false);
+
+        publishEvent(prepareSendMessageEvent(
+                chatId,
+                editMessageId,
+                text,
+                keyboard
+        ));
     }
 
     private String heatLineInfo(HeatLineEntity heatLine) {
@@ -597,7 +626,13 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                 .append(WARNING)
                 .append(" Детальна інформація про змагання відсутня ")
                 .append(WARNING)
-                .append(END_LINE)
+                .append(END_LINE);
+        return sb;
+    }
+
+    private StringBuilder updatingMessageText() {
+        StringBuilder sb = new StringBuilder();
+        sb
                 .append(END_LINE)
                 .append(INFO)
                 .append(" Оновлюю. Вам прийде повідомлення, якщо дані вже доступні ")
