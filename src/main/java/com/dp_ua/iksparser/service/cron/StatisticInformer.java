@@ -28,7 +28,9 @@ public class StatisticInformer {
         String msg = msgCountByChatId.entrySet().stream()
                 .map(e -> e.getKey() + ": " + e.getValue())
                 .collect(Collectors.joining("\n"));
-        bot.sendMessageToAdmin(msg);
+        if (!msg.isEmpty()) {
+            bot.sendMessageToAdmin(msg);
+        }
     }
 
     private Map<String, Long> getStatMsgsSorted(LocalDate now) {
