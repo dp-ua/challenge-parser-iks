@@ -5,6 +5,7 @@ import com.dp_ua.iksparser.dba.element.EventEntity;
 import com.dp_ua.iksparser.dba.element.HeatEntity;
 import com.dp_ua.iksparser.dba.service.DayService;
 import com.dp_ua.iksparser.dba.service.EventService;
+import com.dp_ua.iksparser.exeption.ParsingException;
 import com.dp_ua.iksparser.service.Downloader;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Document;
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.dp_ua.iksparser.exeption.ExceptionType.CANT_PARSE_DAYS;
 
 @Slf4j
 @Component
@@ -33,7 +36,7 @@ public class CompetitionPageParser {
         this.pageParser = pageParser;
     }
 
-    public List<DayEntity> getParsedDays(Document document) {
+    public List<DayEntity> getParsedDays(Document document) throws ParsingException {
         List<DayEntity> days = getUnfilledDays(document);
         days.forEach(day -> {
             List<EventEntity> events = getEvents(document, day.getDateId());
@@ -46,7 +49,7 @@ public class CompetitionPageParser {
         return days;
     }
 
-    public List<DayEntity> getUnfilledDays(Document document) {
+    public List<DayEntity> getUnfilledDays(Document document) throws ParsingException {
         Elements days = document.select("ul#timetable li a");
         checkDays(days);
         List<DayEntity> result = new ArrayList<>();
@@ -61,9 +64,9 @@ public class CompetitionPageParser {
         return result;
     }
 
-    private void checkDays(Elements days) {
+    private void checkDays(Elements days) throws ParsingException {
         if (days.isEmpty()) {
-            throw new RuntimeException("Wrong number of days");
+            throw new ParsingException("Wrong number of days", CANT_PARSE_DAYS);
         }
     }
 

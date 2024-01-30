@@ -12,4 +12,6 @@ public interface CompetitionFacade {
     void startSearchByCoach(String chatId, int commandArgument, Integer editMessageId);
 
     void searchingByCoachWithName(String chatId, String commandArgument, Integer editMessageId);
+
+    void showNotLoadedInfo(String chatId, int commandArgument, Integer editMessageId);
 }

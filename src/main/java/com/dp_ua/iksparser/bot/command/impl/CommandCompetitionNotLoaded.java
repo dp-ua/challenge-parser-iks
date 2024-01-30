@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 @ToString
-public class CommandCompetition extends BaseCommand {
-    public final static String command = "competition";
+public class CommandCompetitionNotLoaded extends BaseCommand {
+    public final static String command = "competitionnotloaded";
     private final boolean isInTextCommand = false;
     @Autowired
     CompetitionFacade competitionFacade;
@@ -31,6 +31,6 @@ public class CommandCompetition extends BaseCommand {
     protected void perform(Message message) {
         String chatId = message.getChatId();
         int commandArgument = getCommandArgument(message.getMessageText());
-        competitionFacade.showCompetition(chatId, commandArgument, message.getEditMessageId());
+        competitionFacade.showNotLoadedInfo(chatId, commandArgument, message.getEditMessageId());
     }
 }
