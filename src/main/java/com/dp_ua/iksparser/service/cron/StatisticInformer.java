@@ -23,7 +23,7 @@ public class StatisticInformer {
 
     @Scheduled(cron = "0 0 9 * * *")  // every day at 9:00
     public void inform() {
-        LocalDate now = LocalDate.now();
+        LocalDate now = LocalDate.now().minusDays(1);
         Map<String, Long> msgCountByChatId = getStatMsgsSorted(now);
         String msg = msgCountByChatId.entrySet().stream()
                 .map(e -> e.getKey() + ": " + e.getValue())
