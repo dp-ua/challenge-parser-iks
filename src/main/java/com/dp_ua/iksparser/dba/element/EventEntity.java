@@ -16,7 +16,7 @@ public class EventEntity extends DomainElement {
     private String category;
     private String round;
     private String startListUrl;
-    private String ResultUrl;
+    private String resultUrl;
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
     private List<HeatEntity> heats;
     @ManyToOne
@@ -31,7 +31,7 @@ public class EventEntity extends DomainElement {
                 ", category='" + category + '\'' +
                 ", round='" + round + '\'' +
                 ", startListUrl='" + startListUrl + '\'' +
-                ", ResultUrl='" + ResultUrl + '\'' +
+                ", ResultUrl='" + resultUrl + '\'' +
                 '}';
     }
 
@@ -45,6 +45,7 @@ public class EventEntity extends DomainElement {
         this.category = category;
         this.round = round;
         this.startListUrl = startListUrl;
+        this.resultUrl = resultUrl;
         heats = new ArrayList<>();
     }
 
