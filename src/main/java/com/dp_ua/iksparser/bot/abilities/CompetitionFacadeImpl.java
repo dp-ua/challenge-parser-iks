@@ -733,7 +733,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
             case PLANED -> BLUE_CIRCLE;
             case NOT_STARTED -> GREEN_CIRCLE;
             case IN_PROGRESS -> RED_CIRCLE;
-            case FINISHED -> GRAY_CIRCLE;
+            case FINISHED -> LIGHT_GRAY_CIRCLE;
         };
     }
 
