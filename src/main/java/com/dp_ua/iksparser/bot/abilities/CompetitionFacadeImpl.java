@@ -376,6 +376,8 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                     .append(LINK)
                     .append(event.getEventName())
                     .append(", ")
+                    .append(event.getCategory())
+                    .append(", ")
                     .append(event.getRound())
                     .append(LINK_END)
                     .append(LINK_SEPARATOR)
