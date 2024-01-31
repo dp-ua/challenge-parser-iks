@@ -40,6 +40,8 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
     private static final int COMPETITION_BUTTON_LIMIT = 40;
     public static final int TTL_MINUTES_COMPETITION_UPDATE = 30;
     public static final int MAX_PARTICIPANTS_SIZE_TO_FIND = 5;
+    private static final int MAX_CHUNK_SIZE = 4096;
+
     @Autowired
     MainParserService mainPageParser;
     @Autowired
@@ -288,8 +290,8 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                 participantHeatLines.add(heatLine);
             });
 
-            StringBuilder sb = new StringBuilder();
-            sb
+            StringBuilder header = new StringBuilder();
+            header
                     .append(LOOK)
                     .append(BOLD)
                     .append("Знайдено тренера: ")
@@ -302,34 +304,61 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                     .append(END_LINE)
                     .append(END_LINE);
 
-            sb
+            header
                     .append(competitionName(competition))
                     .append(END_LINE)
                     .append(competitionDate(competition))
                     .append(END_LINE)
                     .append(END_LINE);
-            sb
+            header
                     .append(ITALIC)
                     .append("Заявлені такі спортсмени: ")
                     .append(ITALIC)
                     .append(END_LINE)
                     .append(END_LINE);
 
-            participantHeatLinesMap.forEach((participant, participantHeatLines) -> {
-                sb
-                        .append(participantInfo(participant))
-                        .append(END_LINE);
-                participantHeatLines.forEach(heatLine -> sb.append(heatLineInfo(heatLine)));
-                sb.append(END_LINE);
-            });
-
-            publishEvent(prepareSendMessageEvent(
-                    chatId,
-                    null,
-                    sb.toString(),
-                    getBackToCompetitionKeyboard(competitionId)
-            ));
+            List<StringBuilder> participantsInfo = prepareParticipantsInfoList(participantHeatLinesMap);
+            sendChunkedMessages(chatId, competitionId, header, participantsInfo);
         });
+    }
+
+    private void sendChunkedMessages(String chatId, String competitionId, StringBuilder header, List<StringBuilder> participantsInfo) {
+        StringBuilder message = new StringBuilder();
+        message.append(header);
+        participantsInfo.forEach(participantInfo -> {
+            if (message.toString().length() + participantInfo.toString().length() >= MAX_CHUNK_SIZE) {
+                publishEvent(prepareSendMessageEvent(
+                        chatId,
+                        null,
+                        message.toString(),
+                        getBackToCompetitionKeyboard(competitionId)
+                ));
+                message.setLength(0);
+                message.append(header);
+            }
+            message.append(participantInfo);
+        });
+
+        publishEvent(prepareSendMessageEvent(
+                chatId,
+                null,
+                message.toString(),
+                getBackToCompetitionKeyboard(competitionId)
+        ));
+    }
+
+    private List<StringBuilder> prepareParticipantsInfoList(Map<ParticipantEntity, List<HeatLineEntity>> participantHeatLinesMap) {
+        List<StringBuilder> result = new ArrayList<>();
+        participantHeatLinesMap.forEach((participant, participantHeatLines) -> {
+            StringBuilder participantInfo = new StringBuilder();
+            participantInfo
+                    .append(participantInfo(participant))
+                    .append(END_LINE);
+            participantHeatLines.forEach(heatLine -> participantInfo.append(heatLineInfo(heatLine)));
+            participantInfo.append(END_LINE);
+            result.add(participantInfo);
+        });
+        return result;
     }
 
     @Override
