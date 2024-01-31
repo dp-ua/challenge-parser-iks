@@ -33,8 +33,8 @@ public class CronStatisticInformer {
         }
     }
 
-    private Map<String, Long> getStatMsgsSorted(LocalDate now) {
-        return service.getAllByDate(now).stream()
+    private Map<String, Long> getStatMsgsSorted(LocalDate day) {
+        return service.getAllByDate(day).stream()
                 .collect(Collectors.groupingBy(StatisticEntity::getChatId, Collectors.counting()))
                 .entrySet().stream()
                 .sorted(Map.Entry.comparingByValue())

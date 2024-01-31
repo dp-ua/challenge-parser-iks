@@ -3,6 +3,7 @@ package com.dp_ua.iksparser.bot.message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.User;
 
 import java.util.Objects;
 
@@ -61,6 +62,25 @@ public class ReceivedMessage implements Message {
     }
 
     @Override
+    public String getUserName() {
+        User user = getUser();
+        if (user != null) {
+            return user.getFirstName() + " " + user.getLastName() + "[" + user.getUserName() + "]";
+        }
+        return "";
+    }
+
+    private User getUser() {
+        if (update.hasMessage()) {
+            return update.getMessage().getFrom();
+        }
+        if (update.hasCallbackQuery()) {
+            return update.getCallbackQuery().getFrom();
+        }
+        return null;
+    }
+
+    @Override
     public String getMessageText() {
         if (update.hasMessage()) {
             return update.getMessage().getText();
@@ -68,6 +88,6 @@ public class ReceivedMessage implements Message {
         if (update.hasCallbackQuery()) {
             return update.getCallbackQuery().getData();
         }
-        return "";
+        return null;
     }
 }
