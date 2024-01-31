@@ -29,7 +29,7 @@ public class CompetitionPageParser {
             EventEntity event = parseEvent(row);
             events.add(event);
         }
-        log.debug("For day[" + day.getDateId() + "] Events count: " + events.size());
+        log.info("For day[" + day.getDateId() + "] Events count: " + events.size());
         return events;
     }
 
@@ -69,13 +69,13 @@ public class CompetitionPageParser {
         try {
             startListUrl = columns.get(4).select("button").attr("onclick").split("'")[1].trim();
         } catch (Exception e) {
-            log.info("No start list url for event:{} {}", eventName, category);
+            log.debug("No start list url for event:{} {}", eventName, category);
         }
         String resultUrl = "";
         try {
             resultUrl = columns.get(5).select("button").attr("onclick").split("'")[1].trim();
         } catch (Exception e) {
-            log.info("No result url for event:{} {}", eventName, category);
+            log.debug("No result url for event:{} {}", eventName, category);
         }
 
         return new EventEntity(time, eventName, category, round, startListUrl, resultUrl);

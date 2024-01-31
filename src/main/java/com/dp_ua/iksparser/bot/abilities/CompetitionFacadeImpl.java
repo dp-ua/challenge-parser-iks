@@ -522,6 +522,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
     }
 
     private void publishUpdateCompetitionMessage(String chatId, Integer editMessageId, CompetitionEntity competition) {
+        // todo move to separate class
         UpdateStatusEntity message = new UpdateStatusEntity();
         message.setChatId(chatId);
         message.setCompetitionId(competition.getId());

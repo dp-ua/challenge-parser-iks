@@ -34,6 +34,9 @@ public class EventEntity extends DomainElement {
         this.startListUrl = event.getStartListUrl();
         this.resultUrl = event.getResultUrl();
     }
+    public boolean isNotFilled() {
+        return startListUrl.isEmpty() || resultUrl.isEmpty();
+    }
 
     @Override
     public String toString() {

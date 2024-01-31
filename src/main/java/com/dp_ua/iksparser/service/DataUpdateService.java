@@ -79,7 +79,6 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
         }
         updating.add(competitionId);
         lock.lock();
-        // todo add check. Is need to full update or only black heats
         try {
             updateCompetition(competition);
             changeStatus(competitionId, STARTED, UPDATED);
@@ -114,9 +113,10 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
                 .collect(Collectors.toMap(UpdateStatusEntity::getChatId, Function.identity(), (a, b) -> a))
                 .values()
                 .forEach(entry -> {
-                    GetMessageEvent messageEvent = getGetMessageEvent(competitionId, entry, status);
-                    // todo do not send for self update message
-                    publisher.publishEvent(messageEvent);
+                    if (!entry.getChatId().isEmpty()) {
+                        GetMessageEvent messageEvent = getGetMessageEvent(competitionId, entry, status);
+                        publisher.publishEvent(messageEvent);
+                    }
                 });
         statuses.forEach(updateStatusEntity -> {
             updateStatusEntity.setStatus(FINISHED.name());
@@ -213,6 +213,7 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
     }
 
     private void operateDaysAndAddItToCompetition(CompetitionEntity competition, Document document) throws ParsingException {
+        log.info("Updating competition {}", competition.getId());
         List<DayEntity> updatedDays = competitionParser.getUnsavedUnfilledDays(document);
         List<DayEntity> oldDays = competition.getDays();
         if (oldDays.isEmpty()) {
