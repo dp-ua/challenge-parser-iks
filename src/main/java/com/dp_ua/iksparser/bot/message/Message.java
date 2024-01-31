@@ -15,6 +15,7 @@ public interface Message {
 
     Integer getEditMessageId();
 
+    String getUserName();
     enum Type {
         RECEIVE, SELF
     }

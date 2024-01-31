@@ -31,4 +31,9 @@ public class SelfMessage implements Message {
     public String getCallBackQueryId() {
         return null;
     }
+
+    @Override
+    public String getUserName() {
+        return "SelfUserName";
+    }
 }

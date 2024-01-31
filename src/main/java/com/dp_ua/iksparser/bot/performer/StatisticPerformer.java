@@ -1,8 +1,8 @@
 package com.dp_ua.iksparser.bot.performer;
 
 import com.dp_ua.iksparser.bot.controller.BotController;
-import com.dp_ua.iksparser.bot.message.Message;
 import com.dp_ua.iksparser.bot.event.GetMessageEvent;
+import com.dp_ua.iksparser.bot.message.Message;
 import com.dp_ua.iksparser.dba.service.StatisticService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,16 +21,17 @@ public class StatisticPerformer implements ApplicationListener<GetMessageEvent> 
     public void onApplicationEvent(GetMessageEvent event) {
         Message message = event.getMessage();
         String chatId = message.getChatId();
+        String name = message.getUserName();
         // todo user name
 //        message.getUserName();
         long count = service.getCount(chatId);
         if (count == 0)
-            sendMessageToAdmin(chatId);
+            sendMessageToAdmin(chatId, name);
         String text = message.getMessageText();
-        service.save(chatId, text);
+        service.save(chatId, name, text);
     }
 
-    private void sendMessageToAdmin(String chatId) {
-        bot.sendMessageToAdmin("New user:{" + chatId + "}");
+    private void sendMessageToAdmin(String chatId, String name) {
+        bot.sendMessageToAdmin("New user:{" + chatId + ", " + name + "}");
     }
 }
