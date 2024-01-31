@@ -23,6 +23,18 @@ public class EventEntity extends DomainElement {
     @JoinColumn(name = "day_id")
     private DayEntity day;
 
+    public boolean isTheSame(EventEntity event) {
+        return this.eventName.equals(event.getEventName()) &&
+                this.category.equals(event.getCategory()) &&
+                this.round.equals(event.getRound());
+    }
+
+    public void updateEventDetails(EventEntity event) {
+        this.time = event.getTime();
+        this.startListUrl = event.getStartListUrl();
+        this.resultUrl = event.getResultUrl();
+    }
+
     @Override
     public String toString() {
         return "EventEntity{" +
@@ -39,7 +51,7 @@ public class EventEntity extends DomainElement {
         heats = new ArrayList<>();
     }
 
-    public EventEntity(String time, String eventName, String category, String round, String startListUrl) {
+    public EventEntity(String time, String eventName, String category, String round, String startListUrl, String resultUrl) {
         this.time = time;
         this.eventName = eventName;
         this.category = category;

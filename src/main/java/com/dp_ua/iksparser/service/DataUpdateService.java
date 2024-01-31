@@ -5,13 +5,11 @@ import com.dp_ua.iksparser.bot.command.impl.CommandCompetitionNotLoaded;
 import com.dp_ua.iksparser.bot.event.GetMessageEvent;
 import com.dp_ua.iksparser.bot.event.UpdateCompetitionEvent;
 import com.dp_ua.iksparser.bot.message.SelfMessage;
-import com.dp_ua.iksparser.dba.element.CompetitionEntity;
-import com.dp_ua.iksparser.dba.element.DayEntity;
-import com.dp_ua.iksparser.dba.element.UpdateStatusEntity;
-import com.dp_ua.iksparser.dba.service.CompetitionService;
-import com.dp_ua.iksparser.dba.service.UpdateStatusService;
+import com.dp_ua.iksparser.dba.element.*;
+import com.dp_ua.iksparser.dba.service.*;
 import com.dp_ua.iksparser.exeption.ParsingException;
 import com.dp_ua.iksparser.service.parser.CompetitionPageParser;
+import com.dp_ua.iksparser.service.parser.EventPageParser;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Document;
@@ -21,6 +19,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
@@ -41,9 +40,17 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
     @Autowired
     private Downloader downloader;
     @Autowired
-    private CompetitionPageParser parser;
+    private CompetitionPageParser competitionParser;
+    @Autowired
+    EventPageParser eventParser;
     @Autowired
     ApplicationEventPublisher publisher;
+    @Autowired
+    private DayService dayService;
+    @Autowired
+    private EventService eventService;
+    @Autowired
+    private HeatService heatService;
     private static final Set<Long> updating = new ConcurrentSkipListSet<>();
     Lock lock = new ReentrantLock();
 
@@ -74,11 +81,10 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
         lock.lock();
         // todo add check. Is need to full update or only black heats
         try {
-            downloadDataForCompetition(competition);
+            updateCompetition(competition);
             changeStatus(competitionId, STARTED, UPDATED);
         } catch (Exception e) {
             log.error("Error updating competition {}", competitionId, e);
-            // todo add send message to user
             changeStatus(competitionId, STARTED, ERROR);
         } catch (ParsingException e) {
             changeStatus(competitionId, STARTED, INFORM_ERROR);
@@ -87,6 +93,17 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
             updating.remove(competitionId);
             List.of(UPDATED, INFORM_ERROR).forEach(status -> sendMessages(competitionId, status));
         }
+    }
+
+    @Transactional
+    private void updateCompetition(CompetitionEntity competition) throws ParsingException {
+        Document document = downloader.getDocument(competition.getUrl());
+
+        operateDaysAndAddItToCompetition(competition, document);
+        List<EventEntity> newEvents = operateAndGetNewEventsForDays(competition, document);
+        operateEventsToParseHeats(newEvents);
+
+        competitionService.save(competition); // save all cascade
     }
 
     private void sendMessages(long competitionId, UpdateStatus status) {
@@ -98,6 +115,7 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
                 .values()
                 .forEach(entry -> {
                     GetMessageEvent messageEvent = getGetMessageEvent(competitionId, entry, status);
+                    // todo do not send for self update message
                     publisher.publishEvent(messageEvent);
                 });
         statuses.forEach(updateStatusEntity -> {
@@ -132,20 +150,94 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
         return selfMessage;
     }
 
-    @Transactional
-    private void downloadDataForCompetition(CompetitionEntity competition) throws ParsingException {
-        Document document = downloader.getDocument(competition.getUrl());
 
-        List<DayEntity> days = parser.getParsedDays(document);
-        days.forEach(day -> {
-            day.setCompetition(competition);
-            competition.addDay(day);
+    private void operateEventsToParseHeats(List<EventEntity> newEvents) {
+        newEvents.forEach(event -> {
+            if (event.getStartListUrl().isEmpty()) {
+                log.warn("Event {} has no start list url", event.getEventName());
+                return;
+            }
+            Document eventDocument = downloader.getDocument(event.getStartListUrl());
+            List<HeatEntity> heats = eventParser.getHeats(eventDocument);
+            heats.forEach(heat -> {
+                heat.getHeatLines().forEach(heatLine -> {
+                    // todo operations around subscribing to participant
+                    // heatLine.getParticipant();
+                });
+                heatService.save(heat);
+
+                heat.setEvent(event);
+                event.addHeat(heat);
+            });
         });
-        competitionService.save(competition);
-        competitionService.flush();
     }
 
-    private void changeStatus(long competitionId, UpdateStatus oldStatus, UpdateStatus newStatus) {
+    private List<EventEntity> operateAndGetNewEventsForDays(CompetitionEntity competition, Document document) {
+        List<EventEntity> newEventResults = new ArrayList<>();
+        competition.getDays().forEach(day -> {
+            List<EventEntity> updatedEvents = competitionParser.getUnsavedEvents(document, day);
+            List<EventEntity> oldEvents = day.getEvents();
+
+            if (oldEvents.isEmpty()) {
+                updatedEvents.forEach(event -> {
+                    if (!event.getStartListUrl().isEmpty()) {
+                        newEventResults.add(event);
+                    }
+                    eventService.save(event);
+                    event.setDay(day);
+                    day.addEvent(event);
+                });
+            } else {
+                updatedEvents.forEach(newEvent -> oldEvents.stream()
+                        .filter(newEvent::isTheSame)
+                        .findFirst()
+                        .ifPresentOrElse(oldEvent -> {
+                                    boolean needToUpdate = oldEvent.getStartListUrl().isEmpty() && !newEvent.getStartListUrl().isEmpty();
+                                    oldEvent.updateEventDetails(newEvent);
+                                    if (needToUpdate) {
+                                        newEventResults.add(newEvent);
+                                    }
+                                },
+                                () -> {
+                                    eventService.save(newEvent);
+                                    newEvent.setDay(day);
+                                    day.addEvent(newEvent);
+                                    if (!newEvent.getStartListUrl().isEmpty()) {
+                                        newEventResults.add(newEvent);
+                                    }
+                                }
+                        ));
+            }
+        });
+        return newEventResults;
+    }
+
+    private void operateDaysAndAddItToCompetition(CompetitionEntity competition, Document document) throws ParsingException {
+        List<DayEntity> updatedDays = competitionParser.getUnsavedUnfilledDays(document);
+        List<DayEntity> oldDays = competition.getDays();
+        if (oldDays.isEmpty()) {
+            updatedDays.forEach(day -> {
+                dayService.save(day);
+                day.setCompetition(competition);
+                competition.addDay(day);
+            });
+        } else {
+            updatedDays.forEach(newDay -> oldDays.stream()
+                    .filter(newDay::isTheSame)
+                    .findFirst()
+                    .ifPresentOrElse(oldDay -> {
+                            },
+                            () -> {
+                                dayService.save(newDay);
+                                newDay.setCompetition(competition);
+                                competition.addDay(newDay);
+                            }
+                    ));
+        }
+    }
+
+    private void changeStatus(long competitionId, UpdateStatus oldStatus, UpdateStatus
+            newStatus) {
         List<UpdateStatusEntity> allByCompetitionId = service.findAllByCompetitionIdAndStatus(competitionId, oldStatus.name());
         allByCompetitionId.forEach(updateStatusEntity -> {
             updateStatusEntity.setStatus(newStatus.name());
