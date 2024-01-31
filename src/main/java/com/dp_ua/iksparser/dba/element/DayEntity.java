@@ -39,6 +39,13 @@ public class DayEntity extends DomainElement {
         events.add(event);
     }
 
+    public boolean isTheSame(DayEntity day) {
+        return this.date.equals(day.getDate()) &&
+                this.dateId.equals(day.getDateId()) &&
+                this.dayName.equals(day.getDayName()) &&
+                this.dayNameEn.equals(day.getDayNameEn());
+    }
+
     @Override
     public String toString() {
         return "DayEntity{" +

@@ -16,12 +16,27 @@ public class EventEntity extends DomainElement {
     private String category;
     private String round;
     private String startListUrl;
-    private String ResultUrl;
+    private String resultUrl;
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
     private List<HeatEntity> heats;
     @ManyToOne
     @JoinColumn(name = "day_id")
     private DayEntity day;
+
+    public boolean isTheSame(EventEntity event) {
+        return this.eventName.equals(event.getEventName()) &&
+                this.category.equals(event.getCategory()) &&
+                this.round.equals(event.getRound());
+    }
+
+    public void updateEventDetails(EventEntity event) {
+        this.time = event.getTime();
+        this.startListUrl = event.getStartListUrl();
+        this.resultUrl = event.getResultUrl();
+    }
+    public boolean isNotFilled() {
+        return startListUrl.isEmpty() || resultUrl.isEmpty();
+    }
 
     @Override
     public String toString() {
@@ -31,7 +46,7 @@ public class EventEntity extends DomainElement {
                 ", category='" + category + '\'' +
                 ", round='" + round + '\'' +
                 ", startListUrl='" + startListUrl + '\'' +
-                ", ResultUrl='" + ResultUrl + '\'' +
+                ", ResultUrl='" + resultUrl + '\'' +
                 '}';
     }
 
@@ -39,12 +54,13 @@ public class EventEntity extends DomainElement {
         heats = new ArrayList<>();
     }
 
-    public EventEntity(String time, String eventName, String category, String round, String startListUrl) {
+    public EventEntity(String time, String eventName, String category, String round, String startListUrl, String resultUrl) {
         this.time = time;
         this.eventName = eventName;
         this.category = category;
         this.round = round;
         this.startListUrl = startListUrl;
+        this.resultUrl = resultUrl;
         heats = new ArrayList<>();
     }
 

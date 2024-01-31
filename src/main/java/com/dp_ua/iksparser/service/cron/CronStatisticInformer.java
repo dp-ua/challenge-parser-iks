@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 @Component
 @Slf4j
-public class StatisticInformer {
+public class CronStatisticInformer {
     @Autowired
     StatisticService service;
     @Autowired

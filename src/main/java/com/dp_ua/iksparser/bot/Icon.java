@@ -1,8 +1,10 @@
 package com.dp_ua.iksparser.bot;
 
 public enum Icon {
+    RESULT("📊"),
     GREEN_CIRCLE("🟢"),
     GRAY_CIRCLE("⚪"),
+    LIGHT_GRAY_CIRCLE("🔘"),
     RED_CIRCLE("🔴"),
     BLUE_CIRCLE("🔵"),
     YELLOW_CIRCLE("🟡"),

@@ -33,6 +33,7 @@ public class CommandProviderTest {
         Assert.assertEquals(
                 """
                         competition
+                        competitionnotloaded
                         competitions
                         help
                         searchbycoach

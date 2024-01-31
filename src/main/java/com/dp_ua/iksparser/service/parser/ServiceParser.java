@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ServiceParser {
     public DayEntity parseDay(String input) {
-        log.info("parse: " + input);
+        log.debug("Need to parse day: " + input);
         String[] parts = input.split(" ");
         checkParts(parts);
         String date = parts[0];
