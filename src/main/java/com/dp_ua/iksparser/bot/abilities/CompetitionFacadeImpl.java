@@ -422,8 +422,18 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                 .append(", д.")
                 .append(heatLine.getLane())
                 .append(",bib.")
-                .append(heatLine.getBib())
-                .append(END_LINE);
+                .append(heatLine.getBib());
+        if (!event.getResultUrl().isEmpty()) {
+            sb
+                    .append(" ")
+                    .append(LINK)
+                    .append(RESULT)
+                    .append(LINK_END)
+                    .append(LINK_SEPARATOR)
+                    .append(event.getResultUrl())
+                    .append(LINK_SEPARATOR_END);
+        }
+        sb.append(END_LINE);
         return sb.toString();
     }
 
