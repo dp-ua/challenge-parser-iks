@@ -61,9 +61,6 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
 
     @Override
     public void showCompetitions(String chatId, int pageNumber, Integer editMessageId) {
-        if (pageNumber < 0) {
-            throw new IllegalArgumentException("Page number must be positive");
-        }
         log.info("showCompetitions. Page {}, chatId:{} ", pageNumber, chatId);
         sendTypingAction(chatId);
 
@@ -785,7 +782,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
 
     private SendMessageEvent getMessageForCompetitions(List<CompetitionEntity> competitions, String
             chatId, Integer messageId, int page) {
-        if (page == 0) {
+        if (page < 0) {
             LocalDateTime now = LocalDateTime.now();
             Map<Long, Integer> compareMap = new HashMap<>();
             for (int i = 0; i < competitions.size(); i++) {
