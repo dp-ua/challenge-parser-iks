@@ -21,3 +21,5 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
+    volumes:
+      - /home/dp_ua/bots/logs/iks-bot/:app/logs/
