@@ -25,6 +25,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -786,15 +787,15 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
             chatId, Integer messageId, int page) {
         if (page == 0) {
             LocalDateTime now = LocalDateTime.now();
-            Map<Integer, Integer> compareMap = new HashMap<>();
+            Map<Long, Integer> compareMap = new HashMap<>();
             for (int i = 0; i < competitions.size(); i++) {
                 CompetitionEntity competition = competitions.get(i);
                 LocalDateTime competitionDate = LocalDateTime.parse(
                         String.format("%s %s",
                                 competition.getBeginDate(), now.format(DateTimeFormatter.ofPattern("HH:mm:ss"))),
                         DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"));
-                int abs = Math.abs(now.compareTo(competitionDate));
-                compareMap.put(abs, i);
+                long hours = Math.abs(ChronoUnit.HOURS.between(now, competitionDate));
+                compareMap.put(hours, i);
             }
             int index = compareMap.get(Collections.min(compareMap.keySet()));
             page = index / COMPETITIONS_PAGE_SIZE;
