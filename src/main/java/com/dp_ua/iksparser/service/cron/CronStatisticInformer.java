@@ -21,10 +21,10 @@ public class CronStatisticInformer {
     @Autowired
     BotController bot;
 
-    @Scheduled(cron = "0 0 9 * * *")  // every day at 9:00
+    @Scheduled(cron = "0 0 7 * * *")  // every day at 7:00
     public void inform() {
         LocalDate now = LocalDate.now().minusDays(1);
-        Map<String, Long> msgCountByChatId = getStatMsgsSorted(now);
+        Map<String, Long> msgCountByChatId = getStatMessagesSorted(now);
         String msg = msgCountByChatId.entrySet().stream()
                 .map(e -> e.getKey() + ": " + e.getValue())
                 .collect(Collectors.joining("\n"));
@@ -33,7 +33,7 @@ public class CronStatisticInformer {
         }
     }
 
-    private Map<String, Long> getStatMsgsSorted(LocalDate day) {
+    private Map<String, Long> getStatMessagesSorted(LocalDate day) {
         return service.getAllByDate(day).stream()
                 .collect(Collectors.groupingBy(StatisticEntity::getChatId, Collectors.counting()))
                 .entrySet().stream()
