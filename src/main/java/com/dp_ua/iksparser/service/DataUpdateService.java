@@ -192,10 +192,10 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
                         .filter(newEvent::isTheSame)
                         .findFirst()
                         .ifPresentOrElse(oldEvent -> {
-                                    boolean needToUpdate = oldEvent.getStartListUrl().isEmpty() && !newEvent.getStartListUrl().isEmpty();
+                                    boolean needToUpdate = isNeedToUpdateEvent(newEvent, oldEvent);
                                     oldEvent.updateEventDetails(newEvent);
                                     if (needToUpdate) {
-                                        newEventResults.add(newEvent);
+                                        newEventResults.add(oldEvent);
                                     }
                                 },
                                 () -> {
@@ -210,6 +210,11 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
             }
         });
         return newEventResults;
+    }
+
+    private static boolean isNeedToUpdateEvent(EventEntity newEvent, EventEntity oldEvent) {
+        return oldEvent.getStartListUrl().isEmpty() && !newEvent.getStartListUrl().isEmpty() ||
+                oldEvent.getResultUrl().isEmpty() && !newEvent.getResultUrl().isEmpty();
     }
 
     private void operateDaysAndAddItToCompetition(CompetitionEntity competition, Document document) throws ParsingException {
