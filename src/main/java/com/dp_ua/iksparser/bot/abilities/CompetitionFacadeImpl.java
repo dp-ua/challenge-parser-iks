@@ -398,7 +398,8 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                 .append(", ")
                 .append(event.getTime())
                 .append(", ");
-        if (!event.getStartListUrl().isEmpty()) {
+        String link = getLink(event);
+        if (!link.isEmpty()) {
             sb
                     .append(LINK)
                     .append(event.getEventName())
@@ -408,7 +409,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                     .append(event.getRound())
                     .append(LINK_END)
                     .append(LINK_SEPARATOR)
-                    .append(event.getStartListUrl())
+                    .append(link)
                     .append(LINK_SEPARATOR_END);
         } else {
             sb.append(event.getEventName())
@@ -435,6 +436,16 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         }
         sb.append(END_LINE);
         return sb.toString();
+    }
+
+    private static String getLink(EventEntity event) {
+        return !event.getResultUrl().isEmpty() ? event.getResultUrl()
+                :
+                !event.getStartListUrl().isEmpty()
+                        ?
+                        event.getStartListUrl()
+                        :
+                        "";
     }
 
     private String participantInfo(ParticipantEntity participant) {
