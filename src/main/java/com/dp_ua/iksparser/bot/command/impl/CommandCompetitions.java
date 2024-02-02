@@ -15,7 +15,7 @@ public class CommandCompetitions extends BaseCommand {
     public static final String command = "competitions";
     private final boolean isInTextCommand = false;
     @Autowired
-    CompetitionFacade competitionFacade;
+    private CompetitionFacade competitionFacade;
 
     @Override
     public String command() {

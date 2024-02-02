@@ -11,7 +11,7 @@ import static com.dp_ua.iksparser.service.MessageCreator.SERVICE;
 @Slf4j
 public abstract class BaseCommand implements CommandInterface {
     @Autowired
-    ApplicationEventPublisher publisher;
+    protected ApplicationEventPublisher publisher;
     public static final int DEFAULT_NO_PAGE_ARGUMENT = -1;
 
     private void sendCallbackMessage(String callBackQueryId, String message) {
