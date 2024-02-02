@@ -83,11 +83,11 @@ public class CompetitionPageParser {
 
     private static String getEventName(Element cell) {
         if (cell.childNodes().get(0).childNodes().size() == 4) {
-            return cell.childNodes().get(0).childNode(0).childNode(0) +
+            return cell.childNodes().get(0).childNode(0).childNode(0).toString().trim() +
                     ". (" +
-                    cell.childNodes().get(0).childNode(1) +
+                    cell.childNodes().get(0).childNode(1).toString().trim() +
                     ")";
         }
-        return cell.childNodes().get(0).childNodes().get(0).toString();
+        return cell.childNodes().get(0).childNodes().get(0).toString().trim();
     }
 }
