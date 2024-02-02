@@ -15,7 +15,7 @@ public class CommandSearchByCoach extends BaseCommand {
     public static final String command = "searchbycoach";
     private final boolean isInTextCommand = false;
     @Autowired
-    CompetitionFacade competitionFacade;
+    private CompetitionFacade competitionFacade;
 
     @Override
     public String command() {

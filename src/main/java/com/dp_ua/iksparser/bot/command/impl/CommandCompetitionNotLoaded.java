@@ -15,7 +15,7 @@ public class CommandCompetitionNotLoaded extends BaseCommand {
     public final static String command = "competitionnotloaded";
     private final boolean isInTextCommand = false;
     @Autowired
-    CompetitionFacade competitionFacade;
+    private CompetitionFacade competitionFacade;
 
     @Override
     public String command() {

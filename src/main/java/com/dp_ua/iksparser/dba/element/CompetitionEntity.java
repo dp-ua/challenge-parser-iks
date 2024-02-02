@@ -25,6 +25,10 @@ public class CompetitionEntity extends DomainElement {
     @OneToMany(mappedBy = "competition", cascade = CascadeType.ALL)
     private List<DayEntity> days;
 
+    public String getUrl() {
+        return codeURL(url);
+    }
+
     public CompetitionEntity() {
         days = new ArrayList<>();
     }

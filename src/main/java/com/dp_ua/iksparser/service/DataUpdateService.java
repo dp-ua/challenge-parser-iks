@@ -192,10 +192,11 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
                         .filter(newEvent::isTheSame)
                         .findFirst()
                         .ifPresentOrElse(oldEvent -> {
-                                    boolean needToUpdate = isNeedToUpdateEvent(newEvent, oldEvent);
-                                    oldEvent.updateEventDetails(newEvent);
-                                    if (needToUpdate) {
+                                    if (isHaveNewResults(newEvent, oldEvent)) {
                                         newEventResults.add(oldEvent);
+                                    }
+                                    if (isNeedToUpdateEvent(newEvent, oldEvent)) {
+                                        oldEvent.updateEventDetails(newEvent);
                                     }
                                 },
                                 () -> {
@@ -212,7 +213,11 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
         return newEventResults;
     }
 
-    private static boolean isNeedToUpdateEvent(EventEntity newEvent, EventEntity oldEvent) {
+    private static boolean isHaveNewResults(EventEntity newEvent, EventEntity oldEvent) {
+        return oldEvent.getStartListUrl().isEmpty() && !newEvent.getStartListUrl().isEmpty();
+    }
+
+    private boolean isNeedToUpdateEvent(EventEntity newEvent, EventEntity oldEvent) {
         return oldEvent.getStartListUrl().isEmpty() && !newEvent.getStartListUrl().isEmpty() ||
                 oldEvent.getResultUrl().isEmpty() && !newEvent.getResultUrl().isEmpty();
     }

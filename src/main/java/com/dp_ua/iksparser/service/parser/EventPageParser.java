@@ -53,8 +53,8 @@ public class EventPageParser {
                 heat.addHeatLine(heatLine);
                 heatLine.setHeat(heat);
 
-                String surname = cells.get(5).text().split(" ")[0];
-                String name = cells.get(6).text().split(" ")[0];
+                String surname = cells.get(5).childNode(0).childNode(0).toString();
+                String name = cells.get(6).childNode(0).childNode(0).toString();
                 String team = cells.get(9).text();
                 String region = cells.get(8).text();
                 String born = cells.get(7).text();
