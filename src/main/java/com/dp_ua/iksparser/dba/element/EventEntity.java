@@ -29,11 +29,20 @@ public class EventEntity extends DomainElement {
                 this.round.equals(event.getRound());
     }
 
+    public String getStartListUrl() {
+        return codeURL(startListUrl);
+    }
+
+    public String getResultUrl() {
+        return codeURL(resultUrl);
+    }
+
     public void updateEventDetails(EventEntity event) {
         this.time = event.getTime();
         this.startListUrl = event.getStartListUrl();
         this.resultUrl = event.getResultUrl();
     }
+
     public boolean isNotFilled() {
         return startListUrl.isEmpty() || resultUrl.isEmpty();
     }

@@ -34,4 +34,11 @@ public class DomainElement {
         updated = new Date();
         log.debug("updated: {}, {}", this.getClass().getSimpleName(), this);
     }
+
+    protected String codeURL(String url) {
+        return url.replaceAll(" ", "%20")
+                .replaceAll("\\+", "%2B")
+                .replaceAll("\\(", "%2F")
+                .replaceAll("\\)", "%29");
+    }
 }
