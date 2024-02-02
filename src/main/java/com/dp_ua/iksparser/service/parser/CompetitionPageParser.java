@@ -60,20 +60,20 @@ public class CompetitionPageParser {
     }
 
     public EventEntity parseEvent(Element row) {
-        Elements columns = row.select("td");
-        String time = columns.get(0).text();
-        String eventName = removeTags(columns.get(1).childNodes().get(0).childNodes().get(0).toString());
-        String category = columns.get(2).textNodes().get(0).text();
-        String round = columns.get(3).text().split(" ")[0].toLowerCase();
+        Elements cells = row.select("td");
+        String time = cells.get(0).text();
+        String eventName = getEventName(cells.get(1));
+        String category = cells.get(2).textNodes().get(0).text();
+        String round = cells.get(3).text().split(" ")[0].toLowerCase();
         String startListUrl = "";
         try {
-            startListUrl = columns.get(4).select("button").attr("onclick").split("'")[1].trim();
+            startListUrl = cells.get(4).select("button").attr("onclick").split("'")[1].trim();
         } catch (Exception e) {
             log.debug("No start list url for event:{} {}", eventName, category);
         }
         String resultUrl = "";
         try {
-            resultUrl = columns.get(5).select("button").attr("onclick").split("'")[1].trim();
+            resultUrl = cells.get(5).select("button").attr("onclick").split("'")[1].trim();
         } catch (Exception e) {
             log.debug("No result url for event:{} {}", eventName, category);
         }
@@ -81,7 +81,13 @@ public class CompetitionPageParser {
         return new EventEntity(time, eventName, category, round, startListUrl, resultUrl);
     }
 
-    private String removeTags(String string) {
-        return string.replaceAll("<.*?>", "");
+    private static String getEventName(Element cell) {
+        if (cell.childNodes().get(0).childNodes().size() == 4) {
+            return cell.childNodes().get(0).childNode(0).childNode(0) +
+                    ". (" +
+                    cell.childNodes().get(0).childNode(1) +
+                    ")";
+        }
+        return cell.childNodes().get(0).childNodes().get(0).toString();
     }
 }

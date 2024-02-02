@@ -704,6 +704,17 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                 .append(BOLD)
                 .append(END_LINE);
 
+        int eventCount = competition.getDays().stream()
+                .flatMap(day -> day.getEvents().stream())
+                .collect(Collectors.toSet()).size();
+        sb
+                .append(EVENT)
+                .append(" Кількість змагань: ")
+                .append(BOLD)
+                .append(eventCount)
+                .append(BOLD)
+                .append(END_LINE);
+
         int heatCount = competition.getDays().stream()
                 .flatMap(day -> day.getEvents().stream())
                 .flatMap(event -> event.getHeats().stream())
