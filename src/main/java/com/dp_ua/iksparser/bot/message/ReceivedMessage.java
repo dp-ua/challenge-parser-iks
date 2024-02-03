@@ -70,7 +70,7 @@ public class ReceivedMessage implements Message {
     public String getUserName() {
         User user = getUser();
         if (user != null) {
-            return user.getFirstName() + " " + user.getLastName() + "[" + user.getUserName() + "]";
+            return user.getFirstName() + " " + user.getLastName() + "[@" + user.getUserName() + "]";
         }
         return "";
     }
