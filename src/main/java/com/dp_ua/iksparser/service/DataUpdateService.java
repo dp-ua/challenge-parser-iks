@@ -55,7 +55,7 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
     Lock lock = new ReentrantLock();
 
     @Override
-    @Async("defaultTaskExecutor")
+    @Async("taskExecutor")
     @Transactional
     public void onApplicationEvent(UpdateCompetitionEvent event) {
         UpdateStatusEntity message = event.getMessage();

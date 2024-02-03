@@ -39,7 +39,7 @@ public class AppConfig {
         return transactionManager;
     }
 
-    @Bean("defaultTaskExecutor")
+    @Bean("taskExecutor")
     public TaskExecutor defaultTaskExecutor() {
         SimpleAsyncTaskExecutor executor = new SimpleAsyncTaskExecutor();
         executor.setThreadNamePrefix("DefaultExecutor-");
