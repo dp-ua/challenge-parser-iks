@@ -31,7 +31,7 @@ public class CronCompetitionUpdater implements ApplicationListener<ContextRefres
         // todo check is need to update competition
     }
 
-    @Scheduled(cron = "0 0 * * * *")  // every 1 hour check not filled events
+    @Scheduled(cron = "0 0/20 * * * *") // every 20 minutes check not filled events
     public void checkNotFilledEvents() {
         Set<CompetitionEntity> needToUpdateCompetitionIds = new HashSet<>();
         eventService.findAll().stream()
