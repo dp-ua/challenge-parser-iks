@@ -22,13 +22,21 @@ public class StatisticPerformer implements ApplicationListener<GetMessageEvent> 
         Message message = event.getMessage();
         String chatId = message.getChatId();
         String name = message.getUserName();
-        // todo user name
-//        message.getUserName();
+        if (message.kickBot()) {
+            log.info("User kick bot: " + chatId);
+            kickAction(chatId, name);
+            return;
+        }
         long count = service.getCount(chatId);
         if (count == 0)
             sendMessageToAdmin(chatId, name);
         String text = message.getMessageText();
         service.save(chatId, name, text);
+    }
+
+    private void kickAction(String chatId, String name) {
+        bot.sendMessageToAdmin("User kick bot: " + chatId + ", {" + name + "}");
+        //TODO: remove User from Subscribers list
     }
 
     private void sendMessageToAdmin(String chatId, String name) {

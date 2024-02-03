@@ -16,6 +16,9 @@ public interface Message {
     Integer getEditMessageId();
 
     String getUserName();
+
+    boolean kickBot();
+
     enum Type {
         RECEIVE, SELF
     }

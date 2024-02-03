@@ -36,4 +36,9 @@ public class SelfMessage implements Message {
     public String getUserName() {
         return "SelfUserName";
     }
+
+    @Override
+    public boolean kickBot() {
+        return false;
+    }
 }
