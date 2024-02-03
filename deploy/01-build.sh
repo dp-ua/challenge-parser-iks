@@ -3,7 +3,9 @@
 echo "---------------------- Docker build image -------------------"
 
 # Выполняем команду docker build
-docker build -t challenge-parser:latest .
+docker build -t challenge-parser:latest -f deploy/Dockerfile .
+# TODO переместить докер файлы в папку deploy
+# TODO использовать в дженкинсе скриптовые файлы
 
 # Проверяем код возврата
 if [ $? -eq 0 ]; then
@@ -27,7 +29,7 @@ if [ ! -d "$target_directory" ]; then
 fi
 
 # Копируем Docker Compose файл в другую директорию
-cp docker-compose.yml "$target_directory/"
+cp deploy/docker-compose.yml "$target_directory/"
 ls -la "$target_directory"
 
 echo "---------------------- Finish Deploy docker compose file -------------------"
