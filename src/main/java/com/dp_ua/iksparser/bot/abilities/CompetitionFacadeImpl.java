@@ -155,7 +155,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
 
         setStateForSearchingByName(chatId, competitionId);
 
-        if (!isValidInputNameConditions(chatId, editMessageId, competition, competitionId, name)) return;
+        if (!isValidInputNameConditions(chatId, competition, competitionId, name)) return;
 
         List<HeatLineEntity> heatLines = competition.getDays().stream()
                 .flatMap(day -> day.getEvents().stream())
@@ -284,7 +284,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
 
         setStateSearchingByCoach(chatId, competitionId);
 
-        if (!isValidInputNameConditions(chatId, editMessageId, competition, competitionId, coachName)) return;
+        if (!isValidInputNameConditions(chatId, competition, competitionId, coachName)) return;
 
         List<CoachEntity> foundCoaches = coachService.searchByNamePartialMatch(coachName);
         if (checkFoundCoaches(foundCoaches, coachName)) {
@@ -520,34 +520,28 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         return false;
     }
 
-    private boolean isValidInputNameConditions(String chatId, Integer editMessageId, CompetitionEntity competition, String id, String name) {
+    private boolean isValidInputNameConditions(String chatId, CompetitionEntity competition, String id, String name) {
         if (competition == null) {
             log.warn("Competition[{}] not found", id);
-            publishEvent(prepareSendMessageEvent(
-                    chatId, editMessageId,
-                    "Змагання не знайдено", getBackToCompetitionsKeyboard()));
+            publishChunkMessage(chatId, id, new StringBuilder("Змагання не знайдено"), getBackToCompetitionsKeyboard());
             return false;
         }
         if (name.isEmpty()) {
             log.warn("Name is empty");
-            publishEvent(prepareSendMessageEvent(
-                    chatId, editMessageId,
-                    "Ви не вказали прізвище", getBackToCompetitionsKeyboard()));
+            publishChunkMessage(chatId, id, new StringBuilder("Ви не вказали прізвище"), null);
+            publishFindMore(chatId, id);
             return false;
         }
-
         if (name.length() < 3) {
             log.warn("Name is too short");
-            publishEvent(prepareSendMessageEvent(
-                    chatId, editMessageId,
-                    "Ви вказали занадто коротке прізвище", getBackToCompetitionsKeyboard()));
+            publishChunkMessage(chatId, id, new StringBuilder("Ви вказали занадто коротке прізвище"), null);
+            publishFindMore(chatId, id);
             return false;
         }
         if (!name.matches("[а-яА-Яa-zA-Z-ґҐєЄіІїЇ']+")) {
             log.warn("Name contains invalid symbols: " + name);
-            publishEvent(prepareSendMessageEvent(
-                    chatId, editMessageId,
-                    "Ви вказали некоректне прізвище", getBackToCompetitionsKeyboard()));
+            publishChunkMessage(chatId, id, new StringBuilder("Ви вказали некоректне прізвище"), null);
+            publishFindMore(chatId, id);
             return false;
         }
         return true;
