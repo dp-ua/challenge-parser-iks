@@ -129,6 +129,20 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         ));
     }
 
+    private InlineKeyboardMarkup getEnoughKeyboard() {
+        InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
+        List<InlineKeyboardButton> row = new ArrayList<>();
+        InlineKeyboardButton button = SERVICE.getKeyboardButton(
+                " Досить " + ENOUGH,
+                "/" + CommandDeleteMessage.command
+        );
+        row.add(button);
+        rows.add(row);
+        keyboard.setKeyboard(rows);
+        return keyboard;
+    }
+
     private void setStateForSearchingByName(String chatId, String competitionId) {
         stateService.setState(chatId, CommandSearchByNameWithName.getTextForState(competitionId));
     }
@@ -172,6 +186,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
             publishEvent(prepareSendMessageEvent(
                     chatId, editMessageId,
                     "Знайдено забагато спортсменів. Введіть повніше прізвище", getBackToCompetitionKeyboard(competitionId)));
+            publishFindMore(chatId);
             return;
         }
         participants.forEach(participant -> {
@@ -208,7 +223,22 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                     sb.toString(),
                     getSubscribeKeyboard(participant, subscribed)
             ));
+            publishFindMore(chatId);
         });
+    }
+
+    private void publishFindMore(String chatId) {
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        publishEvent(prepareSendMessageEvent(
+                chatId,
+                null,
+                FIND + "Шукати ще?\n\nВведіть прізвище",
+                getEnoughKeyboard())
+        );
     }
 
     @Override
@@ -291,6 +321,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
             publishEvent(prepareSendMessageEvent(
                     chatId, editMessageId,
                     "Учасників не знайдено", getBackToCompetitionKeyboard(competitionId)));
+            publishFindMore(chatId);
             return;
         }
         coachHeatLinesMap.forEach((coach, coachHeatLines) -> {
@@ -331,6 +362,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
 
             List<StringBuilder> participantsInfo = prepareParticipantsInfoList(participantHeatLinesMap);
             sendChunkedMessages(chatId, competitionId, header, participantsInfo);
+            publishFindMore(chatId);
         });
     }
 

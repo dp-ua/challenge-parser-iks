@@ -35,6 +35,7 @@ public class CommandProviderTest {
                         competition
                         competitionnotloaded
                         competitions
+                        deletemessage
                         help
                         searchbycoach
                         searchbycoachwithname

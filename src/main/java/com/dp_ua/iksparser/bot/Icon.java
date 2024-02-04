@@ -3,6 +3,7 @@ package com.dp_ua.iksparser.bot;
 public enum Icon {
     SUBSCRIBE("🔔"),
     UNSUBSCRIBE("🔕"),
+    ENOUGH("👌"),
     RESULT("📊"),
     GREEN_CIRCLE("🟢"),
     GRAY_CIRCLE("⚪"),
