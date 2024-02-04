@@ -21,14 +21,16 @@ echo "---------------------- Deploy docker compose file -------------------"
 target_directory="/home/dp_ua/bots/docker/iks-bot"
 
 echo "----------------------Deploy Start -------------------"
-rm -rf "$target_directory"
+# Удаляем содержимое директории, но оставляем саму директорию
+find "$target_directory" -mindepth 1 -delete
+
+# Проверяем, существует ли директория, и если нет, создаем её
 if [ ! -d "$target_directory" ]; then
-	mkdir -p "$target_directory"
+    mkdir -p "$target_directory"
 fi
 
 # Копируем Docker Compose файл в другую директорию
 cp deploy/docker-compose.yml "$target_directory/"
 cp deploy/02-run.sh "$target_directory/"
 ls -la "$target_directory"
-
 echo "---------------------- Finish Deploy docker compose file -------------------"
