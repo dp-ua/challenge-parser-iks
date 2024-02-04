@@ -1,10 +1,10 @@
 FROM maven:3.8.4-openjdk-17 as builder
 WORKDIR /app
 # Копируйте файлы для кэширования зависимостей
-COPY pom.xml .
+COPY ../pom.xml .
 # Соберите зависимости отдельно, чтобы воспользоваться кэшем при изменении только файлов проекта
 RUN mvn dependency:go-offline
-COPY . /app/.
+COPY .. /app/.
 RUN mvn -f /app/pom.xml clean package -Dmaven.test.skip=true
 
 FROM eclipse-temurin:17-jre-alpine
