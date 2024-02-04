@@ -1,6 +1,7 @@
 package com.dp_ua.iksparser.service.parser;
 
 import com.dp_ua.iksparser.dba.element.CompetitionEntity;
+import com.dp_ua.iksparser.exeption.ParsingException;
 import com.dp_ua.iksparser.service.Downloader;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Document;
@@ -26,7 +27,7 @@ public class FullCalendarParser implements MainParserService {
             "&search_filter=%D0%9F%D0%BE%D1%88%D1%83%D0%BA";
 
     @Override
-    public List<CompetitionEntity> parseCompetitions() {
+    public List<CompetitionEntity> parseCompetitions() throws ParsingException {
         Document document = downloadDocument();
         List<CompetitionEntity> result = new ArrayList<>();
         if (document != null) {
@@ -79,7 +80,7 @@ public class FullCalendarParser implements MainParserService {
         return result;
     }
 
-    private Document downloadDocument() {
+    private Document downloadDocument() throws ParsingException {
         String url = getURL(getYearNow());
         log.info("Start parsing competitions from url: {}", url);
         return downloader.getDocument(url);

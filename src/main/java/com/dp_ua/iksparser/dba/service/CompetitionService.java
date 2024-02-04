@@ -81,4 +81,8 @@ public class CompetitionService {
     public void flush() {
         repo.flush();
     }
+
+    public long count() {
+        return repo.count();
+    }
 }

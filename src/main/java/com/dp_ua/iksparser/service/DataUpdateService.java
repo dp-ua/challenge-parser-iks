@@ -151,13 +151,18 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
     }
 
 
-    private void operateEventsToParseHeats(List<EventEntity> newEvents) {
+    private void operateEventsToParseHeats(List<EventEntity> newEvents) throws ParsingException{
         newEvents.forEach(event -> {
             if (event.getStartListUrl().isEmpty()) {
                 log.info("Event {} has no start list url", event.getEventName());
                 return;
             }
-            Document eventDocument = downloader.getDocument(event.getStartListUrl());
+            Document eventDocument = null;
+            try {
+                eventDocument = downloader.getDocument(event.getStartListUrl());
+            } catch (ParsingException e) {
+                throw new RuntimeException(e);
+            }
             List<HeatEntity> heats = eventParser.getHeats(eventDocument);
             heats.forEach(heat -> {
                 heat.getHeatLines().forEach(heatLine -> {
