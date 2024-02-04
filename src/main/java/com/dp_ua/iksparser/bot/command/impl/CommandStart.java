@@ -43,7 +43,7 @@ public class CommandStart implements CommandInterface {
         sb
                 .append("Вітаю, мене звуть ")
                 .append(LINK)
-                .append("Athletesearch ")
+                .append("AthleteSearch ")
                 .append(ROBOT)
                 .append(LINK_END)
                 .append(LINK_SEPARATOR)

@@ -5,6 +5,7 @@ import org.telegram.telegrambots.meta.api.methods.ActionType;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendChatAction;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
@@ -28,6 +29,13 @@ public enum MessageCreator {
         sendChatAction.setChatId(chatId);
         sendChatAction.setAction(ActionType.TYPING);
         return sendChatAction;
+    }
+
+    public DeleteMessage getDeleteMessage(String chatId, Integer messageId) {
+        DeleteMessage deleteMessage = new DeleteMessage();
+        deleteMessage.setChatId(chatId);
+        deleteMessage.setMessageId(messageId);
+        return deleteMessage;
     }
 
     public EditMessageText getEditMessageText(String chatId, Integer messageId, String text, InlineKeyboardMarkup keyboard, boolean enableMarkdown) {

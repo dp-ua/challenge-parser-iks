@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendChatAction;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -32,14 +33,17 @@ public class SendMessagePerformer implements ApplicationListener<SendMessageEven
                 case SEND_MESSAGE:
                     result = bot.execute((SendMessage) event.getMessage());
                     break;
-                    case EDIT_MESSAGE:
-                    bot.execute((EditMessageText)event.getMessage());
+                case EDIT_MESSAGE:
+                    bot.execute((EditMessageText) event.getMessage());
                     break;
                 case CHAT_ACTION:
                     bot.execute((SendChatAction) event.getMessage());
                     break;
                 case ANSWER_CALLBACK_QUERY:
                     bot.execute((AnswerCallbackQuery) event.getMessage());
+                    break;
+                case DELETE_MESSAGE:
+                    bot.execute((DeleteMessage) event.getMessage());
                     break;
                 default:
                     throw new IllegalArgumentException("Unknown msgType: " + event.getMsgType());
