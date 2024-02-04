@@ -1,13 +1,7 @@
 #!/bin/bash
-
-echo "=======Restarting IKS-BOT Service========"
-
-target_directory="/home/dp_ua/bots/docker/iks-bot"
-cd "$target_directory"
-
+echo "=======Check ENV and VARIABLES========"
 ls -la
 
-echo "=======Check Variables========"
 echo "Bot name: ${IKS_TELEGRAM_BOT_NAME}"
 echo "AdminId: ${IKS_TELEGRAM_ADMIN_ID}"
 echo "DB_Admin: ${IKS_DB_USERNAME}"
