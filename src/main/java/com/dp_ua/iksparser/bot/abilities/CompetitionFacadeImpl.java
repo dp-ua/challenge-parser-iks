@@ -10,6 +10,7 @@ import com.dp_ua.iksparser.bot.event.UpdateCompetitionEvent;
 import com.dp_ua.iksparser.dba.element.*;
 import com.dp_ua.iksparser.dba.service.CoachService;
 import com.dp_ua.iksparser.dba.service.CompetitionService;
+import com.dp_ua.iksparser.exeption.ParsingException;
 import com.dp_ua.iksparser.service.JsonReader;
 import com.dp_ua.iksparser.service.parser.MainParserService;
 import jakarta.transaction.Transactional;
@@ -60,7 +61,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
 
 
     @Override
-    public void showCompetitions(String chatId, int pageNumber, Integer editMessageId) {
+    public void showCompetitions(String chatId, int pageNumber, Integer editMessageId) throws ParsingException {
         log.info("showCompetitions. Page {}, chatId:{} ", pageNumber, chatId);
         sendTypingAction(chatId);
 
@@ -118,7 +119,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
             return;
         }
         String competitionId = competition.getId().toString();
-        stateService.setState(chatId, CommandSearchByNameWithName.getTextForState(competitionId));
+        setStateForSearchingByName(chatId, competitionId);
         StringBuilder sb = getFindByNameMessage(competition);
         publishEvent(prepareSendMessageEvent(
                 chatId,
@@ -126,6 +127,10 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                 sb.toString(),
                 getBackToCompetitionKeyboard(competitionId)
         ));
+    }
+
+    private void setStateForSearchingByName(String chatId, String competitionId) {
+        stateService.setState(chatId, CommandSearchByNameWithName.getTextForState(competitionId));
     }
 
     @Override
@@ -138,6 +143,8 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         String name = jSonReader.getVal(commandArgument, "name");
 
         CompetitionEntity competition = competitionService.findById(Integer.parseInt(competitionId));
+
+        setStateForSearchingByName(chatId, competitionId);
 
         if (!isValidInputNameConditions(chatId, editMessageId, competition, competitionId, name)) return;
 
@@ -200,7 +207,6 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                     getBackToCompetitionKeyboard(competitionId)
             ));
         });
-
     }
 
     @Override
@@ -217,7 +223,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
             return;
         }
         String competitionId = competition.getId().toString();
-        stateService.setState(chatId, CommandSearchByCoachWithName.getTextForState(competitionId));
+        setStateSearchingByCoach(chatId, competitionId);
         StringBuilder sb = getFindByCoachMessage(competition);
         publishEvent(prepareSendMessageEvent(
                 chatId,
@@ -225,6 +231,10 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                 sb.toString(),
                 getBackToCompetitionKeyboard(competitionId)
         ));
+    }
+
+    private void setStateSearchingByCoach(String chatId, String competitionId) {
+        stateService.setState(chatId, CommandSearchByCoachWithName.getTextForState(competitionId));
     }
 
     private StringBuilder getFindByCoachMessage(CompetitionEntity competition) {
@@ -254,6 +264,8 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         String competitionId = jSonReader.getVal(commandArgument, "id");
         String coachName = jSonReader.getVal(commandArgument, "coachName");
         CompetitionEntity competition = competitionService.findById(Integer.parseInt(competitionId));
+
+        setStateSearchingByCoach(chatId, competitionId);
 
         if (!isValidInputNameConditions(chatId, editMessageId, competition, competitionId, coachName)) return;
 
@@ -686,8 +698,11 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         sb
                 .append(END_LINE)
                 .append(INFO)
-                .append(" Оновлюю. Вам прийде повідомлення, якщо дані вже доступні ")
-                .append(END_LINE);
+                .append(" Оновлюю дані. Це може зайняти деякий час ")
+                .append(INFO)
+                .append(END_LINE)
+                .append(END_LINE)
+                .append("Вам прийде повідомлення, якщо дані вже доступні");
         return sb;
     }
 
@@ -964,22 +979,27 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         return competitions.subList(fromIndex, toIndex);
     }
 
-    private List<CompetitionEntity> getCompetitions() {
+    private List<CompetitionEntity> getCompetitions() throws ParsingException {
         CompetitionEntity competition = competitionService.getFreshestCompetition();
 
         if (isNeedToUpdate(competition)) {
             log.info("Need to update competitions");
-            updateCompetitions();
+            updateCompetitionsList();
         }
         log.info("Get competitions from DB");
         return competitionService.findAllOrderByBeginDate(true);
     }
 
-    public void updateCompetitions() {
+    @Override
+    public synchronized void updateCompetitionsList() throws ParsingException {
+        log.info("Update competitions list");
         List<CompetitionEntity> competitions = mainPageParser.parseCompetitions();
         competitions
                 .forEach(c -> competitionService.saveOrUpdate(c));
         state.setUpdateCompetitionsTime(LocalDateTime.now());
+        competitionService.flush();
+        log.info("Competitions parsed. Size: {}", competitions.size());
+        log.info("Competitions in DB: {}", competitionService.count());
     }
 
     private boolean isNeedToUpdate(CompetitionEntity competition) {

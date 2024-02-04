@@ -4,8 +4,8 @@ services:
   client-backend:
     image: challenge-parser:latest
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ..
+      dockerfile: ../Dockerfile
     container_name: challenge-parser
     ports:
       - "8181:8181"
@@ -22,11 +22,4 @@ services:
       timeout: 5s
       retries: 3
     volumes:
-      - app-logs:/app/logs
-
-volumes:
-  app-logs:
-    driver_opts:
-      type: none
-      device: /home/dp_ua/bots/logs/iks-bot/
-      o: bind
+      - /home/dp_ua/bots/logs/iks-bot/:/app/logs

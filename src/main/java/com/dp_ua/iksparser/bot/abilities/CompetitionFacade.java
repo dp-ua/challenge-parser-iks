@@ -1,7 +1,9 @@
 package com.dp_ua.iksparser.bot.abilities;
 
+import com.dp_ua.iksparser.exeption.ParsingException;
+
 public interface CompetitionFacade {
-    void showCompetitions(String chatId, int page, Integer editMessageId);
+    void showCompetitions(String chatId, int page, Integer editMessageId) throws ParsingException;
 
     void showCompetition(String chatId, int commandArgument, Integer editMessageId);
 
@@ -14,4 +16,6 @@ public interface CompetitionFacade {
     void searchingByCoachWithName(String chatId, String commandArgument, Integer editMessageId);
 
     void showNotLoadedInfo(String chatId, int commandArgument, Integer editMessageId);
+
+    void updateCompetitionsList() throws ParsingException;
 }
