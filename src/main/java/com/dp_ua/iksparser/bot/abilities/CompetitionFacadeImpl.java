@@ -297,7 +297,13 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         if (!isValidInputNameConditions(chatId, editMessageId, competition, competitionId, coachName)) return;
 
         List<CoachEntity> foundCoaches = coachService.searchByNamePartialMatch(coachName);
-        if (checkFoundCoaches(chatId, editMessageId, foundCoaches, coachName)) return;
+        if (checkFoundCoaches(foundCoaches, coachName)) {
+            publishEvent(prepareSendMessageEvent(
+                    chatId, editMessageId,
+                    "Тренера не знайдено.", null));
+            publishFindMore(chatId);
+            return;
+        }
 
         List<HeatLineEntity> heatLines = competition.getDays().stream()
                 .flatMap(day -> day.getEvents().stream())
@@ -357,8 +363,8 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
 
             List<StringBuilder> participantsInfo = prepareParticipantsInfoList(participantHeatLinesMap);
             sendChunkedMessages(chatId, competitionId, header, participantsInfo);
-            publishFindMore(chatId);
         });
+        publishFindMore(chatId);
     }
 
     private void sendChunkedMessages(String chatId, String competitionId, StringBuilder header, List<StringBuilder> participantsInfo) {
@@ -519,12 +525,9 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         return sb.toString();
     }
 
-    private boolean checkFoundCoaches(String chatId, Integer editMessageId, List<CoachEntity> foundCoaches, String coachName) {
+    private boolean checkFoundCoaches(List<CoachEntity> foundCoaches, String coachName) {
         if (foundCoaches.isEmpty()) {
             log.warn("No coaches found: {}", coachName);
-            publishEvent(prepareSendMessageEvent(
-                    chatId, editMessageId,
-                    "Тренера не знайдено.", null));
             return true;
         }
         return false;
