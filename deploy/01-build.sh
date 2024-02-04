@@ -4,8 +4,6 @@ echo "---------------------- Docker build image -------------------"
 
 # Выполняем команду docker build
 docker build -t challenge-parser:latest -f deploy/Dockerfile .
-# TODO переместить докер файлы в папку deploy
-# TODO использовать в дженкинсе скриптовые файлы
 
 # Проверяем код возврата
 if [ $? -eq 0 ]; then
