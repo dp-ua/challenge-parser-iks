@@ -214,8 +214,8 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
             heatLines.forEach(heatLine -> sb.append(heatLineInfo(heatLine)));
 
             publishChunkMessage(chatId, competitionId, sb, null);
-            publishFindMore(chatId, competitionId);
         });
+        publishFindMore(chatId, competitionId);
     }
 
     private void publishFindMore(String chatId, String competitionId) {
