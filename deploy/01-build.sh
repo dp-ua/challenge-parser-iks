@@ -27,7 +27,7 @@ if [ ! -d "$target_directory" ]; then
 fi
 
 # Копируем Docker Compose файл в другую директорию
-cp deploy/docker-compose.yml "$target_directory/"
+cp deploy/. "$target_directory/"
 ls -la "$target_directory"
 
 echo "---------------------- Finish Deploy docker compose file -------------------"
