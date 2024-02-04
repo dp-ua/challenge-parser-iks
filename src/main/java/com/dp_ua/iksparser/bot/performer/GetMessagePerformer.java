@@ -37,6 +37,7 @@ public class GetMessagePerformer implements ApplicationListener<GetMessageEvent>
                     onApplicationEvent(selfMessageEvent);
                 }
             } else {
+                stateService.resetState(message.getChatId());
                 commands
                         .forEach(command -> command.execute(message));
             }

@@ -118,7 +118,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
             return;
         }
         String competitionId = competition.getId().toString();
-        stateService.setState(chatId, CommandSearchByNameWithName.getTextForState(competitionId));
+        setStateForSearchingByName(chatId, competitionId);
         StringBuilder sb = getFindByNameMessage(competition);
         publishEvent(prepareSendMessageEvent(
                 chatId,
@@ -126,6 +126,10 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                 sb.toString(),
                 getBackToCompetitionKeyboard(competitionId)
         ));
+    }
+
+    private void setStateForSearchingByName(String chatId, String competitionId) {
+        stateService.setState(chatId, CommandSearchByNameWithName.getTextForState(competitionId));
     }
 
     @Override
@@ -138,6 +142,8 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         String name = jSonReader.getVal(commandArgument, "name");
 
         CompetitionEntity competition = competitionService.findById(Integer.parseInt(competitionId));
+
+        setStateForSearchingByName(chatId, competitionId);
 
         if (!isValidInputNameConditions(chatId, editMessageId, competition, competitionId, name)) return;
 
@@ -200,7 +206,6 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                     getBackToCompetitionKeyboard(competitionId)
             ));
         });
-
     }
 
     @Override
@@ -217,7 +222,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
             return;
         }
         String competitionId = competition.getId().toString();
-        stateService.setState(chatId, CommandSearchByCoachWithName.getTextForState(competitionId));
+        setStateSearchingByCoach(chatId, competitionId);
         StringBuilder sb = getFindByCoachMessage(competition);
         publishEvent(prepareSendMessageEvent(
                 chatId,
@@ -225,6 +230,10 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                 sb.toString(),
                 getBackToCompetitionKeyboard(competitionId)
         ));
+    }
+
+    private void setStateSearchingByCoach(String chatId, String competitionId) {
+        stateService.setState(chatId, CommandSearchByCoachWithName.getTextForState(competitionId));
     }
 
     private StringBuilder getFindByCoachMessage(CompetitionEntity competition) {
@@ -254,6 +263,8 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         String competitionId = jSonReader.getVal(commandArgument, "id");
         String coachName = jSonReader.getVal(commandArgument, "coachName");
         CompetitionEntity competition = competitionService.findById(Integer.parseInt(competitionId));
+
+        setStateSearchingByCoach(chatId, competitionId);
 
         if (!isValidInputNameConditions(chatId, editMessageId, competition, competitionId, coachName)) return;
 

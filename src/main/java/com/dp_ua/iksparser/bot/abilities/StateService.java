@@ -46,4 +46,8 @@ public class StateService {
     public void saveBotSession(BotSession botSession) {
         this.botSession = botSession;
     }
+
+    public void resetState(String chatId) {
+        stateMap.remove(chatId);
+    }
 }
