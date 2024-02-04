@@ -61,7 +61,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
 
 
     @Override
-    public void showCompetitions(String chatId, int pageNumber, Integer editMessageId) throws ParsingException {
+    public void showCompetitions(String chatId, long pageNumber, Integer editMessageId) throws ParsingException {
         log.info("showCompetitions. Page {}, chatId:{} ", pageNumber, chatId);
         sendTypingAction(chatId);
 
@@ -72,7 +72,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
 
     @Override
     @Transactional
-    public void showCompetition(String chatId, int commandArgument, Integer editMessageId) {
+    public void showCompetition(String chatId, long commandArgument, Integer editMessageId) {
         log.info("showCompetition. CommandArgument {}, chatId:{} ", commandArgument, chatId);
         sendTypingAction(chatId);
 
@@ -106,7 +106,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
     }
 
     @Override
-    public void startSearchByName(String chatId, int commandArgument, Integer editMessageId) {
+    public void startSearchByName(String chatId, long commandArgument, Integer editMessageId) {
         log.info("startSearchByName. CommandArgument {}, chatId:{} ", commandArgument, chatId);
         sendTypingAction(chatId);
 
@@ -210,7 +210,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
     }
 
     @Override
-    public void startSearchByCoach(String chatId, int commandArgument, Integer editMessageId) {
+    public void startSearchByCoach(String chatId, long commandArgument, Integer editMessageId) {
         log.info("startSearchByCoach. CommandArgument {}, chatId:{} ", commandArgument, chatId);
         sendTypingAction(chatId);
 
@@ -372,7 +372,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
     }
 
     @Override
-    public void showNotLoadedInfo(String chatId, int commandArgument, Integer editMessageId) {
+    public void showNotLoadedInfo(String chatId, long commandArgument, Integer editMessageId) {
         log.info("showNotLoadedInfo. CommandArgument {}, chatId:{} ", commandArgument, chatId);
         sendTypingAction(chatId);
 
@@ -828,7 +828,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
     }
 
     private SendMessageEvent getMessageForCompetitions(List<CompetitionEntity> competitions, String
-            chatId, Integer messageId, int page) {
+            chatId, Integer messageId, long page) {
         if (page < 0) {
             LocalDateTime now = LocalDateTime.now();
             Map<Long, Integer> compareMap = new HashMap<>();
@@ -853,7 +853,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         return prepareSendMessageEvent(chatId, messageId, text, keyboard);
     }
 
-    private InlineKeyboardMarkup getKeyboard(List<CompetitionEntity> competitions, int page, int totalSize) {
+    private InlineKeyboardMarkup getKeyboard(List<CompetitionEntity> competitions, long page, int totalSize) {
         InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
 
@@ -875,7 +875,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         return keyboard;
     }
 
-    private List<InlineKeyboardButton> getRowWithPages(int page, int totalSize) {
+    private List<InlineKeyboardButton> getRowWithPages(long page, int totalSize) {
         List<InlineKeyboardButton> row = new ArrayList<>();
 
         if (page > 0) {
@@ -900,7 +900,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
     }
 
 
-    private String getText(List<CompetitionEntity> competitions, int page, int totalCompetitions) {
+    private String getText(List<CompetitionEntity> competitions, long page, int totalCompetitions) {
         StringBuilder result = new StringBuilder();
         result
                 .append(CHAMPIONSHIP)
@@ -969,14 +969,14 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                 "...";
     }
 
-    private List<CompetitionEntity> getPage(List<CompetitionEntity> competitions, int pageNumber, int pageSize) {
-        int fromIndex = pageNumber * pageSize;
-        int toIndex = Math.min((pageNumber + 1) * pageSize, competitions.size());
+    private List<CompetitionEntity> getPage(List<CompetitionEntity> competitions, long pageNumber, int pageSize) {
+        long fromIndex = pageNumber * pageSize;
+        long toIndex = Math.min((pageNumber + 1) * pageSize, competitions.size());
 
         if (fromIndex >= competitions.size() || fromIndex < 0 || toIndex < 0) {
             throw new IllegalArgumentException("Invalid page parameters");
         }
-        return competitions.subList(fromIndex, toIndex);
+        return competitions.subList((int) fromIndex, (int) toIndex);
     }
 
     private List<CompetitionEntity> getCompetitions() throws ParsingException {
