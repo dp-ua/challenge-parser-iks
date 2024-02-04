@@ -1,15 +1,13 @@
 package com.dp_ua.iksparser.bot.abilities;
 
 import com.dp_ua.iksparser.bot.Icon;
-import com.dp_ua.iksparser.bot.command.impl.CommandSearchByCoach;
-import com.dp_ua.iksparser.bot.command.impl.CommandSearchByCoachWithName;
-import com.dp_ua.iksparser.bot.command.impl.CommandSearchByName;
-import com.dp_ua.iksparser.bot.command.impl.CommandSearchByNameWithName;
+import com.dp_ua.iksparser.bot.command.impl.*;
 import com.dp_ua.iksparser.bot.event.SendMessageEvent;
 import com.dp_ua.iksparser.bot.event.UpdateCompetitionEvent;
 import com.dp_ua.iksparser.dba.element.*;
 import com.dp_ua.iksparser.dba.service.CoachService;
 import com.dp_ua.iksparser.dba.service.CompetitionService;
+import com.dp_ua.iksparser.dba.service.SubscriberService;
 import com.dp_ua.iksparser.exeption.ParsingException;
 import com.dp_ua.iksparser.service.JsonReader;
 import com.dp_ua.iksparser.service.parser.MainParserService;
@@ -44,6 +42,8 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
     public static final int MAX_PARTICIPANTS_SIZE_TO_FIND = 5;
     private static final int MAX_CHUNK_SIZE = 4096;
 
+    @Autowired
+    SubscriberService subscriberService;
     @Autowired
     MainParserService mainPageParser;
     @Autowired
@@ -200,11 +200,13 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
 
             heatLines.forEach(heatLine -> sb.append(heatLineInfo(heatLine)));
 
+            boolean subscribed = subscriberService.isSubscribed(chatId, participant.getId());
+
             publishEvent(prepareSendMessageEvent(
                     chatId,
                     null,
                     sb.toString(),
-                    getBackToCompetitionKeyboard(competitionId)
+                    getSubscribeKeyboard(participant, subscribed)
             ));
         });
     }
@@ -567,6 +569,30 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
 
         List<InlineKeyboardButton> row = getBackButton("/competitions");
+        rows.add(row);
+
+        keyboard.setKeyboard(rows);
+        return keyboard;
+    }
+
+    private InlineKeyboardMarkup getSubscribeKeyboard(ParticipantEntity participant, boolean subscribed) {
+        InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
+
+        List<InlineKeyboardButton> row = new ArrayList<>();
+        if (subscribed) {
+            InlineKeyboardButton button = SERVICE.getKeyboardButton(
+                    UNSUBSCRIBE + " Відписатись від спортсмена " + participant.getSurname(),
+                    "/" + CommandUnsubscribe.command + " " + participant.getId()
+            );
+            row.add(button);
+        } else {
+            InlineKeyboardButton button = SERVICE.getKeyboardButton(
+                    SUBSCRIBE + " Підписатись на спортсмена " + participant.getSurname(),
+                    "/" + CommandSubscribe.command + " " + participant.getId()
+            );
+            row.add(button);
+        }
         rows.add(row);
 
         keyboard.setKeyboard(rows);

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @Transactional
@@ -46,5 +47,9 @@ public class ParticipantService {
             log.warn("Found " + participants.size() + " participants with surname " + surname + " name " + name + " team " + team + " region " + region + " born " + born);
         }
         return participants.get(0);
+    }
+
+    public Optional<ParticipantEntity> findById(long commandArgument) {
+        return repo.findById(commandArgument);
     }
 }
