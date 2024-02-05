@@ -207,7 +207,9 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                     .append("Приймає участь у змаганнях: ")
                     .append(END_LINE);
 
-            heatLines.forEach(heatLine -> sb.append(heatLineInfo(heatLine)));
+            heatLines.stream()
+                    .filter(heatLine -> heatLine.getParticipant().equals(participant))
+                    .forEach(heatLine -> sb.append(heatLineInfo(heatLine)));
 
             boolean subscribed = subscriberService.isSubscribed(chatId, participant.getId());
             publishChunkMessage(chatId, competitionId, sb, getSubscribeKeyboard(participant, subscribed));
@@ -222,7 +224,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
             throw new RuntimeException(e);
         }
         InlineKeyboardMarkup keyboard = getBackToCompetitionKeyboard(competitionId);
-        keyboard.getKeyboard().addAll(getEnoughKeyboard().getKeyboard());
+//        keyboard.getKeyboard().addAll(getEnoughKeyboard().getKeyboard());
         publishEvent(prepareSendMessageEvent(
                 chatId,
                 null,

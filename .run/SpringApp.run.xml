@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="SpringApp" type="Application" factoryName="Application" nameIsGenerated="true">
     <envs>
-      <env name="--spring.profiles.active" value="prod" />
+      <env name="--spring.profiles.active" value="dev" />
     </envs>
     <option name="MAIN_CLASS_NAME" value="com.dp_ua.iksparser.SpringApp" />
     <module name="ChallengeParser" />
