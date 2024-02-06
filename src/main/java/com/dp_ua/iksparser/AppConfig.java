@@ -45,6 +45,13 @@ public class AppConfig {
         executor.setThreadNamePrefix("DefaultExecutor-");
         return executor;
     }
+    @Bean("updateExecutor")
+    public TaskExecutor updateTaskExecutor() {
+        SimpleAsyncTaskExecutor executor = new SimpleAsyncTaskExecutor();
+        executor.setThreadNamePrefix("UpdateExecutor-");
+        executor.setConcurrencyLimit(2);
+        return executor;
+    }
 
     @Bean
     public TelegramBotsApi telegramBotsApi() throws TelegramApiException {

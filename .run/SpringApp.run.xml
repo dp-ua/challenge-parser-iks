@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="SpringApp" type="Application" factoryName="Application" nameIsGenerated="true">
+  <configuration default="false" name="SpringApp" type="Application" factoryName="Application" focusToolWindowBeforeRun="true" nameIsGenerated="true">
     <envs>
       <env name="--spring.profiles.active" value="dev" />
     </envs>

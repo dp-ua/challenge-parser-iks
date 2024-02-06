@@ -6,11 +6,11 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum CompetitionStatus {
-    CANCELED("Скасовано"),
-    PLANED("Заплановано"),
-    NOT_STARTED("Відбудеться"),
-    IN_PROGRESS("Проводиться"),
-    FINISHED("Завершено");
+    C_CANCELED("Скасовано"),
+    C_PLANED("Заплановано"),
+    C_NOT_STARTED("Відбудеться"),
+    C_IN_PROGRESS("Проводиться"),
+    C_FINISHED("Завершено");
 
     private final String name;
 

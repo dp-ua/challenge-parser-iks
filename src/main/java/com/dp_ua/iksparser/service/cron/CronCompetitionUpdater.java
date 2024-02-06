@@ -9,6 +9,7 @@ import com.dp_ua.iksparser.dba.element.UpdateStatusEntity;
 import com.dp_ua.iksparser.dba.service.CompetitionService;
 import com.dp_ua.iksparser.dba.service.EventService;
 import com.dp_ua.iksparser.exeption.ParsingException;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -18,9 +19,12 @@ import org.springframework.core.Ordered;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static com.dp_ua.iksparser.dba.element.CompetitionStatus.C_FINISHED;
 
 @Component
 @Slf4j
@@ -47,35 +51,50 @@ public class CronCompetitionUpdater implements ApplicationListener<ContextRefres
         }
     }
 
-    @Scheduled(cron = "0 0/20 * * * *") // every 20 minutes check not filled events
+    @Scheduled(cron = "0 0/16 10-23 * * *") // every 16 minutes check not filled events from 10 to 23
     public void checkNotFilledEvents() {
         Set<CompetitionEntity> needToUpdateCompetitionIds = new HashSet<>();
         eventService.findAll().stream()
                 .filter(EventEntity::isNotFilled)
-                .forEach(event -> {
-                    needToUpdateCompetitionIds.add(event.getDay().getCompetition());
-                });
+                .forEach(event -> needToUpdateCompetitionIds.add(event.getDay().getCompetition()));
         needToUpdateCompetitionIds.forEach(competition -> {
             log.info("Need to update competition with id: {}", competition.getId());
             runEventToUpdateCompetition(competition);
         });
     }
 
-    // todo every day at 2:00 update all competition
-    @Scheduled(cron = "0 0 2 * * *")
+    @Scheduled(cron = "0 15 6 * * *") // every day at 6:15 update all competition
+    @Transactional
     public void updateAllCompetitions() {
-
-        // todo update all competition
+        List<CompetitionEntity> competitions = competitionService.findAllOrderByUpdated();
+        log.info("Found {} competitions", competitions.size());
+        competitions.stream()
+                .filter(CompetitionEntity::isNeedToUpdate)
+                .forEach(competition -> {
+                    log.info("Need to update competition with id: {}", competition.getId());
+                    runEventToUpdateCompetition(competition);
+                });
     }
 
-    // todo every 2 hours update information about closest competitions
-    @Scheduled(cron = "0 0 */2 * * *")
+    @Scheduled(cron = "0 15 10,12,14,16,18,20,22 * * *") // from 10 to 00
     public void updateClosestCompetitions() {
-        // todo update information about closest competitions
+        log.info("Start update closest competitions");
+        List<CompetitionEntity> competitions = competitionService.findAllOrderByBeginDate(true);
+        LocalDate now = LocalDate.now();
+        competitions.stream()
+                .filter(competition -> {
+                    if (C_FINISHED.getName().equals(competition.getStatus())) {
+                        return false;
+                    }
+                    return !LocalDate.parse(competition.getBeginDate(), CompetitionService.FORMATTER).isAfter(now.plusWeeks(1));
+                })
+                .forEach(competition -> {
+                    log.info("Need to update competition with id: {}, begin date: {}", competition.getId(), competition.getBeginDate());
+                    runEventToUpdateCompetition(competition);
+                });
     }
 
     private void runEventToUpdateCompetition(CompetitionEntity competition) {
-        // todo move to separate class
         UpdateStatusEntity message = new UpdateStatusEntity();
         message.setCompetitionId(competition.getId());
         message.setChatId("");

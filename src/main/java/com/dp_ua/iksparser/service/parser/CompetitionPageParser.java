@@ -18,6 +18,7 @@ import static com.dp_ua.iksparser.exeption.ExceptionType.CANT_PARSE_DAYS;
 @Slf4j
 @Component
 public class CompetitionPageParser {
+    public static final String RELAY_HEAT = "Естафетний";
     @Autowired
     private ServiceParser serviceParser;
 
@@ -27,7 +28,11 @@ public class CompetitionPageParser {
         checkEvents(rows);
         for (Element row : rows) {
             EventEntity event = parseEvent(row);
-            events.add(event);
+            if (event.getEventName().contains(RELAY_HEAT)) {
+                log.debug("Ignoring relay Event: " + event.getEventName());
+            } else {
+                events.add(event);
+            }
         }
         log.info("For day[" + day.getDateId() + "] Events count: " + events.size());
         return events;

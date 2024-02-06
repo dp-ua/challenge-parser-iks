@@ -2,7 +2,9 @@ package com.dp_ua.iksparser.dba.element;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +12,8 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
+@Slf4j
+@NoArgsConstructor
 public class EventEntity extends DomainElement {
     private String time;
     private String eventName;
@@ -59,9 +63,6 @@ public class EventEntity extends DomainElement {
                 '}';
     }
 
-    public EventEntity() {
-        heats = new ArrayList<>();
-    }
 
     public EventEntity(String time, String eventName, String category, String round, String startListUrl, String resultUrl) {
         this.time = time;
@@ -75,5 +76,12 @@ public class EventEntity extends DomainElement {
 
     public void addHeat(HeatEntity heat) {
         heats.add(heat);
+    }
+
+    public boolean isNeedToUpdate() {
+        if (heats.isEmpty()) {
+            return true;
+        }
+        return isNotFilled();
     }
 }
