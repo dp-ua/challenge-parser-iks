@@ -2,13 +2,13 @@ package com.dp_ua.iksparser.bot.abilities.competition;
 
 import com.dp_ua.iksparser.bot.Icon;
 import com.dp_ua.iksparser.bot.abilities.StateService;
+import com.dp_ua.iksparser.bot.abilities.subscribe.SubscribeFacade;
 import com.dp_ua.iksparser.bot.command.impl.*;
 import com.dp_ua.iksparser.bot.event.SendMessageEvent;
 import com.dp_ua.iksparser.bot.event.UpdateCompetitionEvent;
 import com.dp_ua.iksparser.dba.element.*;
 import com.dp_ua.iksparser.dba.service.CoachService;
 import com.dp_ua.iksparser.dba.service.CompetitionService;
-import com.dp_ua.iksparser.dba.service.SubscriberService;
 import com.dp_ua.iksparser.exeption.ParsingException;
 import com.dp_ua.iksparser.service.JsonReader;
 import com.dp_ua.iksparser.service.parser.MainParserService;
@@ -44,7 +44,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
     private static final int MAX_CHUNK_SIZE = 4096;
 
     @Autowired
-    SubscriberService subscriberService;
+    SubscribeFacade subscribeFacade;
     @Autowired
     MainParserService mainPageParser;
     @Autowired
@@ -212,7 +212,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                     .filter(heatLine -> heatLine.getParticipant().equals(participant))
                     .forEach(heatLine -> sb.append(heatLineInfo(heatLine)));
 
-            boolean subscribed = subscriberService.isSubscribed(chatId, participant.getId());
+            boolean subscribed = subscribeFacade.isSubscribed(chatId, participant.getId());
             publishChunkMessage(chatId, sb, getSubscribeKeyboard(participant, subscribed));
         });
         publishFindMore(chatId, competitionId);
