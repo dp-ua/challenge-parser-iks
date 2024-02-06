@@ -1,7 +1,7 @@
 package com.dp_ua.iksparser.service.cron;
 
 import com.dp_ua.iksparser.SpringApp;
-import com.dp_ua.iksparser.bot.abilities.CompetitionFacade;
+import com.dp_ua.iksparser.bot.abilities.competition.CompetitionFacade;
 import com.dp_ua.iksparser.bot.event.UpdateCompetitionEvent;
 import com.dp_ua.iksparser.dba.element.CompetitionEntity;
 import com.dp_ua.iksparser.dba.element.EventEntity;

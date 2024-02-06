@@ -1,6 +1,7 @@
-package com.dp_ua.iksparser.bot.abilities;
+package com.dp_ua.iksparser.bot.abilities.competition;
 
 import com.dp_ua.iksparser.bot.Icon;
+import com.dp_ua.iksparser.bot.abilities.StateService;
 import com.dp_ua.iksparser.bot.command.impl.*;
 import com.dp_ua.iksparser.bot.event.SendMessageEvent;
 import com.dp_ua.iksparser.bot.event.UpdateCompetitionEvent;
