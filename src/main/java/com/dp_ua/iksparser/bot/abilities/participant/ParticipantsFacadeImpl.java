@@ -1,4 +1,4 @@
-package com.dp_ua.iksparser.bot.abilities;
+package com.dp_ua.iksparser.bot.abilities.participant;
 
 import com.dp_ua.iksparser.dba.service.ParticipantService;
 import com.dp_ua.iksparser.dba.service.SubscriberService;

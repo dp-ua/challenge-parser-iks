@@ -1,4 +1,4 @@
-package com.dp_ua.iksparser.bot.abilities;
+package com.dp_ua.iksparser.bot.abilities.participant;
 
 public interface ParticipantFacade {
     void subscribe(String chatId, long commandArgument, Integer editMessageId);

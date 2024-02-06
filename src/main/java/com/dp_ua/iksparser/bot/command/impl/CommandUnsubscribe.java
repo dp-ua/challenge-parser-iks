@@ -1,7 +1,7 @@
 package com.dp_ua.iksparser.bot.command.impl;
 
 import com.dp_ua.iksparser.bot.Icon;
-import com.dp_ua.iksparser.bot.abilities.ParticipantFacade;
+import com.dp_ua.iksparser.bot.abilities.participant.ParticipantFacade;
 import com.dp_ua.iksparser.bot.command.BaseCommand;
 import com.dp_ua.iksparser.bot.message.Message;
 import lombok.ToString;
