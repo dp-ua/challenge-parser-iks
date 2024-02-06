@@ -1043,6 +1043,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
     }
 
     private boolean isNeedToUpdate(CompetitionEntity competition) {
+        // todo create cron task for update
         if (competition == null) {
             return true;
         }
