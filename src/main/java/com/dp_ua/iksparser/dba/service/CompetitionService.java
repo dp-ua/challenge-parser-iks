@@ -16,6 +16,7 @@ import java.util.List;
 @Transactional
 public class CompetitionService {
     public static final String DD_MM_YYYY = "dd.MM.yyyy";
+    public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DD_MM_YYYY);
     private final CompetitionRepo repo;
 
     @Autowired
@@ -37,9 +38,8 @@ public class CompetitionService {
     }
 
     private final Comparator<String> dateComparator = (o1, o2) -> {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DD_MM_YYYY);
-        LocalDate date1 = LocalDate.parse(o1, formatter);
-        LocalDate date2 = LocalDate.parse(o2, formatter);
+        LocalDate date1 = LocalDate.parse(o1, FORMATTER);
+        LocalDate date2 = LocalDate.parse(o2, FORMATTER);
         return date1.compareTo(date2);
     };
 

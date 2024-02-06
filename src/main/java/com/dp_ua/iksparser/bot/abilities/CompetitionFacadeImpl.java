@@ -815,11 +815,11 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
     private Icon getIconForStatus(CompetitionStatus status) {
         if (status == null) return null;
         return switch (status) {
-            case CANCELED -> GRAY_CIRCLE;
-            case PLANED -> BLUE_CIRCLE;
-            case NOT_STARTED -> GREEN_CIRCLE;
-            case IN_PROGRESS -> RED_CIRCLE;
-            case FINISHED -> LIGHT_GRAY_CIRCLE;
+            case C_CANCELED -> GRAY_CIRCLE;
+            case C_PLANED -> BLUE_CIRCLE;
+            case C_NOT_STARTED -> GREEN_CIRCLE;
+            case C_IN_PROGRESS -> RED_CIRCLE;
+            case C_FINISHED -> LIGHT_GRAY_CIRCLE;
         };
     }
 
