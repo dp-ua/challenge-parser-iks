@@ -56,9 +56,7 @@ public class CronCompetitionUpdater implements ApplicationListener<ContextRefres
         Set<CompetitionEntity> needToUpdateCompetitionIds = new HashSet<>();
         eventService.findAll().stream()
                 .filter(EventEntity::isNotFilled)
-                .forEach(event -> {
-                    needToUpdateCompetitionIds.add(event.getDay().getCompetition());
-                });
+                .forEach(event -> needToUpdateCompetitionIds.add(event.getDay().getCompetition()));
         needToUpdateCompetitionIds.forEach(competition -> {
             log.info("Need to update competition with id: {}", competition.getId());
             runEventToUpdateCompetition(competition);

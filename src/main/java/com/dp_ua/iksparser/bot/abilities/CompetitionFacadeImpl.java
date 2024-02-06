@@ -118,7 +118,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         String competitionId = competition.getId().toString();
         setStateForSearchingByName(chatId, competitionId);
         StringBuilder sb = getFindByNameMessage(competition);
-        publishChunkMessage(chatId, competitionId, sb, getBackToCompetitionKeyboard(competitionId));
+        publishChunkMessage(chatId, sb, getBackToCompetitionKeyboard(competitionId));
     }
 
     private InlineKeyboardMarkup getEnoughKeyboard() {
@@ -165,7 +165,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                 .toList();
         if (heatLines.isEmpty()) {
             log.warn("No participants found");
-            publishChunkMessage(chatId, competitionId, new StringBuilder("Учасників не знайдено"), null);
+            publishChunkMessage(chatId, new StringBuilder("Учасників не знайдено"), null);
             publishFindMore(chatId, competitionId);
             return;
         }
@@ -208,7 +208,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                     .filter(heatLine -> heatLine.getParticipant().equals(participant))
                     .forEach(heatLine -> sb.append(heatLineInfo(heatLine)));
 
-            publishChunkMessage(chatId, competitionId, sb, null);
+            publishChunkMessage(chatId, sb, null);
         });
         publishFindMore(chatId, competitionId);
     }
@@ -245,7 +245,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         String competitionId = competition.getId().toString();
         setStateSearchingByCoach(chatId, competitionId);
         StringBuilder sb = getFindByCoachMessage(competition);
-        publishChunkMessage(chatId, competitionId, sb, getBackToCompetitionKeyboard(competitionId));
+        publishChunkMessage(chatId, sb, getBackToCompetitionKeyboard(competitionId));
     }
 
     private void setStateSearchingByCoach(String chatId, String competitionId) {
@@ -307,7 +307,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         });
         if (coachHeatLinesMap.isEmpty()) {
             log.warn("No participants found");
-            publishChunkMessage(chatId, competitionId, new StringBuilder("Учасників не знайдено"), null);
+            publishChunkMessage(chatId, new StringBuilder("Учасників не знайдено"), null);
             publishFindMore(chatId, competitionId);
             return;
         }
@@ -358,17 +358,17 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         message.append(header);
         participantsInfo.forEach(participantInfo -> {
             if (message.toString().length() + participantInfo.toString().length() >= MAX_CHUNK_SIZE) {
-                publishChunkMessage(chatId, competitionId, message, null);
+                publishChunkMessage(chatId, message, null);
                 message.setLength(0);
                 message.append(header);
             }
             message.append(participantInfo);
         });
 
-        publishChunkMessage(chatId, competitionId, message, null);
+        publishChunkMessage(chatId, message, null);
     }
 
-    private void publishChunkMessage(String chatId, String competitionId, StringBuilder message, InlineKeyboardMarkup keyboard) {
+    private void publishChunkMessage(String chatId, StringBuilder message, InlineKeyboardMarkup keyboard) {
         publishEvent(prepareSendMessageEvent(
                 chatId,
                 null,
@@ -521,24 +521,24 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
     private boolean isValidInputNameConditions(String chatId, CompetitionEntity competition, String id, String name) {
         if (competition == null) {
             log.warn("Competition[{}] not found", id);
-            publishChunkMessage(chatId, id, new StringBuilder("Змагання не знайдено"), getBackToCompetitionsKeyboard());
+            publishChunkMessage(chatId, new StringBuilder("Змагання не знайдено"), getBackToCompetitionsKeyboard());
             return false;
         }
         if (name.isEmpty()) {
             log.warn("Name is empty");
-            publishChunkMessage(chatId, id, new StringBuilder("Ви не вказали прізвище"), null);
+            publishChunkMessage(chatId, new StringBuilder("Ви не вказали прізвище"), null);
             publishFindMore(chatId, id);
             return false;
         }
         if (name.length() < 3) {
             log.warn("Name is too short");
-            publishChunkMessage(chatId, id, new StringBuilder("Ви вказали занадто коротке прізвище"), null);
+            publishChunkMessage(chatId, new StringBuilder("Ви вказали занадто коротке прізвище"), null);
             publishFindMore(chatId, id);
             return false;
         }
         if (!name.matches("[а-яА-Яa-zA-Z-ґҐєЄіІїЇ']+")) {
             log.warn("Name contains invalid symbols: " + name);
-            publishChunkMessage(chatId, id, new StringBuilder("Ви вказали некоректне прізвище"), null);
+            publishChunkMessage(chatId, new StringBuilder("Ви вказали некоректне прізвище"), null);
             publishFindMore(chatId, id);
             return false;
         }
