@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static com.dp_ua.iksparser.bot.Icon.*;
+import static com.dp_ua.iksparser.bot.abilities.infoview.HeatLineView.info;
 import static com.dp_ua.iksparser.bot.event.SendMessageEvent.MsgType.*;
 import static com.dp_ua.iksparser.service.MessageCreator.*;
 
@@ -210,7 +211,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
 
             heatLines.stream()
                     .filter(heatLine -> heatLine.getParticipant().equals(participant))
-                    .forEach(heatLine -> sb.append(heatLineInfo(heatLine)));
+                    .forEach(heatLine -> sb.append(info(heatLine)));
 
             boolean subscribed = subscribeFacade.isSubscribed(chatId, participant.getId());
             publishChunkMessage(chatId, sb, getSubscribeKeyboard(participant, subscribed));
@@ -389,7 +390,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
             participantInfo
                     .append(participantInfo(participant))
                     .append(END_LINE);
-            participantHeatLines.forEach(heatLine -> participantInfo.append(heatLineInfo(heatLine)));
+            participantHeatLines.forEach(heatLine -> participantInfo.append(info(heatLine)));
             participantInfo.append(END_LINE);
             result.add(participantInfo);
         });
@@ -422,68 +423,6 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         ));
     }
 
-    private String heatLineInfo(HeatLineEntity heatLine) {
-        StringBuilder sb = new StringBuilder();
-        HeatEntity heat = heatLine.getHeat();
-        EventEntity event = heat.getEvent();
-        DayEntity day = event.getDay();
-
-        sb
-                .append(MARK)
-                .append(" ")
-                .append(day.getDayName())
-                .append(", ")
-                .append(event.getTime())
-                .append(", ");
-        String link = getLink(event);
-        if (!link.isEmpty()) {
-            sb
-                    .append(LINK)
-                    .append(event.getEventName())
-                    .append(", ")
-                    .append(event.getCategory())
-                    .append(", ")
-                    .append(event.getRound())
-                    .append(LINK_END)
-                    .append(LINK_SEPARATOR)
-                    .append(link)
-                    .append(LINK_SEPARATOR_END);
-        } else {
-            sb.append(event.getEventName())
-                    .append(", ")
-                    .append(event.getRound());
-        }
-        sb
-
-                .append(", ")
-                .append(heat.getName())
-                .append(", д.")
-                .append(heatLine.getLane())
-                .append(",bib.")
-                .append(heatLine.getBib());
-        if (!event.getResultUrl().isEmpty()) {
-            sb
-                    .append(" ")
-                    .append(LINK)
-                    .append(RESULT)
-                    .append(LINK_END)
-                    .append(LINK_SEPARATOR)
-                    .append(event.getResultUrl())
-                    .append(LINK_SEPARATOR_END);
-        }
-        sb.append(END_LINE);
-        return sb.toString();
-    }
-
-    private static String getLink(EventEntity event) {
-        return !event.getResultUrl().isEmpty() ? event.getResultUrl()
-                :
-                !event.getStartListUrl().isEmpty()
-                        ?
-                        event.getStartListUrl()
-                        :
-                        "";
-    }
 
     private String participantInfo(ParticipantEntity participant) {
         StringBuilder sb = new StringBuilder();
