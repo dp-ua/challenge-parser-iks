@@ -1,13 +1,12 @@
 package com.dp_ua.iksparser.bot.abilities.infoview;
 
-import com.dp_ua.iksparser.dba.element.EventEntity;
 import com.dp_ua.iksparser.dba.element.HeatEntity;
 import com.dp_ua.iksparser.dba.element.HeatLineEntity;
 
 import static com.dp_ua.iksparser.bot.Icon.MARK;
 import static com.dp_ua.iksparser.service.MessageCreator.END_LINE;
 
-public class HeatLineView extends BaseView {
+public class HeatLineView {
     public static String info(HeatLineEntity heatLine) {
         StringBuilder sb = new StringBuilder();
         HeatEntity heat = heatLine.getHeat();

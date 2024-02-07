@@ -262,9 +262,7 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
             updatedDays.forEach(newDay -> oldDays.stream()
                     .filter(newDay::isTheSame)
                     .findFirst()
-                    .ifPresentOrElse(oldDay -> {
-                                dayService.save(oldDay);
-                            },
+                    .ifPresentOrElse(oldDay -> dayService.save(oldDay),
                             () -> {
                                 dayService.save(newDay);
                                 newDay.setCompetition(competition);
