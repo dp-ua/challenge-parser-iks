@@ -26,6 +26,8 @@ public enum Icon {
     EVENT("📅"),
     HEAT("🔥"),
     COMPETITION("🏆"),
+    MEDAL("🥇"),
+    DURATION("🕒"),
     CHAMPIONSHIP("🏆"),
     CHALLENGE("🎯"),
     SPORT("🏀"),
