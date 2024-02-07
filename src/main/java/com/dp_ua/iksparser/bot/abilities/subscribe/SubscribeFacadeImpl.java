@@ -48,11 +48,10 @@ public class SubscribeFacadeImpl implements SubscribeFacade {
         SendMessage sendMessage = SERVICE.getSendMessage(
                 subscriber.getChatId(),
                 SubscriptionView.info(participant, heatLines, competition),
-                null, // todo UNSUBSCRIBE_KEYBOARD
+                SubscriptionView.button(participant, true),
                 true);
         sendMessage.disableWebPagePreview();
-        SendMessageEvent sendMessageEvent = new SendMessageEvent(this, sendMessage, SendMessageEvent.MsgType.SEND_MESSAGE);
-        return sendMessageEvent;
+        return new SendMessageEvent(this, sendMessage, SendMessageEvent.MsgType.SEND_MESSAGE);
     }
 
 

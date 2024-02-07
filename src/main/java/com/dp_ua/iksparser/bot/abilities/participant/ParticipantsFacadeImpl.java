@@ -1,6 +1,7 @@
 package com.dp_ua.iksparser.bot.abilities.participant;
 
 import com.dp_ua.iksparser.bot.abilities.infoview.ParticipantView;
+import com.dp_ua.iksparser.bot.abilities.infoview.SubscriptionView;
 import com.dp_ua.iksparser.bot.event.SendMessageEvent;
 import com.dp_ua.iksparser.dba.element.ParticipantEntity;
 import com.dp_ua.iksparser.dba.service.ParticipantService;
@@ -46,8 +47,11 @@ public class ParticipantsFacadeImpl implements ParticipantFacade {
                     " Ви підписались на спортсмена: " +
                     END_LINE +
                     ParticipantView.info(participant);
-            SendMessageEvent sendMessageEvent = prepareSendEvent(chatId, editMessageId, text, null);
-            // todo UNSUBSCRIBE_KEYBOARD
+            SendMessageEvent sendMessageEvent = prepareSendEvent(
+                    chatId,
+                    editMessageId,
+                    text,
+                    SubscriptionView.button(participant, true));
             publisher.publishEvent(sendMessageEvent);
         });
     }
@@ -69,8 +73,11 @@ public class ParticipantsFacadeImpl implements ParticipantFacade {
                     " Ви відписались від спортсмена: " +
                     END_LINE +
                     ParticipantView.info(participant);
-            SendMessageEvent sendMessageEvent = prepareSendEvent(chatId, editMessageId, text, null);
-            // todo SUBSCRIBE_KEYBOARD
+            SendMessageEvent sendMessageEvent = prepareSendEvent(
+                    chatId,
+                    editMessageId,
+                    text,
+                    SubscriptionView.button(participant, false));
             publisher.publishEvent(sendMessageEvent);
         });
     }

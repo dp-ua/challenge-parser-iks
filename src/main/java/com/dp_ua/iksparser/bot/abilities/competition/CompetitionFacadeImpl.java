@@ -5,6 +5,7 @@ import com.dp_ua.iksparser.bot.abilities.StateService;
 import com.dp_ua.iksparser.bot.abilities.infoview.CompetitionView;
 import com.dp_ua.iksparser.bot.abilities.infoview.HeatLineView;
 import com.dp_ua.iksparser.bot.abilities.infoview.ParticipantView;
+import com.dp_ua.iksparser.bot.abilities.infoview.SubscriptionView;
 import com.dp_ua.iksparser.bot.abilities.subscribe.SubscribeFacade;
 import com.dp_ua.iksparser.bot.command.impl.*;
 import com.dp_ua.iksparser.bot.event.SendMessageEvent;
@@ -221,7 +222,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                     .forEach(heatLine -> sb.append(HeatLineView.info(heatLine)));
 
             boolean subscribed = subscribeFacade.isSubscribed(chatId, participant.getId());
-            publishChunkMessage(chatId, sb, getSubscribeKeyboard(participant, subscribed));
+            publishChunkMessage(chatId, sb, SubscriptionView.button(participant, subscribed));
         });
         publishFindMore(chatId, competitionId);
     }
@@ -492,30 +493,6 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
 
         List<InlineKeyboardButton> row = getBackButton("/competitions");
-        rows.add(row);
-
-        keyboard.setKeyboard(rows);
-        return keyboard;
-    }
-
-    private InlineKeyboardMarkup getSubscribeKeyboard(ParticipantEntity participant, boolean subscribed) {
-        InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
-        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
-
-        List<InlineKeyboardButton> row = new ArrayList<>();
-        if (subscribed) {
-            InlineKeyboardButton button = SERVICE.getKeyboardButton(
-                    UNSUBSCRIBE + " Відписатись",
-                    "/" + CommandUnsubscribe.command + " " + participant.getId()
-            );
-            row.add(button);
-        } else {
-            InlineKeyboardButton button = SERVICE.getKeyboardButton(
-                    SUBSCRIBE + " Підписатись ",
-                    "/" + CommandSubscribe.command + " " + participant.getId()
-            );
-            row.add(button);
-        }
         rows.add(row);
 
         keyboard.setKeyboard(rows);
