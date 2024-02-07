@@ -7,6 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.Map;
+
 @Component
 @Slf4j
 public class SubscriberService {
@@ -44,5 +47,9 @@ public class SubscriberService {
         repo.findByChatIdAndParticipantId(chatId, id).ifPresent(subscriber -> {
             repo.delete(subscriber);
         });
+    }
+
+    public List<SubscriberEntity> findAllByParticipant(ParticipantEntity participant) {
+        return repo.findAllByParticipant(participant);
     }
 }
