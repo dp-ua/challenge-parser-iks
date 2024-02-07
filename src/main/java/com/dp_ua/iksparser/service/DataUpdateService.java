@@ -3,6 +3,7 @@ package com.dp_ua.iksparser.service;
 import com.dp_ua.iksparser.bot.command.impl.CommandCompetition;
 import com.dp_ua.iksparser.bot.command.impl.CommandCompetitionNotLoaded;
 import com.dp_ua.iksparser.bot.event.GetMessageEvent;
+import com.dp_ua.iksparser.bot.event.SubscribeEvent;
 import com.dp_ua.iksparser.bot.event.UpdateCompetitionEvent;
 import com.dp_ua.iksparser.bot.message.SelfMessage;
 import com.dp_ua.iksparser.dba.element.*;
@@ -105,13 +106,11 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
         List<EventEntity> newEvents = operateAndGetNewEventsForDays(competition, document);
         Map<ParticipantEntity, List<HeatLineEntity>> participations = operateEventsToParseHeats(newEvents);
         competitionService.save(competition); // save all cascade
-
-        log.info("OPERATE PARTICIPANTS!!!! SUBSCRIBE LIST. new participants count: {}", participations.size());
         if (isNeedToInformSubscribers(competition)) {
-            log.info("WE WILL INFORM SUBSCRIBERS");
-            // todo operate participants
+            log.info("Informing subscribers about new participants{}", participations.size());
+            publisher.publishEvent(new SubscribeEvent(this, participations));
         } else {
-            log.info("WE WILL NOT INFORM SUBSCRIBERS");
+            log.info("Old competition. No need to inform subscribers about new participants{}", participations.size());
         }
     }
 
