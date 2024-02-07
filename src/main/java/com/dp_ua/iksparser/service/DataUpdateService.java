@@ -3,6 +3,7 @@ package com.dp_ua.iksparser.service;
 import com.dp_ua.iksparser.bot.command.impl.CommandCompetition;
 import com.dp_ua.iksparser.bot.command.impl.CommandCompetitionNotLoaded;
 import com.dp_ua.iksparser.bot.event.GetMessageEvent;
+import com.dp_ua.iksparser.bot.event.SubscribeEvent;
 import com.dp_ua.iksparser.bot.event.UpdateCompetitionEvent;
 import com.dp_ua.iksparser.bot.message.SelfMessage;
 import com.dp_ua.iksparser.dba.element.*;
@@ -19,16 +20,16 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.dp_ua.iksparser.dba.element.CompetitionStatus.*;
 import static com.dp_ua.iksparser.service.DataUpdateService.UpdateStatus.*;
+
 
 @Slf4j
 @Component
@@ -55,12 +56,12 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
     Lock lock = new ReentrantLock();
 
     @Override
-    @Async("taskExecutor")
+    @Async("updateExecutor")
     @Transactional
     public void onApplicationEvent(UpdateCompetitionEvent event) {
         UpdateStatusEntity message = event.getMessage();
 
-        message.setStatus(STARTED.name());
+        message.setStatus(U_STARTED.name());
         service.save(message);
 
         long competitionId = message.getCompetitionId();
@@ -73,7 +74,7 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
             String s1 = String.format("Competition with id %d not found", competitionId);
             log.error(s1);
             message.setReason(s1);
-            message.setStatus(ERROR.name());
+            message.setStatus(U_ERROR.name());
             service.save(message);
             return;
         }
@@ -81,28 +82,43 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
         lock.lock();
         try {
             updateCompetition(competition);
-            changeStatus(competitionId, STARTED, UPDATED);
+            changeStatus(competitionId, U_STARTED, U_UPDATED);
         } catch (Exception e) {
             log.error("Error updating competition {}", competitionId, e);
-            changeStatus(competitionId, STARTED, ERROR);
+            changeStatus(competitionId, U_STARTED, U_ERROR);
         } catch (ParsingException e) {
-            changeStatus(competitionId, STARTED, INFORM_ERROR);
+            log.warn("Error parsing competition {}, reason:{}", competitionId, e.getMessage());
+            changeStatus(competitionId, U_STARTED, U_INFORM_ERROR);
         } finally {
+            log.info("Finished updating competition {}", competitionId);
             lock.unlock();
             updating.remove(competitionId);
-            List.of(UPDATED, INFORM_ERROR).forEach(status -> sendMessages(competitionId, status));
+            List.of(U_UPDATED, U_INFORM_ERROR).forEach(status -> sendMessages(competitionId, status));
         }
     }
 
     @Transactional
     private void updateCompetition(CompetitionEntity competition) throws ParsingException {
+        log.info("Updating competition {}", competition.getId());
         Document document = downloader.getDocument(competition.getUrl());
 
         operateDaysAndAddItToCompetition(competition, document);
         List<EventEntity> newEvents = operateAndGetNewEventsForDays(competition, document);
-        operateEventsToParseHeats(newEvents);
-
+        Map<ParticipantEntity, List<HeatLineEntity>> participations = operateEventsToParseHeats(newEvents);
         competitionService.save(competition); // save all cascade
+        if (isNeedToInformSubscribers(competition)) {
+            log.info("Informing subscribers about new participants{}", participations.size());
+            publisher.publishEvent(new SubscribeEvent(this, participations));
+        } else {
+            log.info("Old competition. No need to inform subscribers about new participants{}", participations.size());
+        }
+    }
+
+    private boolean isNeedToInformSubscribers(CompetitionEntity competition) {
+        String status = competition.getStatus();
+        return C_IN_PROGRESS.name().equals(status) ||
+                C_NOT_STARTED.name().equals(status) ||
+                C_PLANED.name().equals(status);
     }
 
     private void sendMessages(long competitionId, UpdateStatus status) {
@@ -119,7 +135,7 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
                     }
                 });
         statuses.forEach(updateStatusEntity -> {
-            updateStatusEntity.setStatus(FINISHED.name());
+            updateStatusEntity.setStatus(U_FINISHED.name());
             service.save(updateStatusEntity);
         });
         service.flush();
@@ -127,10 +143,10 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
 
     private GetMessageEvent getGetMessageEvent(long competitionId, UpdateStatusEntity updateStatusEntity, UpdateStatus status) {
         SelfMessage selfMessage = null;
-        if (status == UPDATED) {
+        if (status == U_UPDATED) {
             selfMessage = getUpdateMessage(competitionId, updateStatusEntity);
         }
-        if (status == INFORM_ERROR) {
+        if (status == U_INFORM_ERROR) {
             selfMessage = getErrorMessage(competitionId, updateStatusEntity);
         }
         return new GetMessageEvent(this, selfMessage);
@@ -151,29 +167,35 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
     }
 
 
-    private void operateEventsToParseHeats(List<EventEntity> newEvents) throws ParsingException{
-        newEvents.forEach(event -> {
+    private Map<ParticipantEntity, List<HeatLineEntity>> operateEventsToParseHeats(List<EventEntity> events) throws ParsingException {
+        Map<ParticipantEntity, List<HeatLineEntity>> participations = new HashMap<>();
+        for (EventEntity event : events) {
             if (event.getStartListUrl().isEmpty()) {
-                log.info("Event {} has no start list url", event.getEventName());
-                return;
-            }
-            Document eventDocument = null;
-            try {
-                eventDocument = downloader.getDocument(event.getStartListUrl());
-            } catch (ParsingException e) {
-                throw new RuntimeException(e);
-            }
-            List<HeatEntity> heats = eventParser.getHeats(eventDocument);
-            heats.forEach(heat -> {
-                heat.getHeatLines().forEach(heatLine -> {
-                    // todo operations around subscribing to participant
-                    // heatLine.getParticipant();
+                log.debug("Event {} has no start list url", event.getEventName());
+            } else {
+                Document eventDocument = downloader.getDocument(event.getStartListUrl());
+                List<HeatEntity> heats = eventParser.getHeats(eventDocument);
+                heats.forEach(heat -> {
+                    heatService.save(heat);
+                    heat.setEvent(event);
+                    event.addHeat(heat);
+                    extractParticipants(heat, participations);
                 });
-                heatService.save(heat);
+            }
+        }
+        return participations;
+    }
 
-                heat.setEvent(event);
-                event.addHeat(heat);
-            });
+    private static void extractParticipants(HeatEntity heat, Map<ParticipantEntity, List<HeatLineEntity>> participations) {
+        heat.getHeatLines().forEach(heatLine -> {
+            ParticipantEntity participant = heatLine.getParticipant();
+            if (participations.containsKey(participant)) {
+                participations.get(participant).add(heatLine);
+            } else {
+                List<HeatLineEntity> heatLines = new ArrayList<>();
+                heatLines.add(heatLine);
+                participations.put(participant, heatLines);
+            }
         });
     }
 
@@ -228,7 +250,6 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
     }
 
     private void operateDaysAndAddItToCompetition(CompetitionEntity competition, Document document) throws ParsingException {
-        log.info("Updating competition {}", competition.getId());
         List<DayEntity> updatedDays = competitionParser.getUnsavedUnfilledDays(document);
         List<DayEntity> oldDays = competition.getDays();
         if (oldDays.isEmpty()) {
@@ -241,8 +262,7 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
             updatedDays.forEach(newDay -> oldDays.stream()
                     .filter(newDay::isTheSame)
                     .findFirst()
-                    .ifPresentOrElse(oldDay -> {
-                            },
+                    .ifPresentOrElse(oldDay -> dayService.save(oldDay),
                             () -> {
                                 dayService.save(newDay);
                                 newDay.setCompetition(competition);
@@ -263,9 +283,10 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
     }
 
     public enum UpdateStatus {
-        STARTED,
-        UPDATED,
-        FINISHED,
-        INFORM_ERROR, ERROR
+        U_STARTED,
+        U_UPDATED,
+        U_FINISHED,
+        U_INFORM_ERROR,
+        U_ERROR
     }
 }

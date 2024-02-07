@@ -1,7 +1,7 @@
 package com.dp_ua.iksparser.bot.command.impl;
 
 import com.dp_ua.iksparser.bot.Icon;
-import com.dp_ua.iksparser.bot.abilities.competition.CompetitionFacade;
+import com.dp_ua.iksparser.bot.abilities.participant.ParticipantFacade;
 import com.dp_ua.iksparser.bot.command.BaseCommand;
 import com.dp_ua.iksparser.bot.message.Message;
 import lombok.ToString;
@@ -11,11 +11,11 @@ import org.springframework.stereotype.Component;
 
 @Component
 @ToString
-public class CommandCompetition extends BaseCommand {
-    public final static String command = "competition";
+public class CommandSubscribe extends BaseCommand {
+    public final static String command = "subscribe";
     private final boolean isInTextCommand = false;
     @Autowired
-    private CompetitionFacade competitionFacade;
+    private ParticipantFacade participantFacade;
 
     @Override
     public String command() {
@@ -24,13 +24,13 @@ public class CommandCompetition extends BaseCommand {
 
     @Override
     protected String getTextForCallBackAnswer(Message message) {
-        return Icon.INFO + " Дивимось інформацію по змаганню " + Icon.INFO;
+        return Icon.SUBSCRIBE + " Підписуємось на спортсмена " + Icon.SUBSCRIBE;
     }
 
     @Override
     protected void perform(Message message) {
         String chatId = message.getChatId();
         long commandArgument = getCommandArgument(message.getMessageText());
-        competitionFacade.showCompetition(chatId, commandArgument, message.getEditMessageId());
+        participantFacade.subscribe(chatId, commandArgument, message.getEditMessageId());
     }
 }

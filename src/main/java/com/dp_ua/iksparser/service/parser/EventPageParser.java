@@ -97,6 +97,8 @@ public class EventPageParser {
 
             if (!heat.getHeatLines().isEmpty()) {
                 heats.add(heat);
+            } else {
+                heatService.delete(heat);
             }
         });
         return heats;

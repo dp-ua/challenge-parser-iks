@@ -1,4 +1,4 @@
-package com.dp_ua.iksparser.bot.abilities;
+package com.dp_ua.iksparser.bot.abilities.competition;
 
 import com.dp_ua.iksparser.exeption.ParsingException;
 

@@ -1,6 +1,8 @@
 package com.dp_ua.iksparser.bot;
 
 public enum Icon {
+    SUBSCRIBE("🔔"),
+    UNSUBSCRIBE("🔕"),
     ENOUGH("👌"),
     RESULT("📊"),
     GREEN_CIRCLE("🟢"),
@@ -24,6 +26,8 @@ public enum Icon {
     EVENT("📅"),
     HEAT("🔥"),
     COMPETITION("🏆"),
+    MEDAL("🥇"),
+    DURATION("🕒"),
     CHAMPIONSHIP("🏆"),
     CHALLENGE("🎯"),
     SPORT("🏀"),
