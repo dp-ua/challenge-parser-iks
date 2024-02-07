@@ -51,7 +51,7 @@ public class CronCompetitionUpdater implements ApplicationListener<ContextRefres
         }
     }
 
-    @Scheduled(cron = "0 0/16 10-23 * * *") // every 16 minutes check not filled events from 10 to 23
+    @Scheduled(cron = "0 0/9 10-23 * * *") // every 9 minutes check not filled events from 10 to 23
     public void checkNotFilledEvents() {
         Set<CompetitionEntity> needToUpdateCompetitionIds = new HashSet<>();
         eventService.findAll().stream()
@@ -76,7 +76,7 @@ public class CronCompetitionUpdater implements ApplicationListener<ContextRefres
                 });
     }
 
-    @Scheduled(cron = "0 15 10,12,14,16,18,20,22 * * *") // from 10 to 00
+    @Scheduled(cron = "0 0/20 10-23 * * *") // every 20 minutes check closest competitions
     public void updateClosestCompetitions() {
         log.info("Start update closest competitions");
         List<CompetitionEntity> competitions = competitionService.findAllOrderByBeginDate(true);
