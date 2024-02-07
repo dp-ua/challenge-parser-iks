@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Map;
 
 @Component
 @Slf4j
@@ -44,9 +43,7 @@ public class SubscriberService {
             log.info("chatId: {} not subscribed to participant: {}", chatId, id);
             return;
         }
-        repo.findByChatIdAndParticipantId(chatId, id).ifPresent(subscriber -> {
-            repo.delete(subscriber);
-        });
+        repo.findByChatIdAndParticipantId(chatId, id).ifPresent(repo::delete);
     }
 
     public List<SubscriberEntity> findAllByParticipant(ParticipantEntity participant) {

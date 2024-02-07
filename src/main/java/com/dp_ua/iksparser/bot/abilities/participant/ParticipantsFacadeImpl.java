@@ -1,6 +1,5 @@
 package com.dp_ua.iksparser.bot.abilities.participant;
 
-import com.dp_ua.iksparser.bot.Icon;
 import com.dp_ua.iksparser.bot.abilities.infoview.ParticipantView;
 import com.dp_ua.iksparser.bot.event.SendMessageEvent;
 import com.dp_ua.iksparser.dba.element.ParticipantEntity;
@@ -16,7 +15,8 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 
 import java.util.Optional;
 
-import static com.dp_ua.iksparser.bot.Icon.*;
+import static com.dp_ua.iksparser.bot.Icon.SUBSCRIBE;
+import static com.dp_ua.iksparser.bot.Icon.UNSUBSCRIBE;
 import static com.dp_ua.iksparser.service.MessageCreator.END_LINE;
 
 @Component
@@ -84,7 +84,6 @@ public class ParticipantsFacadeImpl implements ParticipantFacade {
                 text,
                 keyboard,
                 true);
-        SendMessageEvent sendMessageEvent = new SendMessageEvent(this, editMessageText, SendMessageEvent.MsgType.EDIT_MESSAGE);
-        return sendMessageEvent;
+        return new SendMessageEvent(this, editMessageText, SendMessageEvent.MsgType.EDIT_MESSAGE);
     }
 }

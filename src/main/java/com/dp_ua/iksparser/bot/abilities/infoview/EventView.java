@@ -6,7 +6,7 @@ import com.dp_ua.iksparser.dba.element.EventEntity;
 import static com.dp_ua.iksparser.bot.Icon.RESULT;
 import static com.dp_ua.iksparser.service.MessageCreator.*;
 
-public class EventView extends BaseView {
+public class EventView {
     public static String info(EventEntity event) {
         DayEntity day = event.getDay();
         StringBuilder sb = new StringBuilder();
