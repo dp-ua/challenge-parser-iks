@@ -33,7 +33,7 @@ services:
       POSTGRES_DB: iks_db
       POSTGRES_USER: ${IKS_DB_USERNAME}
       POSTGRES_PASSWORD: ${IKS_DB_PASSWORD}
-      PGDATA: "/var/lib/postgresql/data/pgdata"
+      PGDATA: /var/lib/postgresql/data/pgdata
     ports:
       - "5432:5432"
     volumes:
