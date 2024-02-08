@@ -41,6 +41,7 @@ public class CompetitionEntity extends DomainElement {
         this.name = competition.getName();
         this.country = competition.getCountry();
         this.city = competition.getCity();
+        this.status = competition.getStatus();
     }
 
     public void addDay(DayEntity day) {
