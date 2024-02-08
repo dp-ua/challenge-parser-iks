@@ -30,14 +30,29 @@ services:
     image: postgres:14-alpine3.18
     container_name: iks-db
     environment:
+      POSTGRES_DB: iks_db
       POSTGRES_USER: ${IKS_DB_USERNAME}
       POSTGRES_PASSWORD: ${IKS_DB_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
+      - ./db/create_db.sql:/docker-entrypoint-initdb.d/create_db.sql
       - db-data:/var/lib/postgresql/data
     restart: unless-stopped
+
+  pgadmin:
+    container_name: pgadmin4_container
+    image: dpage/pgadmin4:8.2
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PG_ADMIN_USER}
+      PGADMIN_DEFAULT_PASSWORD: ${PG_ADMIN_PASSWORD}
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
 
 volumes:
   bot-data:
   db-data:
+  pgadmin-data:
