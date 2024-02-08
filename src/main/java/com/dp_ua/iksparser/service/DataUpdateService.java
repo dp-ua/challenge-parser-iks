@@ -116,9 +116,9 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
 
     private boolean isNeedToInformSubscribers(CompetitionEntity competition) {
         String status = competition.getStatus();
-        return C_IN_PROGRESS.name().equals(status) ||
-                C_NOT_STARTED.name().equals(status) ||
-                C_PLANED.name().equals(status);
+        return C_IN_PROGRESS.getName().equals(status) ||
+                C_NOT_STARTED.getName().equals(status) ||
+                C_PLANED.getName().equals(status);
     }
 
     private void sendMessages(long competitionId, UpdateStatus status) {

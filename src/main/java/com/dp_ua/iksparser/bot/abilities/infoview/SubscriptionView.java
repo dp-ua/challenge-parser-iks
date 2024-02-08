@@ -22,11 +22,13 @@ public class SubscriptionView {
                 .append(SUBSCRIBE)
                 .append("Ви підписані на учасника: ")
                 .append(END_LINE)
+                .append(END_LINE)
                 .append(ParticipantView.info(participant))
                 .append(END_LINE).append("Приймає участь у змаганнях: ")
                 .append(CompetitionView.nameAndDate(competition))
                 .append(END_LINE)
-                .append("Нова заявка в забігах:")
+                .append(END_LINE)
+                .append("Нова заявка в івентах:")
                 .append(END_LINE);
         for (HeatLineEntity heatLine : heatLines) {
             sb
