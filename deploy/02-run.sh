@@ -12,6 +12,7 @@ if [ -z "$IKS_TELEGRAM_BOT_NAME" ] || [ -z "$IKS_TELEGRAM_ADMIN_ID" ] || [ -z "$
 fi
 
 echo "=======Shutting Down docker-compose========"
+docker-compose rm iks-db
 docker-compose down
 
 # Check if the docker-compose down command was successful
