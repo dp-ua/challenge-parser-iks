@@ -25,12 +25,6 @@ spring:
   output:
     ansi:
       enabled: DETECT
-  liquibase:
-    enabled: true
-    drop-first: false
-    change-log: classpath:db/changelog/db.changelog-master.xml
-    default-schema: public
-
 
 telegram:
   bot:
