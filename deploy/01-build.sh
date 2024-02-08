@@ -3,7 +3,7 @@
 echo "---------------------- Docker build image -------------------"
 
 # Выполняем команду docker build
-docker build -t challenge-parser:latest -f deploy/Dockerfile .
+docker build -t iks-bot:latest -f deploy/Dockerfile .
 
 # Проверяем код возврата
 if [ $? -eq 0 ]; then

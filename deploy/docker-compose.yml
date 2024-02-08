@@ -2,13 +2,15 @@ version: '3.3'
 
 services:
   client-backend:
-    image: challenge-parser:latest
+    image: iks-bot:latest
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: challenge-parser
+    container_name: iks-bot
     ports:
       - "8181:8181"
+    depends_on:
+      - service-db
     environment:
       - SERVER_PORT=8181
       - IKS_TELEGRAM_BOT_TOKEN=${IKS_TELEGRAM_BOT_TOKEN}
@@ -17,9 +19,25 @@ services:
       - IKS_DB_USERNAME=${IKS_DB_USERNAME}
       - IKS_DB_PASSWORD=${IKS_DB_PASSWORD}
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8181/actuator/health"]  # Adjust the URL based on your actual health check endpoint
+      test: [ "CMD", "curl", "-f", "http://localhost:8181/actuator/health" ]  # Adjust the URL based on your actual health check endpoint
       interval: 10s
       timeout: 5s
       retries: 3
     volumes:
-      - /app/logs:/home/dp_ua/bots/logs/iks-bot/
+      - bot-data:/var/lib/iks-bot
+
+  service-db:
+    image: postgres:14-alpine3.18
+    container_name: iks-db
+    environment:
+      POSTGRES_USER: ${IKS_DB_USERNAME}
+      POSTGRES_PASSWORD: ${IKS_DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  bot-data:
+  db-data:
