@@ -1,7 +1,7 @@
 package com.dp_ua.iksparser.bot.abilities.infoview;
 
-import com.dp_ua.iksparser.bot.command.impl.CommandSubscribe;
-import com.dp_ua.iksparser.bot.command.impl.CommandUnsubscribe;
+import com.dp_ua.iksparser.bot.command.impl.subscribe.CommandSubscribe;
+import com.dp_ua.iksparser.bot.command.impl.subscribe.CommandUnsubscribe;
 import com.dp_ua.iksparser.dba.element.CompetitionEntity;
 import com.dp_ua.iksparser.dba.element.HeatLineEntity;
 import com.dp_ua.iksparser.dba.element.ParticipantEntity;
