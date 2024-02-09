@@ -24,7 +24,7 @@ services:
       timeout: 5s
       retries: 3
     volumes:
-      - bot-data:/app/logs
+      - C:\docker\bot:/app/logs
 
   service-db:
     image: postgres:14-alpine3.18
@@ -38,7 +38,7 @@ services:
       - "5432:5432"
     volumes:
       - ./db/create_db.sql:/docker-entrypoint-initdb.d/create_db.sql
-      - .:/var/lib/postgresql/data
+      - C:\docker\db:/var/lib/postgresql/data:/var/lib/postgresql/data
     restart: unless-stopped
 
   pgadmin:
@@ -51,7 +51,7 @@ services:
     ports:
       - "5050:80"
     volumes:
-      - pgadmin-data:/var/lib/pgadmin
+      - C:\docker\pg:/var/lib/pgadmin
 
 volumes:
   bot-data:
