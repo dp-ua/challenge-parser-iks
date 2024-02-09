@@ -47,7 +47,7 @@ if "%IKS_DB_PASSWORD%"=="" (
 )
 
 echo =======Shutting Down docker-compose========
-docker-compose down
+docker-compose -f local-docker-compose.yml down
 
 REM Check if the docker-compose down command was successful
 if %ERRORLEVEL% equ 0 (
@@ -58,7 +58,7 @@ if %ERRORLEVEL% equ 0 (
 )
 
 echo =======Starting docker-compose========
-docker-compose up --force-recreate -d
+docker-compose -f local-docker-compose.yml up -d
 
 REM Check if the docker-compose up command was successful
 if %ERRORLEVEL% equ 0 (
