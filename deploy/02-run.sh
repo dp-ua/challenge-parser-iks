@@ -23,7 +23,7 @@ else
 fi
 
 echo "=======Starting docker-compose========"
-docker-compose up --force-recreate -d
+docker-compose up -d
 
 # Check if the docker-compose up command was successful
 if [ $? -eq 0 ]; then
