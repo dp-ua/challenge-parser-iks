@@ -1,4 +1,4 @@
-package com.dp_ua.iksparser.bot.command.impl;
+package com.dp_ua.iksparser.bot.command.impl.competition;
 
 import com.dp_ua.iksparser.bot.Icon;
 import com.dp_ua.iksparser.bot.abilities.competition.CompetitionFacade;
@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 @ToString
-public class CommandCompetition extends BaseCommand {
-    public final static String command = "competition";
+public class CommandCompetitionNotLoaded extends BaseCommand {
+    public final static String command = "competitionnotloaded";
     private final boolean isInTextCommand = false;
     @Autowired
     private CompetitionFacade competitionFacade;
@@ -31,6 +31,6 @@ public class CommandCompetition extends BaseCommand {
     protected void perform(Message message) {
         String chatId = message.getChatId();
         long commandArgument = getCommandArgument(message.getMessageText());
-        competitionFacade.showCompetition(chatId, commandArgument, message.getEditMessageId());
+        competitionFacade.showNotLoadedInfo(chatId, commandArgument, message.getEditMessageId());
     }
 }

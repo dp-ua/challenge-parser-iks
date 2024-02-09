@@ -1,10 +1,9 @@
-package com.dp_ua.iksparser.bot.command.impl;
+package com.dp_ua.iksparser.bot.command.impl.competition;
 
 import com.dp_ua.iksparser.bot.Icon;
 import com.dp_ua.iksparser.bot.abilities.competition.CompetitionFacade;
 import com.dp_ua.iksparser.bot.command.BaseCommand;
 import com.dp_ua.iksparser.bot.message.Message;
-import com.dp_ua.iksparser.exeption.ParsingException;
 import lombok.ToString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -12,8 +11,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 @ToString
-public class CommandCompetitions extends BaseCommand {
-    public static final String command = "competitions";
+public class CommandCompetition extends BaseCommand {
+    public final static String command = "competition";
     private final boolean isInTextCommand = false;
     @Autowired
     private CompetitionFacade competitionFacade;
@@ -25,17 +24,13 @@ public class CommandCompetitions extends BaseCommand {
 
     @Override
     protected String getTextForCallBackAnswer(Message message) {
-        return Icon.PREVIOUS + " дивитись змагання " + Icon.NEXT;
+        return Icon.INFO + " Дивимось інформацію по змаганню " + Icon.INFO;
     }
 
     @Override
     protected void perform(Message message) {
         String chatId = message.getChatId();
         long commandArgument = getCommandArgument(message.getMessageText());
-        try {
-            competitionFacade.showCompetitions(chatId, commandArgument, message.getEditMessageId());
-        } catch (ParsingException e) {
-            throw new RuntimeException(e);
-        }
+        competitionFacade.showCompetition(chatId, commandArgument, message.getEditMessageId());
     }
 }

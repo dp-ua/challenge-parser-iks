@@ -2,6 +2,7 @@ package com.dp_ua.iksparser.bot.command.impl;
 
 import com.dp_ua.iksparser.bot.Bot;
 import com.dp_ua.iksparser.bot.command.CommandInterface;
+import com.dp_ua.iksparser.bot.command.impl.competition.CommandCompetitions;
 import com.dp_ua.iksparser.bot.message.Message;
 import com.dp_ua.iksparser.bot.event.SendMessageEvent;
 import com.dp_ua.iksparser.service.MessageCreator;

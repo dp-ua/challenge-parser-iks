@@ -1,7 +1,7 @@
 package com.dp_ua.iksparser.service;
 
-import com.dp_ua.iksparser.bot.command.impl.CommandCompetition;
-import com.dp_ua.iksparser.bot.command.impl.CommandCompetitionNotLoaded;
+import com.dp_ua.iksparser.bot.command.impl.competition.CommandCompetition;
+import com.dp_ua.iksparser.bot.command.impl.competition.CommandCompetitionNotLoaded;
 import com.dp_ua.iksparser.bot.event.GetMessageEvent;
 import com.dp_ua.iksparser.bot.event.SubscribeEvent;
 import com.dp_ua.iksparser.bot.event.UpdateCompetitionEvent;
