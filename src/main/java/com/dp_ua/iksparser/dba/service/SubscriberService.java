@@ -49,4 +49,8 @@ public class SubscriberService {
     public List<SubscriberEntity> findAllByParticipant(ParticipantEntity participant) {
         return repo.findAllByParticipant(participant);
     }
+
+    public List<SubscriberEntity> findAllByChatId(String chatId) {
+        return repo.findAllByChatId(chatId);
+    }
 }

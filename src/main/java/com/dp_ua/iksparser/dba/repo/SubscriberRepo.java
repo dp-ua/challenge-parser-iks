@@ -17,4 +17,6 @@ public interface SubscriberRepo extends CrudRepository<SubscriberEntity, Long> {
     Optional<SubscriberEntity> findByChatIdAndParticipantId(String chatId, Long id);
 
     List<SubscriberEntity> findAllByParticipant(ParticipantEntity participant);
+
+    List<SubscriberEntity> findAllByChatId(String chatId);
 }
