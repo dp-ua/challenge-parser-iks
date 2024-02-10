@@ -52,8 +52,7 @@ public class SubscribeFacadeImpl implements SubscribeFacade {
     }
 
     private List<SubscriberEntity> getSubscriptions(String chatId) {
-        List<SubscriberEntity> subscribers = subscriberService.findAllByChatId(chatId);
-        return subscribers;
+        return subscriberService.findAllByChatId(chatId);
     }
 
     private SendMessageEvent prepareSendSubscribersEvent(String chatId, List<SubscriberEntity> subscribers, Integer editMessageId) {
