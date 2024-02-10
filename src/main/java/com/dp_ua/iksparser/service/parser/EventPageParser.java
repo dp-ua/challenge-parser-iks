@@ -58,6 +58,7 @@ public class EventPageParser {
                 String team = cells.get(9).text();
                 String region = cells.get(8).text();
                 String born = cells.get(7).text();
+                String url = cells.get(4).select("a").attr("href");
                 ParticipantEntity participant = participantService.findBySurnameAndNameAndTeamAndRegionAndBorn(
                         surname,
                         name,
@@ -67,7 +68,7 @@ public class EventPageParser {
                 );
                 if (participant == null) {
                     participant = new ParticipantEntity();
-                    participant.setUrl(cells.get(4).select("a").attr("href"));
+                    participant.setUrl(url);
                     participant.setSurname(surname);
                     participant.setName(name);
                     participant.setBorn(born);
@@ -75,7 +76,12 @@ public class EventPageParser {
                     participant.setTeam(team);
                     participantService.save(participant);
                 }
-
+                if ((participant.getUrl() == null || participant.getUrl().isEmpty())
+                        && url != null && !url.isEmpty()) {
+                    log.debug("Participant {} has no url. Set url: {}", participant, url);
+                    participant.setUrl(url);
+                    participantService.save(participant);
+                }
                 saveRelationBetweenHeatLineAndParticipant(heatLine, participant);
 
                 String[] coaches = cells.get(10).text().split(",");
