@@ -32,16 +32,19 @@ public class CommandProviderTest {
         String actual = String.join("\n", allCommands);
         Assert.assertEquals(
                 """
-                        competition
-                        competitionnotloaded
-                        competitions
                         deletemessage
                         help
                         searchbycoach
                         searchbycoachwithname
                         searchbyname
                         searchbynamewithname
-                        start""",
+                        start
+                        competition
+                        competitionnotloaded
+                        competitions
+                        subscribe
+                        subscriptions
+                        unsubscribe""",
                 actual);
     }
 }
