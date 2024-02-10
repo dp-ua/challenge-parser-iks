@@ -42,19 +42,19 @@ public class SubscriptionView {
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
 
         List<InlineKeyboardButton> row = new ArrayList<>();
+        InlineKeyboardButton button;
         if (subscribed) {
-            InlineKeyboardButton button = SERVICE.getKeyboardButton(
+            button = SERVICE.getKeyboardButton(
                     UNSUBSCRIBE + " Відписатись",
                     "/" + CommandUnsubscribe.command + " " + participant.getId()
             );
-            row.add(button);
         } else {
-            InlineKeyboardButton button = SERVICE.getKeyboardButton(
+            button = SERVICE.getKeyboardButton(
                     SUBSCRIBE + " Підписатись ",
                     "/" + CommandSubscribe.command + " " + participant.getId()
             );
-            row.add(button);
         }
+        row.add(button);
         rows.add(row);
 
         keyboard.setKeyboard(rows);
