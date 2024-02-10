@@ -53,4 +53,8 @@ public class SubscriberService {
     public List<SubscriberEntity> findAllByChatId(String chatId) {
         return repo.findAllByChatId(chatId);
     }
+
+    public void unsubscribeAll(String chatId) {
+        repo.findByChatId(chatId).forEach(repo::delete);
+    }
 }

@@ -38,6 +38,31 @@ public class SubscribeFacadeImpl implements SubscribeFacade {
         });
     }
 
+    @Override
+    public void showSubscribers(String chatId, long commandArgument, Integer editMessageId) {
+        List<SubscriberEntity> subscriptions = getSubscriptions(chatId);
+        SendMessageEvent sendMessageEvent = prepareSendSubscribersEvent(chatId, subscriptions, editMessageId);
+        publisher.publishEvent(sendMessageEvent);
+    }
+
+    @Override
+    public void unsubscribe(String chatId) {
+        log.info("Unsubscribing chatId: {}", chatId);
+        subscriberService.unsubscribeAll(chatId);
+    }
+
+    private List<SubscriberEntity> getSubscriptions(String chatId) {
+        List<SubscriberEntity> subscribers = subscriberService.findAllByChatId(chatId);
+        return subscribers;
+    }
+
+    private SendMessageEvent prepareSendSubscribersEvent(String chatId, List<SubscriberEntity> subscribers, Integer editMessageId) {
+        String text = SubscriptionView.subscriptions(subscribers);
+        SendMessage sendMessage = SERVICE.getSendMessage(chatId, text, null, true);
+        sendMessage.setReplyToMessageId(editMessageId);
+        return new SendMessageEvent(this, sendMessage, SendMessageEvent.MsgType.SEND_MESSAGE);
+    }
+
     private void sendMessageToSubscriber(SubscriberEntity subscriber, ParticipantEntity participant, List<HeatLineEntity> heatLines) {
         CompetitionEntity competition = heatLines.get(0).getHeat().getEvent().getDay().getCompetition();
         SendMessageEvent sendMessageEvent = prepareSendEvent(subscriber, participant, heatLines, competition);
@@ -53,6 +78,4 @@ public class SubscribeFacadeImpl implements SubscribeFacade {
         sendMessage.disableWebPagePreview();
         return new SendMessageEvent(this, sendMessage, SendMessageEvent.MsgType.SEND_MESSAGE);
     }
-
-
 }

@@ -9,4 +9,9 @@ public interface SubscribeFacade {
     boolean isSubscribed(String chatId, Long id);
 
     void operateParticipantWithHeatlines(ParticipantEntity participant, List<HeatLineEntity> heatLines);
+
+    void showSubscribers(String chatId, long commandArgument, Integer editMessageId);
+
+    void unsubscribe(String chatId);
+
 }
