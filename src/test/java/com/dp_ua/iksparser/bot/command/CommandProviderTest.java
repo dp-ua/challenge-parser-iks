@@ -44,6 +44,7 @@ public class CommandProviderTest {
                         competitions
                         subscribe
                         subscriptions
+                        subscriptionslist
                         unsubscribe""",
                 actual);
     }

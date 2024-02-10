@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 @ToString
-public class CommandSubscriptions extends BaseCommand {
-    public final static String command = "subscriptions";
+public class CommandSubscriptionsList extends BaseCommand {
+    public final static String command = "subscriptionslist";
     private final boolean isInTextCommand = false;
     @Autowired
     private SubscribeFacade subscribeFacade;
@@ -31,6 +31,6 @@ public class CommandSubscriptions extends BaseCommand {
     protected void perform(Message message) {
         String chatId = message.getChatId();
         long commandArgument = getCommandArgument(message.getMessageText());
-        subscribeFacade.showSubscriptions(chatId, commandArgument, message.getEditMessageId());
+        subscribeFacade.showSubscriptionsList(chatId, commandArgument, message.getEditMessageId());
     }
 }
