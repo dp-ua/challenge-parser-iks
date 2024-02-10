@@ -17,6 +17,7 @@ public enum MessageCreator {
     SERVICE;
     public static final String END_LINE = "\n";
     public static final String BOLD = "*";
+    public static final String SPACE = " ";
     public static final String ITALIC = "_";
     public static final String CODE = "`";
     public static final String LINK = "[";
