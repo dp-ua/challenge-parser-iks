@@ -110,7 +110,7 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
             log.info("Informing subscribers about new participants: [{}]", participations.size());
             publisher.publishEvent(new SubscribeEvent(this, participations));
         } else {
-            log.info("Old competition. No need to inform subscribers about new participants{}", participations.size());
+            log.info("Old competition. No need to inform subscribers about new participants [{}]", participations.size());
         }
     }
 
