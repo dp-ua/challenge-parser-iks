@@ -738,7 +738,6 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         List<CompetitionEntity> competitions = mainPageParser.parseCompetitions(year);
         competitions
                 .forEach(c -> competitionService.saveOrUpdate(c));
-        state.setUpdateCompetitionsTime(LocalDateTime.now());
         competitionService.flush();
         log.info("Competitions parsed. Size: {}, year: {}", competitions.size(), year);
         log.info("Competitions in DB: {}", competitionService.count());
