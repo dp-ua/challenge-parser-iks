@@ -221,7 +221,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                     .filter(heatLine -> heatLine.getParticipant().equals(participant))
                     .forEach(heatLine -> sb.append(HeatLineView.info(heatLine)));
 
-            boolean subscribed = subscribeFacade.isSubscribed(chatId, participant.getId());
+            boolean subscribed = subscribeFacade.isSubscribed(chatId, participant);
             publishChunkMessage(chatId, sb, SubscriptionView.button(participant, subscribed));
         });
         publishFindMore(chatId, competitionId);
@@ -519,28 +519,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
     }
 
     private SendMessageEvent prepareSendMessageEvent(String chatId, Integer editMessageId, String text, InlineKeyboardMarkup keyboard) {
-        SendMessageEvent sendMessageEvent;
-        String prepareText = SERVICE.maskApostrof(text);
-        if (editMessageId == null) {
-            SendMessage message = SERVICE.getSendMessage(
-                    chatId,
-                    prepareText,
-                    keyboard,
-                    true
-            );
-            message.disableWebPagePreview();
-            sendMessageEvent = new SendMessageEvent(this, message, SEND_MESSAGE);
-        } else {
-            EditMessageText editMessageText = SERVICE.getEditMessageText(
-                    chatId,
-                    editMessageId,
-                    prepareText,
-                    keyboard,
-                    true);
-            editMessageText.disableWebPagePreview();
-            sendMessageEvent = new SendMessageEvent(this, editMessageText, EDIT_MESSAGE);
-        }
-        return sendMessageEvent;
+        return SERVICE.getSendMessageEvent(chatId, text, keyboard, editMessageId);
     }
 
     private InlineKeyboardMarkup getCompetitionDetailsKeyboard(CompetitionEntity competition, boolean competitionFilled) {

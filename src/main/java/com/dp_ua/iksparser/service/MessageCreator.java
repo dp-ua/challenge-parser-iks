@@ -11,7 +11,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
-import static com.dp_ua.iksparser.bot.event.SendMessageEvent.MsgType.ANSWER_CALLBACK_QUERY;
+import static com.dp_ua.iksparser.bot.event.SendMessageEvent.MsgType.*;
 
 public enum MessageCreator {
     SERVICE;
@@ -41,26 +41,38 @@ public enum MessageCreator {
 
     public EditMessageText getEditMessageText(String chatId, Integer messageId, String text, InlineKeyboardMarkup keyboard, boolean enableMarkdown) {
         EditMessageText.EditMessageTextBuilder builder = EditMessageText.builder();
-
+        String cleanText = maskApostrof(text);
         EditMessageText message = builder
                 .chatId(chatId)
                 .messageId(messageId)
-                .text(text)
+                .text(cleanText)
                 .replyMarkup(keyboard)
                 .build();
         message.enableMarkdown(enableMarkdown);
+        message.disableWebPagePreview();
         return message;
+    }
+
+    public SendMessageEvent getSendMessageEvent(String chatId, String text, InlineKeyboardMarkup keyboard, Integer editMessageId) {
+        if (editMessageId != null) {
+            EditMessageText editMessageText = getEditMessageText(chatId, editMessageId, text, keyboard, true);
+            return new SendMessageEvent(this, editMessageText, EDIT_MESSAGE);
+        } else {
+            SendMessage sendMessage = getSendMessage(chatId, text, keyboard, true);
+            return new SendMessageEvent(this, sendMessage, SEND_MESSAGE);
+        }
     }
 
     public SendMessage getSendMessage(String chatId, String text, ReplyKeyboard replyMarkup, boolean enableMarkdown) {
         SendMessage.SendMessageBuilder builder = SendMessage.builder();
-
+        String cleanText = maskApostrof(text);
         SendMessage message = builder
                 .chatId(chatId)
-                .text(text)
+                .text(cleanText)
                 .replyMarkup(replyMarkup)
                 .build();
         message.enableMarkdown(enableMarkdown);
+        message.disableWebPagePreview();
         return message;
     }
 
