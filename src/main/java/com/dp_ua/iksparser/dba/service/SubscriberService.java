@@ -19,15 +19,14 @@ public class SubscriberService {
         this.repo = repo;
     }
 
-    public boolean isSubscribed(String chatId, Long id) {
-        return repo.findByChatIdAndParticipantId(chatId, id).isPresent();
+    public boolean isSubscribed(String chatId, ParticipantEntity participant) {
+        return repo.findByChatIdAndParticipant(chatId, participant).isPresent();
     }
 
     public void subscribe(String chatId, ParticipantEntity participant) {
-        // check if already subscribed
-        boolean isSubscribed = isSubscribed(chatId, participant.getId());
-        if (isSubscribed) {
-            log.info("chatId: {} already subscribed to participant: {}", chatId, participant.getId());
+        log.debug("chatId: {} subscribing to participant: {}", chatId, participant.getId());
+        if (isSubscribed(chatId, participant)) {
+            log.debug("chatId: {} already subscribed to participant: {}", chatId, participant.getId());
             return;
         }
         SubscriberEntity subscriber = new SubscriberEntity();
@@ -36,25 +35,17 @@ public class SubscriberService {
         repo.save(subscriber);
     }
 
-    public void unsubscribe(String chatId, Long id) {
-        // check if already subscribed
-        boolean isSubscribed = isSubscribed(chatId, id);
-        if (!isSubscribed) {
-            log.info("chatId: {} not subscribed to participant: {}", chatId, id);
-            return;
-        }
-        repo.findByChatIdAndParticipantId(chatId, id).ifPresent(repo::delete);
+    public void unsubscribe(String chatId, ParticipantEntity participant) {
+        log.debug("chatId: {} unsubscribing from participant: {}", chatId, participant.getId());
+        repo.findByChatIdAndParticipant(chatId, participant).ifPresent(repo::delete);
     }
 
     public List<SubscriberEntity> findAllByParticipant(ParticipantEntity participant) {
-        return repo.findAllByParticipant(participant);
+        return repo.findByParticipant(participant);
     }
 
     public List<SubscriberEntity> findAllByChatId(String chatId) {
-        return repo.findAllByChatId(chatId);
+        return repo.findByChatId(chatId);
     }
 
-    public void unsubscribeAll(String chatId) {
-        repo.findByChatId(chatId).forEach(repo::delete);
-    }
 }

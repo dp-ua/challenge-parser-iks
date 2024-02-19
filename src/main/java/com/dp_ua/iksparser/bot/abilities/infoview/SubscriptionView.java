@@ -1,6 +1,7 @@
 package com.dp_ua.iksparser.bot.abilities.infoview;
 
 import com.dp_ua.iksparser.bot.command.impl.subscribe.CommandSubscribe;
+import com.dp_ua.iksparser.bot.command.impl.subscribe.CommandSubscriptionsList;
 import com.dp_ua.iksparser.bot.command.impl.subscribe.CommandUnsubscribe;
 import com.dp_ua.iksparser.dba.element.CompetitionEntity;
 import com.dp_ua.iksparser.dba.element.HeatLineEntity;
@@ -37,6 +38,16 @@ public class SubscriptionView {
         return sb.toString();
     }
 
+    public static String subscriptionText(ParticipantEntity participant, boolean subscribed) {
+        String text = ParticipantView.info(participant);
+        if (subscribed) {
+            text = SUBSCRIBE + " Ви підписані на спортсмена: " + END_LINE + text;
+        } else {
+            text = UNSUBSCRIBE + " Ви відписані від спортсмена: " + END_LINE + text;
+        }
+        return text;
+    }
+
     public static InlineKeyboardMarkup button(ParticipantEntity participant, boolean subscribed) {
         InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
@@ -64,7 +75,7 @@ public class SubscriptionView {
     public static String subscriptions(List<SubscriberEntity> subscriptions) {
         String sb = whatIsSubscriptions() +
                 END_LINE +
-                subscriptionsInfo(subscriptions);
+                subscriptionsDetails(subscriptions);
         return sb;
     }
 
@@ -88,7 +99,7 @@ public class SubscriptionView {
         return sb;
     }
 
-    public static String subscriptionsInfo(List<SubscriberEntity> subscriptions) {
+    public static String subscriptionsDetails(List<SubscriberEntity> subscriptions) {
         int size = subscriptions.size();
         String sb = SUBSCRIBE +
                 " Ви підписані на " +
@@ -102,5 +113,19 @@ public class SubscriptionView {
                 ATHLETE +
                 END_LINE;
         return sb;
+    }
+
+    public static InlineKeyboardMarkup getSubscriptionsKeyboard(List<SubscriberEntity> subscribers) {
+        InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
+        List<InlineKeyboardButton> row = new ArrayList<>();
+        InlineKeyboardButton button = SERVICE.getKeyboardButton(
+                SUBSCRIBE + " Переглянути підписки",
+                "/" + CommandSubscriptionsList.command
+        );
+        row.add(button);
+        rows.add(row);
+        keyboard.setKeyboard(rows);
+        return keyboard;
     }
 }
