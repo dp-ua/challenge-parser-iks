@@ -43,11 +43,24 @@ public class CronCompetitionUpdater implements ApplicationListener<ContextRefres
         List<CompetitionEntity> competitions = competitionService.findAllOrderByUpdated();
         if (competitions.isEmpty()) {
             log.info("No competitions in DB");
-            try {
-                competitionFacade.updateCompetitionsList();
-            } catch (ParsingException e) {
-                throw new RuntimeException(e);
-            }
+            update(LocalDate.now().getYear());
+        }
+    }
+
+    @Scheduled(cron = "0 0 0/8 * * *") // update competitions list every 8 hours
+    public void updateCompetitionsList() {
+        LocalDate now = LocalDate.now();
+        update(now.getYear());
+        if (now.getMonthValue() == 12 && now.getDayOfMonth() >= 20) {
+            update(now.getYear() + 1);
+        }
+    }
+
+    private void update(int year) {
+        try {
+            competitionFacade.updateCompetitionsList(year);
+        } catch (ParsingException e) {
+            log.error("Error while updating competitions list", e);
         }
     }
 
@@ -65,7 +78,7 @@ public class CronCompetitionUpdater implements ApplicationListener<ContextRefres
 
     @Scheduled(cron = "0 15 6 * * *") // every day at 6:15 update all competition
     @Transactional
-    public void updateAllCompetitions() {
+    public void updateAllCompetitionsDetails() {
         List<CompetitionEntity> competitions = competitionService.findAllOrderByUpdated();
         log.info("Found {} competitions", competitions.size());
         competitions.stream()
@@ -77,7 +90,7 @@ public class CronCompetitionUpdater implements ApplicationListener<ContextRefres
     }
 
     @Scheduled(cron = "0 0/20 10-23 * * *") // every 20 minutes check closest competitions
-    public void updateClosestCompetitions() {
+    public void updateClosestCompetitionDetails() {
         log.info("Start update closest competitions");
         List<CompetitionEntity> competitions = competitionService.findAllOrderByBeginDate(true);
         LocalDate now = LocalDate.now();

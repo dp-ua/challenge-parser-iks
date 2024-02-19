@@ -6,5 +6,5 @@ import com.dp_ua.iksparser.exeption.ParsingException;
 import java.util.List;
 
 public interface MainParserService {
-    List<CompetitionEntity> parseCompetitions() throws ParsingException;
+    List<CompetitionEntity> parseCompetitions(int year) throws ParsingException;
 }

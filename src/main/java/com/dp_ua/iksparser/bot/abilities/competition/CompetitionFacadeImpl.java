@@ -22,8 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendChatAction;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
@@ -35,7 +33,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static com.dp_ua.iksparser.bot.Icon.*;
-import static com.dp_ua.iksparser.bot.event.SendMessageEvent.MsgType.*;
+import static com.dp_ua.iksparser.bot.event.SendMessageEvent.MsgType.CHAT_ACTION;
 import static com.dp_ua.iksparser.service.MessageCreator.*;
 
 @Component
@@ -43,7 +41,7 @@ import static com.dp_ua.iksparser.service.MessageCreator.*;
 public class CompetitionFacadeImpl implements CompetitionFacade {
     public static final int COMPETITIONS_PAGE_SIZE = 3;
     private static final int COMPETITION_BUTTON_LIMIT = 40;
-    public static final int TTL_MINUTES_COMPETITION_UPDATE = 30;
+    public static final int TTL_MINUTES_COMPETITION_UPDATE = 1800;
     public static final int MAX_PARTICIPANTS_SIZE_TO_FIND = 5;
     private static final int MAX_CHUNK_SIZE = 4096;
 
@@ -66,7 +64,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
 
 
     @Override
-    public void showCompetitions(String chatId, long pageNumber, Integer editMessageId) throws ParsingException {
+    public void showCompetitions(String chatId, long pageNumber, Integer editMessageId) {
         log.info("showCompetitions. Page {}, chatId:{} ", pageNumber, chatId);
         sendTypingAction(chatId);
 
@@ -729,38 +727,20 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         return competitions.subList((int) fromIndex, (int) toIndex);
     }
 
-    private List<CompetitionEntity> getCompetitions() throws ParsingException {
-        CompetitionEntity competition = competitionService.getFreshestCompetition();
-
-        if (isNeedToUpdate(competition)) {
-            log.info("Need to update competitions");
-            updateCompetitionsList();
-        }
+    private List<CompetitionEntity> getCompetitions() {
         log.info("Get competitions from DB");
         return competitionService.findAllOrderByBeginDate(true);
     }
 
     @Override
-    public synchronized void updateCompetitionsList() throws ParsingException {
-        log.info("Update competitions list");
-        List<CompetitionEntity> competitions = mainPageParser.parseCompetitions();
+    public synchronized void updateCompetitionsList(int year) throws ParsingException {
+        log.info("Update competitions list. Year: {}", year);
+        List<CompetitionEntity> competitions = mainPageParser.parseCompetitions(year);
         competitions
                 .forEach(c -> competitionService.saveOrUpdate(c));
         state.setUpdateCompetitionsTime(LocalDateTime.now());
         competitionService.flush();
-        log.info("Competitions parsed. Size: {}", competitions.size());
+        log.info("Competitions parsed. Size: {}, year: {}", competitions.size(), year);
         log.info("Competitions in DB: {}", competitionService.count());
-    }
-
-    private boolean isNeedToUpdate(CompetitionEntity competition) {
-        // todo create cron task for update
-        if (competition == null) {
-            return true;
-        }
-        LocalDateTime time = state.getUpdateCompetitionsTime();
-        if (time == null) {
-            return true;
-        }
-        return time.isBefore(LocalDateTime.now().minusMinutes(TTL_MINUTES_COMPETITION_UPDATE));
     }
 }
