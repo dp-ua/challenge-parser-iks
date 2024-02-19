@@ -1,7 +1,7 @@
-package com.dp_ua.iksparser.bot.command.impl;
+package com.dp_ua.iksparser.bot.command.impl.competition;
 
 import com.dp_ua.iksparser.bot.Icon;
-import com.dp_ua.iksparser.bot.abilities.CompetitionFacade;
+import com.dp_ua.iksparser.bot.abilities.competition.CompetitionFacade;
 import com.dp_ua.iksparser.bot.command.BaseCommand;
 import com.dp_ua.iksparser.bot.message.Message;
 import lombok.ToString;
@@ -11,11 +11,11 @@ import org.springframework.stereotype.Component;
 
 @Component
 @ToString
-public class CommandCompetitions extends BaseCommand {
-    public static final String command = "competitions";
+public class CommandCompetitionNotLoaded extends BaseCommand {
+    public final static String command = "competitionnotloaded";
     private final boolean isInTextCommand = false;
     @Autowired
-    CompetitionFacade competitionFacade;
+    private CompetitionFacade competitionFacade;
 
     @Override
     public String command() {
@@ -24,13 +24,13 @@ public class CommandCompetitions extends BaseCommand {
 
     @Override
     protected String getTextForCallBackAnswer(Message message) {
-        return Icon.PREVIOUS + " дивитись змагання " + Icon.NEXT;
+        return Icon.INFO + " Дивимось інформацію по змаганню " + Icon.INFO;
     }
 
     @Override
     protected void perform(Message message) {
         String chatId = message.getChatId();
-        int commandArgument = getCommandArgument(message.getMessageText());
-        competitionFacade.showCompetitions(chatId, commandArgument, message.getEditMessageId());
+        long commandArgument = getCommandArgument(message.getMessageText());
+        competitionFacade.showNotLoadedInfo(chatId, commandArgument, message.getEditMessageId());
     }
 }

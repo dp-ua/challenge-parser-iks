@@ -19,4 +19,8 @@ public class HeatService {
     public HeatEntity save(HeatEntity heat) {
         return repo.save(heat);
     }
+
+    public void delete(HeatEntity heat) {
+        repo.delete(heat);
+    }
 }

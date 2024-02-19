@@ -1,7 +1,7 @@
-package com.dp_ua.iksparser.bot.command.impl;
+package com.dp_ua.iksparser.bot.command.impl.subscribe;
 
 import com.dp_ua.iksparser.bot.Icon;
-import com.dp_ua.iksparser.bot.abilities.CompetitionFacade;
+import com.dp_ua.iksparser.bot.abilities.subscribe.SubscribeFacade;
 import com.dp_ua.iksparser.bot.command.BaseCommand;
 import com.dp_ua.iksparser.bot.message.Message;
 import lombok.ToString;
@@ -11,11 +11,11 @@ import org.springframework.stereotype.Component;
 
 @Component
 @ToString
-public class CommandCompetition extends BaseCommand {
-    private final String command = "competition";
+public class CommandSubscriptions extends BaseCommand {
+    public final static String command = "subscriptions";
     private final boolean isInTextCommand = false;
     @Autowired
-    CompetitionFacade competitionFacade;
+    private SubscribeFacade subscribeFacade;
 
     @Override
     public String command() {
@@ -24,13 +24,13 @@ public class CommandCompetition extends BaseCommand {
 
     @Override
     protected String getTextForCallBackAnswer(Message message) {
-        return Icon.INFO + " Дивимось інформацію по змаганню " + Icon.INFO;
+        return Icon.SUBSCRIBE + " Підписки " + Icon.SUBSCRIBE;
     }
 
     @Override
     protected void perform(Message message) {
         String chatId = message.getChatId();
-        int commandArgument = getCommandArgument(message.getMessageText());
-        competitionFacade.showCompetition(chatId, commandArgument, message.getEditMessageId());
+        long commandArgument = getCommandArgument(message.getMessageText());
+        subscribeFacade.showSubscriptions(chatId, commandArgument, message.getEditMessageId());
     }
 }

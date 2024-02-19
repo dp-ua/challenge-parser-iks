@@ -1,12 +1,11 @@
-package com.dp_ua.iksparser.bot.performer.event;
+package com.dp_ua.iksparser.bot.event;
 
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
+@Getter
 public class SendMessageEvent extends ApplicationEvent {
-    @Getter
     private final Object message;
-    @Getter
     private final MsgType msgType;
 
     public SendMessageEvent(Object source, Object message, MsgType msgType) {
@@ -16,6 +15,7 @@ public class SendMessageEvent extends ApplicationEvent {
     }
 
     public enum MsgType {
-        SEND_MESSAGE, CHAT_ACTION, EDIT_MESSAGE, ANSWER_CALLBACK_QUERY
+        SEND_MESSAGE, CHAT_ACTION, EDIT_MESSAGE, ANSWER_CALLBACK_QUERY,
+        DELETE_MESSAGE,
     }
 }

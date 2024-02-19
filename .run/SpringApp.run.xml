@@ -1,0 +1,18 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="SpringApp" type="Application" factoryName="Application" focusToolWindowBeforeRun="true" nameIsGenerated="true">
+    <envs>
+      <env name="--spring.profiles.active" value="dev" />
+    </envs>
+    <option name="MAIN_CLASS_NAME" value="com.dp_ua.iksparser.SpringApp" />
+    <module name="ChallengeParser" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="com.dp_ua.iksparser.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

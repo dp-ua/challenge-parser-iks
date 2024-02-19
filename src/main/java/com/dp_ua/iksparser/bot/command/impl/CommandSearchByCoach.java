@@ -1,7 +1,7 @@
 package com.dp_ua.iksparser.bot.command.impl;
 
 import com.dp_ua.iksparser.bot.Icon;
-import com.dp_ua.iksparser.bot.abilities.CompetitionFacade;
+import com.dp_ua.iksparser.bot.abilities.competition.CompetitionFacade;
 import com.dp_ua.iksparser.bot.command.BaseCommand;
 import com.dp_ua.iksparser.bot.message.Message;
 import lombok.ToString;
@@ -15,7 +15,7 @@ public class CommandSearchByCoach extends BaseCommand {
     public static final String command = "searchbycoach";
     private final boolean isInTextCommand = false;
     @Autowired
-    CompetitionFacade competitionFacade;
+    private CompetitionFacade competitionFacade;
 
     @Override
     public String command() {
@@ -30,7 +30,7 @@ public class CommandSearchByCoach extends BaseCommand {
     @Override
     protected void perform(Message message) {
         String chatId = message.getChatId();
-        int commandArgument = getCommandArgument(message.getMessageText());
+        long commandArgument = getCommandArgument(message.getMessageText());
         competitionFacade.startSearchByCoach(chatId, commandArgument, message.getEditMessageId());
     }
 }

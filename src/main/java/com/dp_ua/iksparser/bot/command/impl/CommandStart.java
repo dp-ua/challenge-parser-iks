@@ -2,8 +2,9 @@ package com.dp_ua.iksparser.bot.command.impl;
 
 import com.dp_ua.iksparser.bot.Bot;
 import com.dp_ua.iksparser.bot.command.CommandInterface;
+import com.dp_ua.iksparser.bot.command.impl.competition.CommandCompetitions;
 import com.dp_ua.iksparser.bot.message.Message;
-import com.dp_ua.iksparser.bot.performer.event.SendMessageEvent;
+import com.dp_ua.iksparser.bot.event.SendMessageEvent;
 import com.dp_ua.iksparser.service.MessageCreator;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
 import static com.dp_ua.iksparser.bot.Icon.*;
-import static com.dp_ua.iksparser.bot.performer.event.SendMessageEvent.MsgType.SEND_MESSAGE;
+import static com.dp_ua.iksparser.bot.event.SendMessageEvent.MsgType.SEND_MESSAGE;
 import static com.dp_ua.iksparser.service.MessageCreator.*;
 
 @Component
@@ -23,9 +24,9 @@ public class CommandStart implements CommandInterface {
     public static final String command = "start";
     private final boolean isInTextCommand = false;
     @Autowired
-    Bot bot;
+    private Bot bot;
     @Autowired
-    ApplicationEventPublisher publisher;
+    private ApplicationEventPublisher publisher;
 
     @Override
     public String command() {
@@ -43,7 +44,7 @@ public class CommandStart implements CommandInterface {
         sb
                 .append("Вітаю, мене звуть ")
                 .append(LINK)
-                .append("Athletesearch ")
+                .append("AthleteSearch ")
                 .append(ROBOT)
                 .append(LINK_END)
                 .append(LINK_SEPARATOR)

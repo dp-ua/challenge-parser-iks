@@ -5,6 +5,7 @@ import lombok.Setter;
 
 @Getter
 public class SelfMessage implements Message {
+    public static final String SELF_USER_NAME = "SelfUserName";
     @Setter
     private String messageText;
     @Setter
@@ -30,5 +31,15 @@ public class SelfMessage implements Message {
     @Override
     public String getCallBackQueryId() {
         return null;
+    }
+
+    @Override
+    public String getUserName() {
+        return SELF_USER_NAME;
+    }
+
+    @Override
+    public boolean kickBot() {
+        return false;
     }
 }

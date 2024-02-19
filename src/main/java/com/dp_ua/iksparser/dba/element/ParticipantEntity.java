@@ -22,6 +22,10 @@ public class ParticipantEntity extends DomainElement {
     @OneToMany(mappedBy = "participant", cascade = CascadeType.ALL)
     private List<HeatLineEntity> heatLines;
 
+    public String getUrl() {
+        return codeURL(url);
+    }
+
     @Override
     public String toString() {
         return "ParticipantEntity{" +

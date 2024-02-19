@@ -1,0 +1,59 @@
+version: '3.3'
+
+services:
+  client-backend:
+    image: iks-bot:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: iks-bot
+    ports:
+      - "8181:8181"
+    depends_on:
+      - service-db
+    environment:
+      - SERVER_PORT=8181
+      - IKS_TELEGRAM_BOT_TOKEN=${IKS_TELEGRAM_BOT_TOKEN}
+      - IKS_TELEGRAM_BOT_NAME=${IKS_TELEGRAM_BOT_NAME}
+      - IKS_TELEGRAM_ADMIN_ID=${IKS_TELEGRAM_ADMIN_ID}
+      - IKS_DB_USERNAME=${IKS_DB_USERNAME}
+      - IKS_DB_PASSWORD=${IKS_DB_PASSWORD}
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8181/actuator/health" ]  # Adjust the URL based on your actual health check endpoint
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    volumes:
+      - C:\docker\bot:/app/logs
+
+  service-db:
+    image: postgres:14-alpine3.18
+    container_name: iks-db
+    environment:
+      POSTGRES_DB: iks_db
+      POSTGRES_USER: ${IKS_DB_USERNAME}
+      POSTGRES_PASSWORD: ${IKS_DB_PASSWORD}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db/create_db.sql:/docker-entrypoint-initdb.d/create_db.sql
+      - C:\docker\db:/var/lib/postgresql/data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  pgadmin:
+    container_name: pgadmin4_container
+    image: dpage/pgadmin4:8.3
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PG_ADMIN_USER}
+      PGADMIN_DEFAULT_PASSWORD: ${PG_ADMIN_PASSWORD}
+    ports:
+      - "5050:80"
+    volumes:
+      - C:\docker\pg:/var/lib/pgadmin
+
+volumes:
+  bot-data:
+  db-data:
+  pgadmin-data:

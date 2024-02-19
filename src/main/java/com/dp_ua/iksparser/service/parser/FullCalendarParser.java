@@ -1,6 +1,7 @@
 package com.dp_ua.iksparser.service.parser;
 
 import com.dp_ua.iksparser.dba.element.CompetitionEntity;
+import com.dp_ua.iksparser.exeption.ParsingException;
 import com.dp_ua.iksparser.service.Downloader;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Document;
@@ -9,7 +10,6 @@ import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,8 +26,9 @@ public class FullCalendarParser implements MainParserService {
             "&search_filter=%D0%9F%D0%BE%D1%88%D1%83%D0%BA";
 
     @Override
-    public List<CompetitionEntity> parseCompetitions() {
-        Document document = downloadDocument();
+    public List<CompetitionEntity> parseCompetitions(int year) throws ParsingException {
+        log.debug("Start parsing competitions for year: {}", year);
+        Document document = downloadDocument(year);
         List<CompetitionEntity> result = new ArrayList<>();
         if (document != null) {
             result = getParsedCompetitions(document);
@@ -66,7 +67,7 @@ public class FullCalendarParser implements MainParserService {
         for (Element row : rows) {
             Elements tds = row.getElementsByTag("td");
             if (ignore) {
-                if ("Легка атлетика" .contains(tds.get(0).text())) {
+                if ("Легка атлетика".contains(tds.get(0).text())) {
                     ignore = false;
                 }
             } else {
@@ -79,17 +80,13 @@ public class FullCalendarParser implements MainParserService {
         return result;
     }
 
-    private Document downloadDocument() {
-        String url = getURL(getYearNow());
-        log.info("Start parsing competitions from url: {}", url);
+    private Document downloadDocument(int year) throws ParsingException {
+        String url = getURL(year);
+        log.debug("Start parsing competitions from url: {}", url);
         return downloader.getDocument(url);
     }
 
     private String getURL(int year) {
         return URL.replace("{$year}", String.valueOf(year));
-    }
-
-    private int getYearNow() {
-        return LocalDate.now().getYear();
     }
 }

@@ -177,7 +177,7 @@ public class ComplexDBATest {
     }
 
     private EventEntity getEvent() {
-        EventEntity event = new EventEntity("time", "eventName", "category", "round", "startListUrl");
+        EventEntity event = new EventEntity("time", "eventName", "category", "round", "startListUrl", "resultUrl");
         return eventService.save(event);
     }
 

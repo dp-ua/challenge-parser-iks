@@ -33,12 +33,16 @@ public class StateService {
     public static String formatArgs(String template, String... args) {
         String result = template;
         for (String arg : args) {
-            result = result.replaceFirst("\\{\\}", arg);
+            result = result.replaceFirst("\\{}", arg);
         }
         return result;
     }
 
     public void saveBotSession(BotSession botSession) {
         this.botSession = botSession;
+    }
+
+    public void resetState(String chatId) {
+        stateMap.remove(chatId);
     }
 }

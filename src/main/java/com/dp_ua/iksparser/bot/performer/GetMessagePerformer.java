@@ -5,7 +5,7 @@ import com.dp_ua.iksparser.bot.command.CommandInterface;
 import com.dp_ua.iksparser.bot.command.TextCommandDetectorService;
 import com.dp_ua.iksparser.bot.message.Message;
 import com.dp_ua.iksparser.bot.message.SelfMessage;
-import com.dp_ua.iksparser.bot.performer.event.GetMessageEvent;
+import com.dp_ua.iksparser.bot.event.GetMessageEvent;
 import com.dp_ua.iksparser.exeption.NotForMeException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +37,7 @@ public class GetMessagePerformer implements ApplicationListener<GetMessageEvent>
                     onApplicationEvent(selfMessageEvent);
                 }
             } else {
+                stateService.resetState(message.getChatId());
                 commands
                         .forEach(command -> command.execute(message));
             }

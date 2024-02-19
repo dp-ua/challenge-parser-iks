@@ -2,7 +2,10 @@ package com.dp_ua.iksparser.bot.message;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.telegram.telegrambots.meta.api.objects.ChatMemberUpdated;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.User;
+import org.telegram.telegrambots.meta.api.objects.chatmember.ChatMember;
 
 import java.util.Objects;
 
@@ -22,6 +25,9 @@ public class ReceivedMessage implements Message {
         }
         if (update.hasCallbackQuery()) {
             return update.getCallbackQuery().getMessage().getChatId().toString();
+        }
+        if (update.hasChatMember()) {
+            return update.getChatMember().getChat().getId().toString();
         }
         return "";
     }
@@ -61,6 +67,43 @@ public class ReceivedMessage implements Message {
     }
 
     @Override
+    public String getUserName() {
+        User user = getUser();
+        if (user != null) {
+            return user.getFirstName() + " " + user.getLastName() + "[@" + user.getUserName() + "]";
+        }
+        return "";
+    }
+
+    @Override
+    public boolean kickBot() {
+        if (update.hasChatMember()) {
+            ChatMemberUpdated chatMember = update.getChatMember();
+            ChatMember newChatMember = chatMember.getNewChatMember();
+            if ("kicked".equals(newChatMember.getStatus())) {
+                return true;
+            }
+            if (!(newChatMember == null)) {
+                log.warn("ChatMemberUpdated: " + newChatMember.getStatus() + " " + newChatMember.getUser().getUserName());
+            }
+        }
+        return false;
+    }
+
+    private User getUser() {
+        if (update.hasMessage()) {
+            return update.getMessage().getFrom();
+        }
+        if (update.hasCallbackQuery()) {
+            return update.getCallbackQuery().getFrom();
+        }
+        if (update.hasChatMember()) {
+            return update.getChatMember().getFrom();
+        }
+        return null;
+    }
+
+    @Override
     public String getMessageText() {
         if (update.hasMessage()) {
             return update.getMessage().getText();
@@ -68,6 +111,6 @@ public class ReceivedMessage implements Message {
         if (update.hasCallbackQuery()) {
             return update.getCallbackQuery().getData();
         }
-        return "";
+        return null;
     }
 }
