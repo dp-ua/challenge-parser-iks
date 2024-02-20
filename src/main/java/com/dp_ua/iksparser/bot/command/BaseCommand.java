@@ -14,19 +14,20 @@ public abstract class BaseCommand implements CommandInterface {
     protected ApplicationEventPublisher publisher;
     public static final int DEFAULT_NO_PAGE_ARGUMENT = -1;
 
-    private void sendCallbackMessage(String callBackQueryId, String message) {
-        SendMessageEvent answerCallbackQuery = SERVICE.getAnswerCallbackQuery(callBackQueryId, message);
-        if (answerCallbackQuery != null) {
-            log.info("answerCallbackQuery: {}", answerCallbackQuery);
-            publisher.publishEvent(answerCallbackQuery);
+    protected void sendCallbackForMessage(Message message, String text) {
+        if (message.hasCallbackQuery()) {
+            String callBackQueryId = message.getCallBackQueryId();
+            SendMessageEvent answerCallbackQuery = SERVICE.getAnswerCallbackQuery(callBackQueryId, text);
+            if (answerCallbackQuery != null) {
+                log.info("answerCallbackQuery: {}", answerCallbackQuery);
+                publisher.publishEvent(answerCallbackQuery);
+            }
         }
     }
 
     @Override
     public void execute(Message message) {
-        if (message.hasCallbackQuery()) {
-            sendCallbackMessage(message.getCallBackQueryId(), getTextForCallBackAnswer(message));
-        }
+        sendCallbackForMessage(message, getTextForCallBackAnswer(message));
         perform(message);
     }
 
