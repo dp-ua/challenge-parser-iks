@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static com.dp_ua.iksparser.dba.element.CompetitionStatus.C_CANCELED;
 import static com.dp_ua.iksparser.dba.element.CompetitionStatus.C_FINISHED;
 
 @Component
@@ -96,7 +97,8 @@ public class CronCompetitionUpdater implements ApplicationListener<ContextRefres
         LocalDate now = LocalDate.now();
         competitions.stream()
                 .filter(competition -> {
-                    if (C_FINISHED.getName().equals(competition.getStatus())) {
+                    if (C_FINISHED.getName().equals(competition.getStatus()) ||
+                            C_CANCELED.getName().equals(competition.getStatus())) {
                         return false;
                     }
                     return !LocalDate.parse(competition.getBeginDate(), CompetitionService.FORMATTER).isAfter(now.plusWeeks(1));
