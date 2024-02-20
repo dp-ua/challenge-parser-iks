@@ -43,7 +43,7 @@ public class BotController implements ControllerService {
             try {
                 Thread.sleep(reconnectTimeout);
             } catch (InterruptedException e1) {
-                e1.printStackTrace();
+                log.error("Error while sleep", e1);
                 return null;
             }
             botConnect();
