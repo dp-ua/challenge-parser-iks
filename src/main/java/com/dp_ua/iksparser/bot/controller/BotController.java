@@ -60,4 +60,11 @@ public class BotController implements ControllerService {
     private int getTimeInSec() {
         return reconnectTimeout / 1000;
     }
+
+    public void sendMessageToUser(String chatId, String text) {
+        log.info("Send message to chatId: {} with text: {}", chatId, text);
+        SendMessage message = SERVICE.getSendMessage(chatId, text);
+        SendMessageEvent event = new SendMessageEvent(this, message, SendMessageEvent.MsgType.SEND_MESSAGE);
+        publisher.publishEvent(event);
+    }
 }
