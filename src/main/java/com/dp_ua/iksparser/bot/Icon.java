@@ -1,6 +1,7 @@
 package com.dp_ua.iksparser.bot;
 
 public enum Icon {
+    DENIED("🚫"),
     MESSAGE("📩"),
     SUBSCRIBE("🔔"),
     UNSUBSCRIBE("🔕"),
@@ -71,6 +72,7 @@ public enum Icon {
     TEN("🔟"),
     ZERO("0️⃣"),
     ;
+
 
     public static Icon getIconForNumber(int number) {
         if (number < 0 || number > 9) throw new IllegalArgumentException("Number must be between 0 and 9");
