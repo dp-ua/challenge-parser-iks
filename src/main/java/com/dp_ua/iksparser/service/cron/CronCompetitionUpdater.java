@@ -110,12 +110,31 @@ public class CronCompetitionUpdater implements ApplicationListener<ContextRefres
     }
 
     private void runEventToUpdateCompetition(CompetitionEntity competition) {
+        if (isCompetitionURLEmpty(competition)) {
+            log.warn("Can't update. Competition URL is empty, id: {}", competition.getId());
+            return;
+        }
+        if (isCompetitionUrlIsNotValid(competition)) {
+            log.warn("Can't update. Competition URL is not valid, id: {}", competition.getId());
+            return;
+        }
         UpdateStatusEntity message = new UpdateStatusEntity();
         message.setCompetitionId(competition.getId());
         message.setChatId("");
         message.setEditMessageId(null);
         UpdateCompetitionEvent updateCompetitionEvent = new UpdateCompetitionEvent(this, message);
         publisher.publishEvent(updateCompetitionEvent);
+    }
+
+    private boolean isCompetitionUrlIsNotValid(CompetitionEntity competition) {
+        // not valid url example:
+        //  URL=https://www.flavo.org.ua/files/zmagannya/protocol/2023/2023.02.21.pdf  - can't be pdg file
+        String url = competition.getUrl();
+        return url.endsWith(".pdf");
+    }
+
+    private boolean isCompetitionURLEmpty(CompetitionEntity competition) {
+        return competition.getUrl() == null || competition.getUrl().isEmpty();
     }
 
     @Override
