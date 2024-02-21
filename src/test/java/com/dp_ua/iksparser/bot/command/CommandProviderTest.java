@@ -38,10 +38,12 @@ public class CommandProviderTest {
                         searchbycoachwithname
                         searchbyname
                         searchbynamewithname
+                        send
                         start
                         competition
                         competitionnotloaded
                         competitions
+                        update
                         subscribe
                         subscriptions
                         subscriptionslist
