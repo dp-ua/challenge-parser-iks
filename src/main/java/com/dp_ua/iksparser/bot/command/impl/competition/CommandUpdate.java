@@ -2,6 +2,7 @@ package com.dp_ua.iksparser.bot.command.impl.competition;
 
 import com.dp_ua.iksparser.bot.abilities.competition.CompetitionFacade;
 import com.dp_ua.iksparser.bot.command.AdminAccessCommand;
+import com.dp_ua.iksparser.bot.controller.BotController;
 import com.dp_ua.iksparser.bot.message.Message;
 import com.dp_ua.iksparser.exeption.ParsingException;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +15,8 @@ public class CommandUpdate extends AdminAccessCommand {
     public static final String command = "update";
     @Autowired
     CompetitionFacade competitionFacade;
+    @Autowired
+    BotController bot;
 
     @Override
     protected String getTextForCallBackAnswer(Message message) {
@@ -34,6 +37,7 @@ public class CommandUpdate extends AdminAccessCommand {
         }
         try {
             log.info("Updating competitions list for year: {}", year);
+            bot.sendMessageToUser(message.getChatId(), "Updating competitions list for year: " + year);
             competitionFacade.updateCompetitionsList(year);
         } catch (ParsingException e) {
             log.error("Error while updating competitions list", e);
