@@ -1,7 +1,6 @@
 package com.dp_ua.iksparser;
 
 import com.dp_ua.iksparser.bot.abilities.StateService;
-import com.dp_ua.iksparser.bot.command.CommandInterface;
 import com.dp_ua.iksparser.bot.command.CommandProvider;
 import com.dp_ua.iksparser.bot.controller.ControllerService;
 import com.dp_ua.iksparser.bot.event.SendMessageEvent;
@@ -38,11 +37,7 @@ public class App implements ApplicationListener<ContextRefreshedEvent>, Ordered 
     }
 
     public void editBotMenu() {
-        List<BotCommand> commands = commandProvider.getCommands()
-                .stream()
-                .filter(CommandInterface::isNeedToAddToMenu)
-                .map(c -> new BotCommand(c.command(), c.description()))
-                .toList();
+        List<BotCommand> commands = commandProvider.menuCommands();
         log.info("Edit bot menu: " + commands);
         SetMyCommands setCommandsMessage = SetMyCommands.builder()
                 .commands(commands)
