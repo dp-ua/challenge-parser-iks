@@ -61,8 +61,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
     @Autowired
     JsonReader jSonReader;
     @Autowired
-    StateService state;
-
+    SubscriptionView subscriptionView;
 
     @Override
     public void showCompetitions(String chatId, long pageNumber, Integer editMessageId) {
@@ -221,7 +220,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                     .forEach(heatLine -> sb.append(HeatLineView.info(heatLine)));
 
             boolean subscribed = subscribeFacade.isSubscribed(chatId, participant);
-            publishChunkMessage(chatId, sb, SubscriptionView.button(participant, subscribed));
+            publishChunkMessage(chatId, sb, subscriptionView.button(participant, subscribed));
         });
         publishFindMore(chatId, competitionId);
     }
@@ -747,7 +746,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
     @Override
     public String getInfoAboutCompetitions() {
         List<CompetitionEntity> competition = competitionService.findAllOrderByBeginDate(true);
-        List<String> years = competition.stream().map(c->{
+        List<String> years = competition.stream().map(c -> {
             String beginDate = c.getBeginDate();
             LocalDate date = LocalDate.parse(beginDate, CompetitionService.FORMATTER);
             return date.getYear();

@@ -7,6 +7,7 @@ import com.dp_ua.iksparser.dba.element.CompetitionEntity;
 import com.dp_ua.iksparser.dba.element.HeatLineEntity;
 import com.dp_ua.iksparser.dba.element.ParticipantEntity;
 import com.dp_ua.iksparser.dba.element.SubscriberEntity;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
@@ -16,8 +17,9 @@ import java.util.List;
 import static com.dp_ua.iksparser.bot.Icon.*;
 import static com.dp_ua.iksparser.service.MessageCreator.*;
 
+@Component
 public class SubscriptionView {
-    public static String info(ParticipantEntity participant, List<HeatLineEntity> heatLines, CompetitionEntity competition) {
+    public String info(ParticipantEntity participant, List<HeatLineEntity> heatLines, CompetitionEntity competition) {
         StringBuilder sb = new StringBuilder()
                 .append(SUBSCRIBE)
                 .append("Ви підписані на учасника: ")
@@ -38,7 +40,7 @@ public class SubscriptionView {
         return sb.toString();
     }
 
-    public static String subscriptionText(ParticipantEntity participant, boolean subscribed) {
+    public String subscriptionText(ParticipantEntity participant, boolean subscribed) {
         String text = ParticipantView.info(participant);
         if (subscribed) {
             text = SUBSCRIBE + " Ви підписані на спортсмена: " + END_LINE + text;
@@ -48,7 +50,7 @@ public class SubscriptionView {
         return text;
     }
 
-    public static InlineKeyboardMarkup button(ParticipantEntity participant, boolean subscribed) {
+    public InlineKeyboardMarkup button(ParticipantEntity participant, boolean subscribed) {
         InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
 
@@ -72,14 +74,14 @@ public class SubscriptionView {
         return keyboard;
     }
 
-    public static String subscriptions(List<SubscriberEntity> subscriptions) {
+    public String subscriptions(List<SubscriberEntity> subscriptions) {
         String sb = whatIsSubscriptions() +
                 END_LINE +
                 subscriptionsDetails(subscriptions);
         return sb;
     }
 
-    public static String whatIsSubscriptions() {
+    public String whatIsSubscriptions() {
         String sb = SUBSCRIBE +
                 BOLD +
                 " Підписка" +
@@ -99,7 +101,7 @@ public class SubscriptionView {
         return sb;
     }
 
-    public static String subscriptionsDetails(List<SubscriberEntity> subscriptions) {
+    public String subscriptionsDetails(List<SubscriberEntity> subscriptions) {
         int size = subscriptions.size();
         String sb = SUBSCRIBE +
                 " Ви підписані на " +
@@ -115,7 +117,7 @@ public class SubscriptionView {
         return sb;
     }
 
-    public static InlineKeyboardMarkup getSubscriptionsKeyboard(List<SubscriberEntity> subscribers) {
+    public InlineKeyboardMarkup getSubscriptionsKeyboard(List<SubscriberEntity> subscribers) {
         InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
         List<InlineKeyboardButton> row = new ArrayList<>();

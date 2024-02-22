@@ -1,6 +1,5 @@
 package com.dp_ua.iksparser.bot.abilities.subscribe;
 
-import com.dp_ua.iksparser.bot.Icon;
 import com.dp_ua.iksparser.bot.abilities.infoview.SubscriptionView;
 import com.dp_ua.iksparser.bot.event.SendMessageEvent;
 import com.dp_ua.iksparser.dba.element.CompetitionEntity;
@@ -16,7 +15,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 
 import java.util.List;
 
-import static com.dp_ua.iksparser.service.MessageCreator.*;
+import static com.dp_ua.iksparser.service.MessageCreator.SERVICE;
 
 @Component
 @Slf4j
@@ -25,6 +24,9 @@ public class SubscribeFacadeImpl implements SubscribeFacade {
     SubscriberService subscriberService;
     @Autowired
     ApplicationEventPublisher publisher;
+
+    @Autowired
+    SubscriptionView view;
 
     @Override
     public boolean isSubscribed(String chatId, ParticipantEntity participant) {
@@ -55,8 +57,8 @@ public class SubscribeFacadeImpl implements SubscribeFacade {
     public void inform(String chatId, ParticipantEntity participant, Integer editMessageId) {
         boolean subscribed = isSubscribed(chatId, participant);
 
-        String text = SubscriptionView.subscriptionText(participant, subscribed);
-        InlineKeyboardMarkup button = SubscriptionView.button(participant, subscribed);
+        String text = view.subscriptionText(participant, subscribed);
+        InlineKeyboardMarkup button = view.button(participant, subscribed);
         publisher.publishEvent(
                 SERVICE.getSendMessageEvent(chatId, text, button, editMessageId)
         );
@@ -87,15 +89,7 @@ public class SubscribeFacadeImpl implements SubscribeFacade {
     @Override
     public String getInfoAboutSubscribes(String chatId) {
         List<SubscriberEntity> subscriptions = subscriberService.findAllByChatId(chatId);
-        // todo move to SubscriptionView
-
-        return Icon.SUBSCRIBE +
-                "Ви підписані на: " +
-                BOLD +
-                subscriptions.size() +
-                BOLD +
-                " атл." +
-                END_LINE;
+        return view.subscriptionsDetails(subscriptions);
     }
 
     private List<SubscriberEntity> getSubscriptions(String chatId) {
@@ -103,8 +97,8 @@ public class SubscribeFacadeImpl implements SubscribeFacade {
     }
 
     private SendMessageEvent prepareSendSubscribersEvent(String chatId, List<SubscriberEntity> subscribers, Integer editMessageId) {
-        String text = SubscriptionView.subscriptions(subscribers);
-        InlineKeyboardMarkup keyboard = SubscriptionView.getSubscriptionsKeyboard(subscribers);
+        String text = view.subscriptions(subscribers);
+        InlineKeyboardMarkup keyboard = view.getSubscriptionsKeyboard(subscribers);
         return SERVICE.getSendMessageEvent(chatId, text, keyboard, editMessageId);
     }
 
@@ -116,8 +110,8 @@ public class SubscribeFacadeImpl implements SubscribeFacade {
 
     private SendMessageEvent prepareSendEvent(SubscriberEntity subscriber, ParticipantEntity participant, List<HeatLineEntity> heatLines, CompetitionEntity competition) {
         String chatId = subscriber.getChatId();
-        String text = SubscriptionView.info(participant, heatLines, competition);
-        InlineKeyboardMarkup keyboard = SubscriptionView.button(participant, true);
+        String text = view.info(participant, heatLines, competition);
+        InlineKeyboardMarkup keyboard = view.button(participant, true);
         return SERVICE.getSendMessageEvent(chatId, text, keyboard, null);
     }
 }
