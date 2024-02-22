@@ -14,9 +14,20 @@ import org.springframework.stereotype.Component;
 @ToString
 public class CommandCompetitions extends BaseCommand {
     public static final String command = "competitions";
+    public static final String description = "Список змагань";
     private final boolean isInTextCommand = false;
     @Autowired
     private CompetitionFacade competitionFacade;
+
+    @Override
+    public String description() {
+        return description;
+    }
+
+    @Override
+    public boolean isNeedToAddToMenu() {
+        return true;
+    }
 
     @Override
     public String command() {

@@ -3,8 +3,8 @@ package com.dp_ua.iksparser.bot.command.impl;
 import com.dp_ua.iksparser.bot.Bot;
 import com.dp_ua.iksparser.bot.command.CommandInterface;
 import com.dp_ua.iksparser.bot.command.impl.competition.CommandCompetitions;
-import com.dp_ua.iksparser.bot.message.Message;
 import com.dp_ua.iksparser.bot.event.SendMessageEvent;
+import com.dp_ua.iksparser.bot.message.Message;
 import com.dp_ua.iksparser.service.MessageCreator;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -22,6 +22,18 @@ import static com.dp_ua.iksparser.service.MessageCreator.*;
 @EqualsAndHashCode
 public class CommandStart implements CommandInterface {
     public static final String command = "start";
+    public static final String description = "Розпочати роботу";
+
+    @Override
+    public String description() {
+        return description;
+    }
+
+    @Override
+    public boolean isNeedToAddToMenu() {
+        return true;
+    }
+
     private final boolean isInTextCommand = false;
     @Autowired
     private Bot bot;

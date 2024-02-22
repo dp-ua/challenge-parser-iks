@@ -9,6 +9,12 @@ import java.util.stream.Stream;
 
 public interface CommandInterface {
     String command();
+    default String description() {
+        return "";
+    }
+    default boolean isNeedToAddToMenu() {
+        return false;
+    }
 
     default List<String> altCommands() {
         return Collections.EMPTY_LIST;

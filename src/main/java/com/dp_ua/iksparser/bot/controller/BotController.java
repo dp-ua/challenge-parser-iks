@@ -26,7 +26,6 @@ public class BotController implements ControllerService {
     @Autowired
     ApplicationEventPublisher publisher;
 
-
     @Autowired
     Bot bot;
     @Autowired
