@@ -25,6 +25,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendChatAction;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -741,5 +742,43 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         competitionService.flush();
         log.info("Competitions parsed. Size: {}, year: {}", competitions.size(), year);
         log.info("Competitions in DB: {}", competitionService.count());
+    }
+
+    @Override
+    public String getInfoAboutCompetitions() {
+        List<CompetitionEntity> competition = competitionService.findAllOrderByBeginDate(true);
+        List<String> years = competition.stream().map(c->{
+            String beginDate = c.getBeginDate();
+            LocalDate date = LocalDate.parse(beginDate, CompetitionService.FORMATTER);
+            return date.getYear();
+        }).distinct().sorted().map(String::valueOf).toList();
+
+        //todo move to competition view
+
+        String sb = COMPETITION +
+                "Всього змагань в базі: " +
+                BOLD +
+                competition.size() +
+                BOLD +
+                END_LINE +
+                CALENDAR +
+                "Дата : з " +
+                BOLD +
+                years.get(0) +
+                BOLD +
+                " по " +
+                BOLD +
+                years.get(years.size() - 1) +
+                BOLD +
+                " роки" +
+                END_LINE +
+                RESULT +
+                "Змагань, по яким заповнена інформація: " +
+                BOLD +
+                competition.stream().filter(this::isCompetitionFilled).count() +
+                BOLD +
+                END_LINE;
+
+        return sb;
     }
 }

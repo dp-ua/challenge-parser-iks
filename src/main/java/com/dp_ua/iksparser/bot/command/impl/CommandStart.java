@@ -72,6 +72,7 @@ public class CommandStart implements CommandInterface {
                 .append(END_LINE)
                 .append(END_LINE)
                 .append("Для початку роботи введи команду /" + CommandCompetitions.command)
+                .append(" або /" + CommandMenu.command)
                 .append(END_LINE)
                 .append("Або скористайся кнопкою в меню");
         return sb;

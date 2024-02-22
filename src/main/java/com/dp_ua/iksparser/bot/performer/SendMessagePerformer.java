@@ -9,6 +9,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
+import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.methods.send.SendChatAction;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
@@ -49,6 +50,9 @@ public class SendMessagePerformer implements ApplicationListener<SendMessageEven
                     break;
                 case DELETE_MESSAGE:
                     bot.execute((DeleteMessage) event.getMessage());
+                    break;
+                case SET_MY_COMMANDS:
+                    bot.execute((SetMyCommands) event.getMessage());
                     break;
                 default:
                     throw new IllegalArgumentException("Unknown msgType: " + event.getMsgType());

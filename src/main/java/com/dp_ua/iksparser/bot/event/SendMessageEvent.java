@@ -16,6 +16,6 @@ public class SendMessageEvent extends ApplicationEvent {
 
     public enum MsgType {
         SEND_MESSAGE, CHAT_ACTION, EDIT_MESSAGE, ANSWER_CALLBACK_QUERY,
-        DELETE_MESSAGE,
+        DELETE_MESSAGE, SET_MY_COMMANDS,
     }
 }

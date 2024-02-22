@@ -22,4 +22,6 @@ public interface SubscribeFacade {
 
 
     void showSubscriptionsList(String chatId, long commandArgument, Integer editMessageId);
+
+    String getInfoAboutSubscribes(String chatId);
 }

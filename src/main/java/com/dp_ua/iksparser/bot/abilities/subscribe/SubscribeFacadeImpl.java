@@ -1,5 +1,6 @@
 package com.dp_ua.iksparser.bot.abilities.subscribe;
 
+import com.dp_ua.iksparser.bot.Icon;
 import com.dp_ua.iksparser.bot.abilities.infoview.SubscriptionView;
 import com.dp_ua.iksparser.bot.event.SendMessageEvent;
 import com.dp_ua.iksparser.dba.element.CompetitionEntity;
@@ -15,7 +16,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 
 import java.util.List;
 
-import static com.dp_ua.iksparser.service.MessageCreator.SERVICE;
+import static com.dp_ua.iksparser.service.MessageCreator.*;
 
 @Component
 @Slf4j
@@ -81,6 +82,20 @@ public class SubscribeFacadeImpl implements SubscribeFacade {
         List<SubscriberEntity> subscriptions = getSubscriptions(chatId);
         // TODO:
         throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    @Override
+    public String getInfoAboutSubscribes(String chatId) {
+        List<SubscriberEntity> subscriptions = subscriberService.findAllByChatId(chatId);
+        // todo move to SubscriptionView
+
+        return Icon.SUBSCRIBE +
+                "Ви підписані на: " +
+                BOLD +
+                subscriptions.size() +
+                BOLD +
+                " атл." +
+                END_LINE;
     }
 
     private List<SubscriberEntity> getSubscriptions(String chatId) {
