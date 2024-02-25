@@ -125,7 +125,7 @@ public class SubscriptionView {
         return sb;
     }
 
-    public InlineKeyboardMarkup getSubscriptionsKeyboard(List<SubscriberEntity> subscribers) {
+    public InlineKeyboardMarkup getSubscriptionsKeyboard() {
         InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
         List<InlineKeyboardButton> row = new ArrayList<>();

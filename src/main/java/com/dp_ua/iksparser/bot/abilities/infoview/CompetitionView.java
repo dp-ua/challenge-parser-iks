@@ -1,11 +1,16 @@
 package com.dp_ua.iksparser.bot.abilities.infoview;
 
 import com.dp_ua.iksparser.bot.Icon;
+import com.dp_ua.iksparser.bot.command.impl.competition.CommandCompetitions;
 import com.dp_ua.iksparser.dba.element.CompetitionEntity;
 import com.dp_ua.iksparser.dba.element.CompetitionStatus;
 import com.dp_ua.iksparser.dba.element.HeatLineEntity;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.dp_ua.iksparser.bot.Icon.*;
@@ -150,4 +155,23 @@ public class CompetitionView {
                 .append(END_LINE);
         return sb.toString();
     }
+
+    public InlineKeyboardMarkup getCompetitionsKeyboard() {
+        InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
+        keyboard.setKeyboard(getCompetitionsButtons());
+        return keyboard;
+    }
+
+    private List<List<InlineKeyboardButton>> getCompetitionsButtons() {
+        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
+        List<InlineKeyboardButton> row = new ArrayList<>();
+
+        InlineKeyboardButton button = SERVICE.getKeyboardButton(
+                COMPETITION + " Переглянути змагання",
+                "/" + CommandCompetitions.command);
+        row.add(button);
+        rows.add(row);
+        return rows;
+    }
+
 }

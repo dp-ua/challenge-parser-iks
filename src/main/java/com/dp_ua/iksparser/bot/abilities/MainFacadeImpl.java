@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 
 import static com.dp_ua.iksparser.service.MessageCreator.SERVICE;
 
@@ -36,8 +37,9 @@ public class MainFacadeImpl implements MainFacade {
         String participantsInfo = participantFacade.getInfoAboutParticipants();
         String subscribeInfo = subscribeFacade.getInfoAboutSubscribes(chatId);
         String menuText = menuView.mainMenu(competitionsInfo, participantsInfo, subscribeInfo);
+        InlineKeyboardMarkup buttons = menuView.menuButtons();
 
-        SendMessageEvent sendMessageEvent = SERVICE.getSendMessageEvent(chatId, menuText, null, editMessageId);
+        SendMessageEvent sendMessageEvent = SERVICE.getSendMessageEvent(chatId, menuText, buttons, editMessageId);
         publisher.publishEvent(sendMessageEvent);
     }
 }

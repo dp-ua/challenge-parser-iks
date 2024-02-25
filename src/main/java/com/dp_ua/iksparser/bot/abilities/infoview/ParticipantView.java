@@ -2,6 +2,11 @@ package com.dp_ua.iksparser.bot.abilities.infoview;
 
 import com.dp_ua.iksparser.dba.element.ParticipantEntity;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.dp_ua.iksparser.bot.Icon.*;
 import static com.dp_ua.iksparser.service.MessageCreator.*;
@@ -36,5 +41,20 @@ public class ParticipantView {
                 .append(", ")
                 .append(participant.getTeam());
         return sb.toString();
+    }
+
+    public InlineKeyboardMarkup getParticipantsKeyboard() {
+        InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
+        List<InlineKeyboardButton> row = new ArrayList<>();
+        InlineKeyboardButton button = SERVICE.getKeyboardButton(
+                ATHLETE + " Переглянути спортсменів",
+                "/participants" //+ CommandParticipants.command // todo
+        );
+        row.add(button);
+        rows.add(row);
+        keyboard.setKeyboard(rows);
+        return keyboard;
+
     }
 }

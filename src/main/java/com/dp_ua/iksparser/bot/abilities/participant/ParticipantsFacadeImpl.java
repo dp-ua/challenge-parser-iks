@@ -53,4 +53,10 @@ public class ParticipantsFacadeImpl implements ParticipantFacade {
                 BOLD +
                 END_LINE;
     }
+
+    @Override
+    public void showParticipants(String chatId, long commandArgument, Integer editMessageId) {
+        log.info("SHOW PARTICIPANTS chatId: {}, commandArgument: {}", chatId, commandArgument);
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
 }

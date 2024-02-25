@@ -82,6 +82,7 @@ public class SubscribeFacadeImpl implements SubscribeFacade {
     @Override
     public void showSubscriptionsList(String chatId, long commandArgument, Integer editMessageId) {
         List<SubscriberEntity> subscriptions = getSubscriptions(chatId);
+        log.info("Subscriptions list: {}", subscriptions);
         // TODO:
         throw new UnsupportedOperationException("Not implemented yet");
     }
@@ -98,7 +99,7 @@ public class SubscribeFacadeImpl implements SubscribeFacade {
 
     private SendMessageEvent prepareSendSubscribersEvent(String chatId, List<SubscriberEntity> subscribers, Integer editMessageId) {
         String text = view.subscriptions(subscribers);
-        InlineKeyboardMarkup keyboard = view.getSubscriptionsKeyboard(subscribers);
+        InlineKeyboardMarkup keyboard = view.getSubscriptionsKeyboard();
         return SERVICE.getSendMessageEvent(chatId, text, keyboard, editMessageId);
     }
 
