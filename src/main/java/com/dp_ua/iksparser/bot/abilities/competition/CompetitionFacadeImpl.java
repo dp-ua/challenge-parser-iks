@@ -42,7 +42,6 @@ import static com.dp_ua.iksparser.service.MessageCreator.*;
 public class CompetitionFacadeImpl implements CompetitionFacade {
     public static final int COMPETITIONS_PAGE_SIZE = 3;
     private static final int COMPETITION_BUTTON_LIMIT = 40;
-    public static final int TTL_MINUTES_COMPETITION_UPDATE = 1800;
     public static final int MAX_PARTICIPANTS_SIZE_TO_FIND = 5;
     private static final int MAX_CHUNK_SIZE = 4096;
 
@@ -64,6 +63,8 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
     SubscriptionView subscriptionView;
     @Autowired
     CompetitionView competitionView;
+    @Autowired
+    HeatLineView heatLineView;
 
     @Override
     public void showCompetitions(String chatId, long pageNumber, Integer editMessageId) {
@@ -219,7 +220,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
 
             heatLines.stream()
                     .filter(heatLine -> heatLine.getParticipant().equals(participant))
-                    .forEach(heatLine -> sb.append(HeatLineView.info(heatLine)));
+                    .forEach(heatLine -> sb.append(heatLineView.info(heatLine)));
 
             boolean subscribed = subscribeFacade.isSubscribed(chatId, participant);
             publishChunkMessage(chatId, sb, subscriptionView.button(participant, subscribed));
@@ -393,7 +394,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
             participantInfo
                     .append(ParticipantView.info(participant))
                     .append(END_LINE);
-            participantHeatLines.forEach(heatLine -> participantInfo.append(HeatLineView.info(heatLine)));
+            participantHeatLines.forEach(heatLine -> participantInfo.append(heatLineView.info(heatLine)));
             participantInfo.append(END_LINE);
             result.add(participantInfo);
         });
@@ -756,7 +757,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
 
         //todo move to competition view
 
-        String sb = COMPETITION +
+        return COMPETITION +
                 "Всього змагань в базі: " +
                 BOLD +
                 competition.size() +
@@ -779,7 +780,5 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                 competition.stream().filter(this::isCompetitionFilled).count() +
                 BOLD +
                 END_LINE;
-
-        return sb;
     }
 }

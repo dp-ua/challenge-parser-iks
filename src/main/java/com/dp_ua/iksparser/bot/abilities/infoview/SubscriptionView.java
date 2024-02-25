@@ -22,6 +22,8 @@ import static com.dp_ua.iksparser.service.MessageCreator.*;
 public class SubscriptionView {
     @Autowired
     CompetitionView competitionView;
+    @Autowired
+    HeatLineView heatLineView;
 
     public String info(ParticipantEntity participant, List<HeatLineEntity> heatLines, CompetitionEntity competition) {
         StringBuilder sb = new StringBuilder()
@@ -38,7 +40,7 @@ public class SubscriptionView {
                 .append(END_LINE);
         for (HeatLineEntity heatLine : heatLines) {
             sb
-                    .append(HeatLineView.info(heatLine))
+                    .append(heatLineView.info(heatLine))
                     .append(END_LINE);
         }
         return sb.toString();
