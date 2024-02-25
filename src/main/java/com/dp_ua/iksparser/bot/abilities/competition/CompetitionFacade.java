@@ -18,4 +18,6 @@ public interface CompetitionFacade {
     void showNotLoadedInfo(String chatId, long commandArgument, Integer editMessageId);
 
     void updateCompetitionsList(int year) throws ParsingException;
+
+    String getInfoAboutCompetitions();
 }

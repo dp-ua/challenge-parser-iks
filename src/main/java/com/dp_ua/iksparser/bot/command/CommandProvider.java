@@ -11,6 +11,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +24,7 @@ public class CommandProvider implements ApplicationListener<ContextRefreshedEven
     public int getOrder() {
         return SpringApp.ORDER_FOR_COMMAND_PROVIDER;
     }
+
     @Autowired
     ApplicationContext context;
 
@@ -39,6 +41,14 @@ public class CommandProvider implements ApplicationListener<ContextRefreshedEven
         commands = context.getBeansOfType(CommandInterface.class).values().stream()
                 .peek(this::preRegisterCheck)
                 .collect(Collectors.toList());
+    }
+
+    public List<BotCommand> menuCommands() {
+        return getCommands()
+                .stream()
+                .filter(CommandInterface::isNeedToAddToMenu)
+                .map(c -> new BotCommand(c.command(), c.description()))
+                .toList();
     }
 
     private void preRegisterCheck(CommandInterface command) {

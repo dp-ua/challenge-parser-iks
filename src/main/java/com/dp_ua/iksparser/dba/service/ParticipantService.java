@@ -52,4 +52,8 @@ public class ParticipantService {
     public Optional<ParticipantEntity> findById(long commandArgument) {
         return repo.findById(commandArgument);
     }
+
+    public Iterable<ParticipantEntity> findAll() {
+        return repo.findAll();
+    }
 }

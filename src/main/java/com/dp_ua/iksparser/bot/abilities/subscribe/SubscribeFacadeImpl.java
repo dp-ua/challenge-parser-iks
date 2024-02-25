@@ -25,6 +25,9 @@ public class SubscribeFacadeImpl implements SubscribeFacade {
     @Autowired
     ApplicationEventPublisher publisher;
 
+    @Autowired
+    SubscriptionView view;
+
     @Override
     public boolean isSubscribed(String chatId, ParticipantEntity participant) {
         return subscriberService.isSubscribed(chatId, participant);
@@ -54,8 +57,8 @@ public class SubscribeFacadeImpl implements SubscribeFacade {
     public void inform(String chatId, ParticipantEntity participant, Integer editMessageId) {
         boolean subscribed = isSubscribed(chatId, participant);
 
-        String text = SubscriptionView.subscriptionText(participant, subscribed);
-        InlineKeyboardMarkup button = SubscriptionView.button(participant, subscribed);
+        String text = view.subscriptionText(participant, subscribed);
+        InlineKeyboardMarkup button = view.button(participant, subscribed);
         publisher.publishEvent(
                 SERVICE.getSendMessageEvent(chatId, text, button, editMessageId)
         );
@@ -83,13 +86,19 @@ public class SubscribeFacadeImpl implements SubscribeFacade {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
+    @Override
+    public String getInfoAboutSubscribes(String chatId) {
+        List<SubscriberEntity> subscriptions = subscriberService.findAllByChatId(chatId);
+        return view.subscriptionsDetails(subscriptions);
+    }
+
     private List<SubscriberEntity> getSubscriptions(String chatId) {
         return subscriberService.findAllByChatId(chatId);
     }
 
     private SendMessageEvent prepareSendSubscribersEvent(String chatId, List<SubscriberEntity> subscribers, Integer editMessageId) {
-        String text = SubscriptionView.subscriptions(subscribers);
-        InlineKeyboardMarkup keyboard = SubscriptionView.getSubscriptionsKeyboard(subscribers);
+        String text = view.subscriptions(subscribers);
+        InlineKeyboardMarkup keyboard = view.getSubscriptionsKeyboard(subscribers);
         return SERVICE.getSendMessageEvent(chatId, text, keyboard, editMessageId);
     }
 
@@ -101,8 +110,8 @@ public class SubscribeFacadeImpl implements SubscribeFacade {
 
     private SendMessageEvent prepareSendEvent(SubscriberEntity subscriber, ParticipantEntity participant, List<HeatLineEntity> heatLines, CompetitionEntity competition) {
         String chatId = subscriber.getChatId();
-        String text = SubscriptionView.info(participant, heatLines, competition);
-        InlineKeyboardMarkup keyboard = SubscriptionView.button(participant, true);
+        String text = view.info(participant, heatLines, competition);
+        InlineKeyboardMarkup keyboard = view.button(participant, true);
         return SERVICE.getSendMessageEvent(chatId, text, keyboard, null);
     }
 }
