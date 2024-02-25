@@ -65,6 +65,8 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
     CompetitionView competitionView;
     @Autowired
     HeatLineView heatLineView;
+    @Autowired
+    ParticipantView participantView;
 
     @Override
     public void showCompetitions(String chatId, long pageNumber, Integer editMessageId) {
@@ -205,7 +207,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                     .append(BOLD)
                     .append(END_LINE);
             sb
-                    .append(ParticipantView.info(participant))
+                    .append(participantView.info(participant))
                     .append(END_LINE)
                     .append(END_LINE);
 
@@ -392,7 +394,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         participantHeatLinesMap.forEach((participant, participantHeatLines) -> {
             StringBuilder participantInfo = new StringBuilder();
             participantInfo
-                    .append(ParticipantView.info(participant))
+                    .append(participantView.info(participant))
                     .append(END_LINE);
             participantHeatLines.forEach(heatLine -> participantInfo.append(heatLineView.info(heatLine)));
             participantInfo.append(END_LINE);

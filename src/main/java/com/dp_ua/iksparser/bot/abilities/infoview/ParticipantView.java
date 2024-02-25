@@ -1,12 +1,14 @@
 package com.dp_ua.iksparser.bot.abilities.infoview;
 
 import com.dp_ua.iksparser.dba.element.ParticipantEntity;
+import org.springframework.stereotype.Component;
 
 import static com.dp_ua.iksparser.bot.Icon.*;
 import static com.dp_ua.iksparser.service.MessageCreator.*;
 
+@Component
 public class ParticipantView {
-    public static String info(ParticipantEntity participant) {
+    public String info(ParticipantEntity participant) {
         StringBuilder sb = new StringBuilder();
         sb
                 .append(ATHLETE)

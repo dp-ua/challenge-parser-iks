@@ -24,6 +24,8 @@ public class SubscriptionView {
     CompetitionView competitionView;
     @Autowired
     HeatLineView heatLineView;
+    @Autowired
+    ParticipantView participantView;
 
     public String info(ParticipantEntity participant, List<HeatLineEntity> heatLines, CompetitionEntity competition) {
         StringBuilder sb = new StringBuilder()
@@ -31,7 +33,7 @@ public class SubscriptionView {
                 .append("Ви підписані на учасника: ")
                 .append(END_LINE)
                 .append(END_LINE)
-                .append(ParticipantView.info(participant))
+                .append(participantView.info(participant))
                 .append(END_LINE).append("Приймає участь у змаганнях: ")
                 .append(competitionView.nameAndDate(competition))
                 .append(END_LINE)
@@ -47,7 +49,7 @@ public class SubscriptionView {
     }
 
     public String subscriptionText(ParticipantEntity participant, boolean subscribed) {
-        String text = ParticipantView.info(participant);
+        String text = participantView.info(participant);
         if (subscribed) {
             text = SUBSCRIBE + " Ви підписані на спортсмена: " + END_LINE + text;
         } else {
