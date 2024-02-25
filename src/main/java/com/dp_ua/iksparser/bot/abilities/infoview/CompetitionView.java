@@ -4,14 +4,16 @@ import com.dp_ua.iksparser.bot.Icon;
 import com.dp_ua.iksparser.dba.element.CompetitionEntity;
 import com.dp_ua.iksparser.dba.element.CompetitionStatus;
 import com.dp_ua.iksparser.dba.element.HeatLineEntity;
+import org.springframework.stereotype.Component;
 
 import java.util.stream.Collectors;
 
 import static com.dp_ua.iksparser.bot.Icon.*;
 import static com.dp_ua.iksparser.service.MessageCreator.*;
 
+@Component
 public class CompetitionView {
-    public static String info(CompetitionEntity competition) {
+    public String info(CompetitionEntity competition) {
         String sb = name(competition) +
                 END_LINE +
                 date(competition) +
@@ -23,7 +25,7 @@ public class CompetitionView {
         return sb;
     }
 
-    public static String notFilledInfo() {
+    public String notFilledInfo() {
         String sb = WARNING +
                 " Детальна інформація про змагання відсутня " +
                 WARNING +
@@ -31,14 +33,14 @@ public class CompetitionView {
         return sb;
     }
 
-    public static String name(CompetitionEntity competition) {
+    public String name(CompetitionEntity competition) {
         String sb = ITALIC +
                 competition.getName() +
                 ITALIC;
         return sb;
     }
 
-    public static String date(CompetitionEntity competition) {
+    public String date(CompetitionEntity competition) {
         StringBuilder sb = new StringBuilder();
         Icon iconForStatus = icon(competition);
         sb
@@ -54,14 +56,14 @@ public class CompetitionView {
         return sb.toString();
     }
 
-    public static String nameAndDate(CompetitionEntity competition) {
+    public String nameAndDate(CompetitionEntity competition) {
         String sb = name(competition) +
                 END_LINE +
                 date(competition);
         return sb;
     }
 
-    public static String area(CompetitionEntity competition) {
+    public String area(CompetitionEntity competition) {
         String sb = AREA +
                 ITALIC +
                 " Місце проведення: " +
@@ -74,7 +76,7 @@ public class CompetitionView {
         return sb;
     }
 
-    public static String link(CompetitionEntity competition) {
+    public String link(CompetitionEntity competition) {
         StringBuilder sb = new StringBuilder();
         if (competition.getUrl().isEmpty()) return sb.toString();
         sb
@@ -88,7 +90,7 @@ public class CompetitionView {
         return sb.toString();
     }
 
-    private static Icon icon(CompetitionEntity competition) {
+    private Icon icon(CompetitionEntity competition) {
         CompetitionStatus status = CompetitionStatus.getByName(competition.getStatus());
         if (status == null) return null;
         return switch (status) {
@@ -100,7 +102,7 @@ public class CompetitionView {
         };
     }
 
-    public static String details(CompetitionEntity competition) {
+    public String details(CompetitionEntity competition) {
         StringBuilder sb = new StringBuilder();
         sb
                 .append(DURATION)

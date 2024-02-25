@@ -62,6 +62,8 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
     JsonReader jSonReader;
     @Autowired
     SubscriptionView subscriptionView;
+    @Autowired
+    CompetitionView competitionView;
 
     @Override
     public void showCompetitions(String chatId, long pageNumber, Integer editMessageId) {
@@ -91,14 +93,14 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
 
         StringBuilder sb = new StringBuilder();
         boolean competitionFilled = isCompetitionFilled(competition);
-        sb.append(CompetitionView.info(competition));
+        sb.append(competitionView.info(competition));
         if (competitionFilled) {
             sb
-                    .append(CompetitionView.details(competition))
+                    .append(competitionView.details(competition))
                     .append(END_LINE);
         } else {
             sb
-                    .append(CompetitionView.notFilledInfo())
+                    .append(competitionView.notFilledInfo())
                     .append(updatingMessageText());
         }
         InlineKeyboardMarkup keyboard = getCompetitionDetailsKeyboard(competition, competitionFilled);
@@ -207,7 +209,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                     .append(END_LINE);
 
             sb
-                    .append(CompetitionView.nameAndDate(competition))
+                    .append(competitionView.nameAndDate(competition))
                     .append(END_LINE)
                     .append(END_LINE);
             sb
@@ -274,7 +276,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                 .append(FIND)
                 .append(" Пошук спортсменів по тренеру буде проводитись в івенті: ")
                 .append(END_LINE)
-                .append(CompetitionView.info(competition))
+                .append(competitionView.info(competition))
                 .append(END_LINE);
         return sb;
     }
@@ -344,7 +346,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                     .append(END_LINE);
 
             header
-                    .append(CompetitionView.nameAndDate(competition))
+                    .append(competitionView.nameAndDate(competition))
                     .append(END_LINE)
                     .append(END_LINE);
             header
@@ -412,9 +414,9 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                     "Змагання не знайдено", getBackToCompetitionsKeyboard()));
             return;
         }
-        String sb = CompetitionView.info(competition) +
+        String sb = competitionView.info(competition) +
                 END_LINE +
-                CompetitionView.notFilledInfo();
+                competitionView.notFilledInfo();
 
         InlineKeyboardMarkup keyboard = getCompetitionDetailsKeyboard(competition, false);
 
@@ -472,7 +474,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                 .append(FIND)
                 .append("Пошук участі спортсмена буде проводитись в івенті: ")
                 .append(END_LINE)
-                .append(CompetitionView.info(competition));
+                .append(competitionView.info(competition));
         return sb;
     }
 
@@ -673,7 +675,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                             sb.append(BOLD).append(Icon.getIconForNumber(count)).append(" ").append(BOLD); // number
                             CompetitionEntity competition = competitions.get(i);
                             sb
-                                    .append(CompetitionView.info(competition))
+                                    .append(competitionView.info(competition))
                                     .append(END_LINE);
 
                             return sb.toString();
