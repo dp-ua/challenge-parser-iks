@@ -97,8 +97,8 @@ public class ReceivedMessage implements Message {
         if (update.hasCallbackQuery()) {
             return update.getCallbackQuery().getFrom();
         }
-        if (update.hasChatMember()) {
-            return update.getChatMember().getFrom();
+        if (update.hasMyChatMember()) {
+            return update.getMyChatMember().getFrom();
         }
         return null;
     }
