@@ -77,8 +77,8 @@ public class ReceivedMessage implements Message {
 
     @Override
     public boolean kickBot() {
-        if (update.hasChatMember()) {
-            ChatMemberUpdated chatMember = update.getChatMember();
+        if (update.hasMyChatMember()) {
+            ChatMemberUpdated chatMember = update.getMyChatMember();
             ChatMember newChatMember = chatMember.getNewChatMember();
             if ("kicked".equals(newChatMember.getStatus())) {
                 return true;
