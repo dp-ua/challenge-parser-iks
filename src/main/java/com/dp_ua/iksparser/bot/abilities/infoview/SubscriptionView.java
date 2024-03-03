@@ -7,6 +7,7 @@ import com.dp_ua.iksparser.dba.element.CompetitionEntity;
 import com.dp_ua.iksparser.dba.element.HeatLineEntity;
 import com.dp_ua.iksparser.dba.element.ParticipantEntity;
 import com.dp_ua.iksparser.dba.element.SubscriberEntity;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -19,29 +20,36 @@ import static com.dp_ua.iksparser.service.MessageCreator.*;
 
 @Component
 public class SubscriptionView {
+    @Autowired
+    CompetitionView competitionView;
+    @Autowired
+    HeatLineView heatLineView;
+    @Autowired
+    ParticipantView participantView;
+
     public String info(ParticipantEntity participant, List<HeatLineEntity> heatLines, CompetitionEntity competition) {
         StringBuilder sb = new StringBuilder()
                 .append(SUBSCRIBE)
                 .append("Ви підписані на учасника: ")
                 .append(END_LINE)
                 .append(END_LINE)
-                .append(ParticipantView.info(participant))
+                .append(participantView.info(participant))
                 .append(END_LINE).append("Приймає участь у змаганнях: ")
-                .append(CompetitionView.nameAndDate(competition))
+                .append(competitionView.nameAndDate(competition))
                 .append(END_LINE)
                 .append(END_LINE)
                 .append("Нова заявка в івентах:")
                 .append(END_LINE);
         for (HeatLineEntity heatLine : heatLines) {
             sb
-                    .append(HeatLineView.info(heatLine))
+                    .append(heatLineView.info(heatLine))
                     .append(END_LINE);
         }
         return sb.toString();
     }
 
     public String subscriptionText(ParticipantEntity participant, boolean subscribed) {
-        String text = ParticipantView.info(participant);
+        String text = participantView.info(participant);
         if (subscribed) {
             text = SUBSCRIBE + " Ви підписані на спортсмена: " + END_LINE + text;
         } else {
@@ -117,7 +125,7 @@ public class SubscriptionView {
         return sb;
     }
 
-    public InlineKeyboardMarkup getSubscriptionsKeyboard(List<SubscriberEntity> subscribers) {
+    public InlineKeyboardMarkup getSubscriptionsKeyboard() {
         InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
         List<InlineKeyboardButton> row = new ArrayList<>();

@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
+import static com.dp_ua.iksparser.bot.message.SelfMessage.SELF_USER_NAME;
+
 @Component
 @Slf4j
 public class StatisticPerformer implements ApplicationListener<GetMessageEvent> {
@@ -27,7 +29,7 @@ public class StatisticPerformer implements ApplicationListener<GetMessageEvent> 
         Message message = event.getMessage();
         String chatId = message.getChatId();
         String name = message.getUserName();
-        if (SelfMessage.SELF_USER_NAME.equals(name)) {
+        if (SELF_USER_NAME.equals(name)) {
             return;
         }
         if (message.kickBot()) {

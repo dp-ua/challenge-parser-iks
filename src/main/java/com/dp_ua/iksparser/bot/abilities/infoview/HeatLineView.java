@@ -2,19 +2,25 @@ package com.dp_ua.iksparser.bot.abilities.infoview;
 
 import com.dp_ua.iksparser.dba.element.HeatEntity;
 import com.dp_ua.iksparser.dba.element.HeatLineEntity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import static com.dp_ua.iksparser.bot.Icon.MARK;
 import static com.dp_ua.iksparser.service.MessageCreator.END_LINE;
 
+@Component
 public class HeatLineView {
-    public static String info(HeatLineEntity heatLine) {
+    @Autowired
+    EventView eventView;
+
+    public String info(HeatLineEntity heatLine) {
         StringBuilder sb = new StringBuilder();
         HeatEntity heat = heatLine.getHeat();
 
         sb
                 .append(MARK)
                 .append(" ");
-        sb.append(EventView.info(heat.getEvent()));
+        sb.append(eventView.info(heat.getEvent()));
         sb
                 .append(", ")
                 .append(heat.getName())
@@ -26,6 +32,4 @@ public class HeatLineView {
         sb.append(END_LINE);
         return sb.toString();
     }
-
-
 }

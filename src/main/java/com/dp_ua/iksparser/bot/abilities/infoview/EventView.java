@@ -2,12 +2,14 @@ package com.dp_ua.iksparser.bot.abilities.infoview;
 
 import com.dp_ua.iksparser.dba.element.DayEntity;
 import com.dp_ua.iksparser.dba.element.EventEntity;
+import org.springframework.stereotype.Component;
 
 import static com.dp_ua.iksparser.bot.Icon.RESULT;
 import static com.dp_ua.iksparser.service.MessageCreator.*;
 
+@Component
 public class EventView {
-    public static String info(EventEntity event) {
+    public String info(EventEntity event) {
         DayEntity day = event.getDay();
         StringBuilder sb = new StringBuilder();
         sb.append(day.getDayName())
@@ -45,7 +47,7 @@ public class EventView {
         return sb.toString();
     }
 
-    private static String getLink(EventEntity event) {
+    private String getLink(EventEntity event) {
         return !event.getResultUrl().isEmpty() ? event.getResultUrl()
                 :
                 !event.getStartListUrl().isEmpty()

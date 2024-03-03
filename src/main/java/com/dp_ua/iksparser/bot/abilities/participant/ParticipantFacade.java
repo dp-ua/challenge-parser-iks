@@ -6,4 +6,6 @@ public interface ParticipantFacade {
     void unsubscribe(String chatId, long commandArgument, Integer editMessageId);
 
     String getInfoAboutParticipants();
+
+    void showParticipants(String chatId, long commandArgument, Integer editMessageId);
 }
