@@ -1,6 +1,7 @@
 package com.dp_ua.iksparser.dba.repo;
 
 import com.dp_ua.iksparser.dba.element.ParticipantEntity;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +9,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.util.List;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
@@ -40,7 +40,7 @@ public class ParticipantRepoTest {
     @Test
     public void shouldFind_None() {
         List<ParticipantEntity> found = participantRepo.findByNameAndSurnameByPart("Ivan");
-        assertTrue(found.isEmpty());
+        Assertions.assertTrue(found.isEmpty());
     }
 
     @Test
