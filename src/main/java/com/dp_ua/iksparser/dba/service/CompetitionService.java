@@ -28,7 +28,11 @@ public class CompetitionService {
         return repo.findAllByOrderByUpdated();
     }
 
-    public List<CompetitionEntity> findAllOrderByBeginDate(boolean reverse) {
+    public List<CompetitionEntity> findAllOrderByBeginDateReverse() {
+        return findAllOrderByBeginDate(true);
+    }
+
+    private List<CompetitionEntity> findAllOrderByBeginDate(boolean reverse) {
         List<CompetitionEntity> all = repo.findAll();
         all.sort((o1, o2) -> dateComparator.compare(o1.getBeginDate(), o2.getBeginDate()));
         if (reverse) {
@@ -42,14 +46,6 @@ public class CompetitionService {
         LocalDate date2 = LocalDate.parse(o2, FORMATTER);
         return date1.compareTo(date2);
     };
-
-    public CompetitionEntity getFreshestCompetition() {
-        List<CompetitionEntity> competitions = findAllOrderByUpdated();
-        if (competitions.isEmpty()) {
-            return null;
-        }
-        return competitions.get(0);
-    }
 
     public CompetitionEntity saveOrUpdate(CompetitionEntity competition) {
         CompetitionEntity competitionFromDb = repo.findByNameAndBeginDateAndUrl(

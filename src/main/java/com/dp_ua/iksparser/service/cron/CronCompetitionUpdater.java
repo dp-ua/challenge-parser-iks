@@ -93,7 +93,7 @@ public class CronCompetitionUpdater implements ApplicationListener<ContextRefres
     @Scheduled(cron = "0 0/20 10-23 * * *") // every 20 minutes check closest competitions
     public void updateClosestCompetitionDetails() {
         log.info("Start update closest competitions");
-        List<CompetitionEntity> competitions = competitionService.findAllOrderByBeginDate(true);
+        List<CompetitionEntity> competitions = competitionService.findAllOrderByBeginDateReverse();
         LocalDate now = LocalDate.now();
         competitions.stream()
                 .filter(competition -> {
@@ -110,11 +110,11 @@ public class CronCompetitionUpdater implements ApplicationListener<ContextRefres
     }
 
     private void runEventToUpdateCompetition(CompetitionEntity competition) {
-        if (isCompetitionURLEmpty(competition)) {
+        if (competition.isURLEmpty()) {
             log.warn("Can't update. Competition URL is empty, id: {}", competition.getId());
             return;
         }
-        if (isCompetitionUrlIsNotValid(competition)) {
+        if (competition.isUrlNotValid()) {
             log.warn("Can't update. Competition URL is not valid, id: {}", competition.getId());
             return;
         }
@@ -124,17 +124,6 @@ public class CronCompetitionUpdater implements ApplicationListener<ContextRefres
         message.setEditMessageId(null);
         UpdateCompetitionEvent updateCompetitionEvent = new UpdateCompetitionEvent(this, message);
         publisher.publishEvent(updateCompetitionEvent);
-    }
-
-    private boolean isCompetitionUrlIsNotValid(CompetitionEntity competition) {
-        // not valid url example:
-        //  URL=https://www.flavo.org.ua/files/zmagannya/protocol/2023/2023.02.21.pdf  - can't be pdg file
-        String url = competition.getUrl();
-        return url.endsWith(".pdf");
-    }
-
-    private boolean isCompetitionURLEmpty(CompetitionEntity competition) {
-        return competition.getUrl() == null || competition.getUrl().isEmpty();
     }
 
     @Override
