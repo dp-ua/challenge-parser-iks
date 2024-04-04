@@ -1,5 +1,6 @@
 package com.dp_ua.iksparser.bot.abilities.infoview;
 
+import com.dp_ua.iksparser.bot.Icon;
 import com.dp_ua.iksparser.dba.element.ParticipantEntity;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -55,6 +56,14 @@ public class ParticipantView {
         rows.add(row);
         keyboard.setKeyboard(rows);
         return keyboard;
+    }
 
+    public String participantsInfo(Iterable<ParticipantEntity> participants) {
+        return Icon.ATHLETE +
+                "Всього атлетів в базі: " +
+                BOLD +
+                participants.spliterator().getExactSizeIfKnown() +
+                BOLD +
+                END_LINE;
     }
 }

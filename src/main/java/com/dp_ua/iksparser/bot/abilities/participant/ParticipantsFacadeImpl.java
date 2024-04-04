@@ -1,6 +1,6 @@
 package com.dp_ua.iksparser.bot.abilities.participant;
 
-import com.dp_ua.iksparser.bot.Icon;
+import com.dp_ua.iksparser.bot.abilities.infoview.ParticipantView;
 import com.dp_ua.iksparser.bot.abilities.subscribe.SubscribeFacade;
 import com.dp_ua.iksparser.dba.element.ParticipantEntity;
 import com.dp_ua.iksparser.dba.service.ParticipantService;
@@ -10,9 +10,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
-import static com.dp_ua.iksparser.service.MessageCreator.BOLD;
-import static com.dp_ua.iksparser.service.MessageCreator.END_LINE;
-
 @Component
 @Slf4j
 public class ParticipantsFacadeImpl implements ParticipantFacade {
@@ -20,6 +17,8 @@ public class ParticipantsFacadeImpl implements ParticipantFacade {
     private ParticipantService participantService;
     @Autowired
     SubscribeFacade subscribeFacade;
+    @Autowired
+    ParticipantView participantView;
 
     @Override
     public void subscribe(String chatId, long commandArgument, Integer editMessageId) {
@@ -44,15 +43,9 @@ public class ParticipantsFacadeImpl implements ParticipantFacade {
     @Override
     public String getInfoAboutParticipants() {
         Iterable<ParticipantEntity> participants = participantService.findAll();
-        // todo move to ParticipantsView
-
-        return Icon.ATHLETE +
-                "Всього атлетів в базі: " +
-                BOLD +
-                participants.spliterator().getExactSizeIfKnown() +
-                BOLD +
-                END_LINE;
+        return participantView.participantsInfo(participants);
     }
+
 
     @Override
     public void showParticipants(String chatId, long commandArgument, Integer editMessageId) {
