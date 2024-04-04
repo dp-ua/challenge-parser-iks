@@ -13,7 +13,6 @@ import java.util.List;
 public interface StatisticRepo extends CrudRepository<StatisticEntity, Long> {
     long countByChatId(String chatId);
 
-
     @Query("SELECT e FROM StatisticEntity e WHERE CAST(e.updated AS DATE) = :date")
     List<StatisticEntity> findByUpdatedInDate(@Param("date") LocalDate date);
 }
