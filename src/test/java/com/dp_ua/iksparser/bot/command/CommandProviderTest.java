@@ -36,6 +36,7 @@ public class CommandProviderTest {
                         deletemessage
                         help
                         menu
+                        participants
                         searchbycoach
                         searchbycoachwithname
                         searchbyname
