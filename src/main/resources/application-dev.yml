@@ -16,8 +16,8 @@ spring:
   datasource:
     url: jdbc:h2:mem:mydb
     driverClassName: org.h2.Driver
-    username: ${IKS_DB_USERNAME}
-    password: ${IKS_DB_PASSWORD}
+    username: ${TEST_DB_USERNAME}
+    password: ${TEST_DB_PASSWORD}
   h2:
     console:
       enabled: true
@@ -33,10 +33,10 @@ spring:
 
 telegram:
   bot:
-    token: ${IKS_TELEGRAM_BOT_TOKEN}
-    name: ${IKS_TELEGRAM_BOT_NAME}
+    token: ${TEST_TELEGRAM_BOT_TOKEN}
+    name: ${TEST_TELEGRAM_BOT_NAME}
     reconnectTimeout: 10000
-    adminId: ${IKS_TELEGRAM_ADMIN_ID}
+    adminId: ${TEST_TELEGRAM_ADMIN_ID}
 
 logging:
   level:

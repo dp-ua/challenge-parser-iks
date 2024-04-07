@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+
 @Slf4j
 @Entity
 @Getter
@@ -53,5 +54,17 @@ public class CompetitionEntity extends DomainElement {
             return true;
         }
         return days.stream().anyMatch(DayEntity::isNeedToUpdate);
+    }
+
+    public boolean isFilled() {
+        return getDays().isEmpty();
+    }
+
+    public boolean isURLEmpty() {
+        return getUrl() == null || getUrl().isEmpty();
+    }
+
+    public boolean isUrlNotValid() {
+        return getUrl().endsWith(".pdf");
     }
 }

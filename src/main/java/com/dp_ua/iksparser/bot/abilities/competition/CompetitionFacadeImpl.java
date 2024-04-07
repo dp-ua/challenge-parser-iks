@@ -95,7 +95,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         }
 
         StringBuilder sb = new StringBuilder();
-        boolean competitionFilled = isCompetitionFilled(competition);
+        boolean competitionFilled = competition.isFilled();
         sb.append(competitionView.info(competition));
         if (competitionFilled) {
             sb
@@ -517,10 +517,6 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         publisher.publishEvent(chatId);
     }
 
-    private boolean isCompetitionFilled(CompetitionEntity competition) {
-        return !competition.getDays().isEmpty();
-    }
-
     private SendMessageEvent prepareSendMessageEvent(String chatId, Integer editMessageId, String text, InlineKeyboardMarkup keyboard) {
         return SERVICE.getSendMessageEvent(chatId, text, keyboard, editMessageId);
     }
@@ -734,7 +730,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
 
     private List<CompetitionEntity> getCompetitions() {
         log.info("Get competitions from DB");
-        return competitionService.findAllOrderByBeginDate(true);
+        return competitionService.findAllOrderByBeginDateDesc();
     }
 
     @Override
@@ -750,37 +746,13 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
 
     @Override
     public String getInfoAboutCompetitions() {
-        List<CompetitionEntity> competition = competitionService.findAllOrderByBeginDate(true);
-        List<String> years = competition.stream().map(c -> {
+        List<CompetitionEntity> competitions = competitionService.findAllOrderByBeginDateDesc();
+        List<String> years = competitions.stream().map(c -> {
             String beginDate = c.getBeginDate();
             LocalDate date = LocalDate.parse(beginDate, CompetitionService.FORMATTER);
             return date.getYear();
         }).distinct().sorted().map(String::valueOf).toList();
 
-        //todo move to competition view
-
-        return COMPETITION +
-                "Всього змагань в базі: " +
-                BOLD +
-                competition.size() +
-                BOLD +
-                END_LINE +
-                CALENDAR +
-                "Дата : з " +
-                BOLD +
-                years.get(0) +
-                BOLD +
-                " по " +
-                BOLD +
-                years.get(years.size() - 1) +
-                BOLD +
-                " роки" +
-                END_LINE +
-                RESULT +
-                "Змагань, по яким заповнена інформація: " +
-                BOLD +
-                competition.stream().filter(this::isCompetitionFilled).count() +
-                BOLD +
-                END_LINE;
+        return competitionView.getCompetitionsInfo(competitions, years);
     }
 }

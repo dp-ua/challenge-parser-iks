@@ -174,4 +174,29 @@ public class CompetitionView {
         return rows;
     }
 
+    public String getCompetitionsInfo(List<CompetitionEntity> competitions, List<String> years) {
+        return COMPETITION +
+                "Всього змагань в базі: " +
+                BOLD +
+                competitions.size() +
+                BOLD +
+                END_LINE +
+                CALENDAR +
+                "Дата : з " +
+                BOLD +
+                years.get(0) +
+                BOLD +
+                " по " +
+                BOLD +
+                years.get(years.size() - 1) +
+                BOLD +
+                " роки" +
+                END_LINE +
+                RESULT +
+                "Змагань, по яким заповнена інформація: " +
+                BOLD +
+                competitions.stream().filter(CompetitionEntity::isFilled).count() +
+                BOLD +
+                END_LINE;
+    }
 }
