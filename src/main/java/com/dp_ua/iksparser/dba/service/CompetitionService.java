@@ -28,6 +28,10 @@ public class CompetitionService {
         this.repo = repo;
     }
 
+    public List<CompetitionEntity> findAllOrderByUpdated() {
+        return repo.findAllByOrderByUpdated();
+    }
+
     public List<CompetitionEntity> findAllOrderByBeginDateDesc() {
         List<CompetitionEntity> all = repo.findAll();
         all.sort((o1, o2) -> dateComparator.compare(o1.getBeginDate(), o2.getBeginDate()));
