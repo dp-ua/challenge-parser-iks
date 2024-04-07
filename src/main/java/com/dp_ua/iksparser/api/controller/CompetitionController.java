@@ -3,6 +3,7 @@ package com.dp_ua.iksparser.api.controller;
 
 import com.dp_ua.iksparser.dba.element.dto.CompetitionDto;
 import com.dp_ua.iksparser.dba.service.CompetitionService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -30,8 +31,16 @@ public class CompetitionController {
 
     @GetMapping("/competitions")
     public Page<CompetitionDto> getAllCompetitions(
+            HttpServletRequest request,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) int size) {
+
+        log.info("URI: {}, page: {}, size: {} Request from IP: {}, User-Agent: {}",
+                request.getRequestURI(),
+                page, size,
+                request.getRemoteAddr(),
+                request.getHeader("User-Agent"));
+
         Pageable pageable = PageRequest.of(page, size);
         return competitionService.getAllCompetitions(pageable);
     }
