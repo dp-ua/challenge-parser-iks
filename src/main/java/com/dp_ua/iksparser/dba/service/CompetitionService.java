@@ -86,7 +86,7 @@ public class CompetitionService {
 
     public Page<CompetitionDto> getAllCompetitions(String text, Pageable pageable) {
         if (text != null) {
-            text = sqlPreprocessorService.escapeSpecialCharacters(text);
+            text = sqlPreprocessorService.escapeSpecialCharacters(text).trim();
             return repo.findByNameContainingIgnoreCase(text, pageable).map(this::convertToDto);
         }
         return repo.findAllByOrderByBeginDateDesc(pageable)
