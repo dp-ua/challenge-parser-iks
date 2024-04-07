@@ -730,7 +730,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
 
     private List<CompetitionEntity> getCompetitions() {
         log.info("Get competitions from DB");
-        return competitionService.findAllOrderByBeginDateReverse();
+        return competitionService.findAllOrderByBeginDateDesc();
     }
 
     @Override
@@ -746,7 +746,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
 
     @Override
     public String getInfoAboutCompetitions() {
-        List<CompetitionEntity> competitions = competitionService.findAllOrderByBeginDateReverse();
+        List<CompetitionEntity> competitions = competitionService.findAllOrderByBeginDateDesc();
         List<String> years = competitions.stream().map(c -> {
             String beginDate = c.getBeginDate();
             LocalDate date = LocalDate.parse(beginDate, CompetitionService.FORMATTER);

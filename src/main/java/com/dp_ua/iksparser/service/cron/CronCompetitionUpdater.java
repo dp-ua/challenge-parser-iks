@@ -93,7 +93,7 @@ public class CronCompetitionUpdater implements ApplicationListener<ContextRefres
     @Scheduled(cron = "0 0/20 10-23 * * *") // every 20 minutes check closest competitions
     public void updateClosestCompetitionDetails() {
         log.info("Start update closest competitions");
-        List<CompetitionEntity> competitions = competitionService.findAllOrderByBeginDateReverse();
+        List<CompetitionEntity> competitions = competitionService.findAllOrderByBeginDateDesc();
         LocalDate now = LocalDate.now();
         competitions.stream()
                 .filter(competition -> {

@@ -1,9 +1,13 @@
 package com.dp_ua.iksparser.dba.service;
 
 import com.dp_ua.iksparser.dba.element.CompetitionEntity;
+import com.dp_ua.iksparser.dba.element.DayEntity;
+import com.dp_ua.iksparser.dba.element.dto.CompetitionDto;
 import com.dp_ua.iksparser.dba.repo.CompetitionRepo;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -24,20 +28,10 @@ public class CompetitionService {
         this.repo = repo;
     }
 
-    public List<CompetitionEntity> findAllOrderByUpdated() {
-        return repo.findAllByOrderByUpdated();
-    }
-
-    public List<CompetitionEntity> findAllOrderByBeginDateReverse() {
-        return findAllOrderByBeginDate(true);
-    }
-
-    private List<CompetitionEntity> findAllOrderByBeginDate(boolean reverse) {
+    public List<CompetitionEntity> findAllOrderByBeginDateDesc() {
         List<CompetitionEntity> all = repo.findAll();
         all.sort((o1, o2) -> dateComparator.compare(o1.getBeginDate(), o2.getBeginDate()));
-        if (reverse) {
-            Collections.reverse(all);
-        }
+        Collections.reverse(all);
         return all;
     }
 
@@ -80,5 +74,24 @@ public class CompetitionService {
 
     public long count() {
         return repo.count();
+    }
+
+    public Page<CompetitionDto> getAllCompetitions(Pageable pageable) {
+        Page<CompetitionEntity> entities = repo.findAllByOrderByBeginDateDesc(pageable);
+        return entities.map(this::convertToDto);
+    }
+
+    private CompetitionDto convertToDto(CompetitionEntity competition) {
+        CompetitionDto dto = new CompetitionDto();
+        dto.setId(competition.getId());
+        dto.setDays(competition.getDays().stream().map(DayEntity::getId).toList());
+        dto.setName(competition.getName());
+        dto.setStatus(competition.getStatus());
+        dto.setBeginDate(competition.getBeginDate());
+        dto.setEndDate(competition.getEndDate());
+        dto.setCountry(competition.getCountry());
+        dto.setCity(competition.getCity());
+        dto.setUrl(competition.getUrl());
+        return dto;
     }
 }
