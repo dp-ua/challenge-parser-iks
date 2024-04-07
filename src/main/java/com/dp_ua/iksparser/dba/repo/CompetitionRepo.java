@@ -21,5 +21,7 @@ public interface CompetitionRepo extends CrudRepository<CompetitionEntity, Long>
     void flush();
 
     Page<CompetitionEntity> findAllByOrderByBeginDateDesc(Pageable pageable);
+
+    Page<CompetitionEntity> findByNameContainingIgnoreCase(String name, Pageable pageable);
 }
 

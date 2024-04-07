@@ -33,15 +33,16 @@ public class CompetitionController {
     public Page<CompetitionDto> getAllCompetitions(
             HttpServletRequest request,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) int size) {
+            @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) int size,
+            @RequestParam(required = false) String text) {
 
-        log.info("URI: {}, page: {}, size: {} Request from IP: {}, User-Agent: {}",
+        log.info("URI: {}, page: {}, size: {}, text: {} Request from IP: {}, User-Agent: {}",
                 request.getRequestURI(),
-                page, size,
+                page, size, text,
                 request.getRemoteAddr(),
                 request.getHeader("User-Agent"));
 
         Pageable pageable = PageRequest.of(page, size);
-        return competitionService.getAllCompetitions(pageable);
+        return competitionService.getAllCompetitions(text, pageable);
     }
 }

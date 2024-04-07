@@ -4,6 +4,7 @@ import com.dp_ua.iksparser.dba.element.CompetitionEntity;
 import com.dp_ua.iksparser.dba.element.DayEntity;
 import com.dp_ua.iksparser.dba.element.dto.CompetitionDto;
 import com.dp_ua.iksparser.dba.repo.CompetitionRepo;
+import com.dp_ua.iksparser.service.SqlPreprocessorService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,6 +23,9 @@ public class CompetitionService {
     public static final String DD_MM_YYYY = "dd.MM.yyyy";
     public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DD_MM_YYYY);
     private final CompetitionRepo repo;
+
+    @Autowired
+    SqlPreprocessorService sqlPreprocessorService;
 
     @Autowired
     public CompetitionService(CompetitionRepo repo) {
@@ -80,9 +84,13 @@ public class CompetitionService {
         return repo.count();
     }
 
-    public Page<CompetitionDto> getAllCompetitions(Pageable pageable) {
-        Page<CompetitionEntity> entities = repo.findAllByOrderByBeginDateDesc(pageable);
-        return entities.map(this::convertToDto);
+    public Page<CompetitionDto> getAllCompetitions(String text, Pageable pageable) {
+        if (text != null) {
+            text = sqlPreprocessorService.escapeSpecialCharacters(text);
+            return repo.findByNameContainingIgnoreCase(text, pageable).map(this::convertToDto);
+        }
+        return repo.findAllByOrderByBeginDateDesc(pageable)
+                .map(this::convertToDto);
     }
 
     private CompetitionDto convertToDto(CompetitionEntity competition) {
