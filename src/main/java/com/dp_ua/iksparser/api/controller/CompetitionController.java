@@ -9,8 +9,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -40,7 +38,7 @@ public class CompetitionController {
             @RequestParam(defaultValue = "0") int page,
             @Schema(description = "Size of the page for results pagination", defaultValue = DEFAULT_PAGE_SIZE)
             @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) int size,
-            @Schema(description = "Text for name search(case-insensitive)", required = false)
+            @Schema(description = "Text for name search(case-insensitive)")
             @RequestParam(required = false) String text) {
 
         log.info("URI: {}, page: {}, size: {}, text: {} Request from IP: {}, User-Agent: {}",
@@ -49,7 +47,6 @@ public class CompetitionController {
                 request.getRemoteAddr(),
                 request.getHeader("User-Agent"));
 
-        Pageable pageable = PageRequest.of(page, size);
-        return competitionService.getAllCompetitions(text, pageable);
+        return competitionService.getAllCompetitions(text, page, size);
     }
 }

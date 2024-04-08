@@ -4,11 +4,11 @@ import com.dp_ua.iksparser.dba.element.CompetitionEntity;
 import com.dp_ua.iksparser.dba.element.DayEntity;
 import com.dp_ua.iksparser.dba.element.dto.CompetitionDto;
 import com.dp_ua.iksparser.dba.repo.CompetitionRepo;
+import com.dp_ua.iksparser.service.PageableService;
 import com.dp_ua.iksparser.service.SqlPreprocessorService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -26,6 +26,8 @@ public class CompetitionService {
 
     @Autowired
     SqlPreprocessorService sqlPreprocessorService;
+    @Autowired
+    PageableService pageableService;
 
     @Autowired
     public CompetitionService(CompetitionRepo repo) {
@@ -84,13 +86,22 @@ public class CompetitionService {
         return repo.count();
     }
 
-    public Page<CompetitionDto> getAllCompetitions(String text, Pageable pageable) {
+    public Page<CompetitionDto> getAllCompetitions(int page, int size) {
+        return getAllCompetitions(null, page, size);
+    }
+
+    public Page<CompetitionDto> getAllCompetitions(String text, int page, int size) {
+        List<CompetitionEntity> content = findAllOrderByBeginDateDesc();
         if (text != null) {
-            text = sqlPreprocessorService.escapeSpecialCharacters(text).trim();
-            return repo.findByNameContainingIgnoreCase(text, pageable).map(this::convertToDto);
+            String escapedText = sqlPreprocessorService.escapeSpecialCharacters(text).trim().toLowerCase();
+            content = content.stream().filter(
+                            competition ->
+                                    competition.getName().toLowerCase().contains(escapedText)
+                    )
+                    .toList();
         }
-        return repo.findAllByOrderByBeginDateDesc(pageable)
-                .map(this::convertToDto);
+        Page<CompetitionEntity> result = pageableService.getPage(page, size, content);
+        return result.map(this::convertToDto);
     }
 
     private CompetitionDto convertToDto(CompetitionEntity competition) {
