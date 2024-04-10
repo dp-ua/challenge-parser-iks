@@ -15,7 +15,6 @@ import com.dp_ua.iksparser.dba.service.CoachService;
 import com.dp_ua.iksparser.dba.service.CompetitionService;
 import com.dp_ua.iksparser.exeption.ParsingException;
 import com.dp_ua.iksparser.service.JsonReader;
-import com.dp_ua.iksparser.service.PageableService;
 import com.dp_ua.iksparser.service.parser.MainParserService;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -65,9 +64,6 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
     HeatLineView heatLineView;
     @Autowired
     ParticipantView participantView;
-    @Autowired
-    PageableService pageableService;
-
 
     @Override
     public void showCompetitions(String chatId, int pageNumber, Integer editMessageId) {
@@ -597,15 +593,6 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         InlineKeyboardMarkup keyboard = competitionView.getKeyboardForCompetitionsPage(content);
 
         return prepareSendMessageEvent(chatId, messageId, text, keyboard);
-    }
-
-    private Page<CompetitionEntity> getPage(List<CompetitionEntity> competitions, long pageNumber, int pageSize) {
-        return pageableService.getPage((int) pageNumber, pageSize, competitions);
-    }
-
-    private List<CompetitionEntity> getCompetitions() {
-        log.info("Get competitions from DB");
-        return competitionService.findAllOrderByBeginDateDesc();
     }
 
     @Override
