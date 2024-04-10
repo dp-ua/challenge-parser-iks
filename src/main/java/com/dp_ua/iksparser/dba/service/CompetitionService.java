@@ -4,18 +4,18 @@ import com.dp_ua.iksparser.dba.element.CompetitionEntity;
 import com.dp_ua.iksparser.dba.element.DayEntity;
 import com.dp_ua.iksparser.dba.element.dto.CompetitionDto;
 import com.dp_ua.iksparser.dba.repo.CompetitionRepo;
+import com.dp_ua.iksparser.service.PageableService;
 import com.dp_ua.iksparser.service.SqlPreprocessorService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 
 @Component
 @Transactional
@@ -26,6 +26,8 @@ public class CompetitionService {
 
     @Autowired
     SqlPreprocessorService sqlPreprocessorService;
+    @Autowired
+    PageableService pageableService;
 
     @Autowired
     public CompetitionService(CompetitionRepo repo) {
@@ -84,13 +86,22 @@ public class CompetitionService {
         return repo.count();
     }
 
-    public Page<CompetitionDto> getAllCompetitions(String text, Pageable pageable) {
+    public Page<CompetitionDto> getAllCompetitions(int page, int size) {
+        return getAllCompetitions(null, page, size);
+    }
+
+    public Page<CompetitionDto> getAllCompetitions(String text, int page, int size) {
+        List<CompetitionEntity> content = findAllOrderByBeginDateDesc();
         if (text != null) {
-            text = sqlPreprocessorService.escapeSpecialCharacters(text).trim();
-            return repo.findByNameContainingIgnoreCase(text, pageable).map(this::convertToDto);
+            String escapedText = sqlPreprocessorService.escapeSpecialCharacters(text).trim().toLowerCase();
+            content = content.stream().filter(
+                            competition ->
+                                    competition.getName().toLowerCase().contains(escapedText)
+                    )
+                    .toList();
         }
-        return repo.findAllByOrderByBeginDateDesc(pageable)
-                .map(this::convertToDto);
+        Page<CompetitionEntity> result = pageableService.getPage(page, size, content);
+        return result.map(this::convertToDto);
     }
 
     private CompetitionDto convertToDto(CompetitionEntity competition) {
@@ -105,5 +116,34 @@ public class CompetitionService {
         dto.setCity(competition.getCity());
         dto.setUrl(competition.getUrl());
         return dto;
+    }
+
+    public Page<CompetitionEntity> getPagedCompetitionsClosetToDate(LocalDateTime date, int pageSize) {
+        List<CompetitionEntity> content = findAllOrderByBeginDateDesc();
+        int page = getPage(date, pageSize, content);
+        return pageableService.getPage(page, pageSize, content);
+    }
+
+    public Page<CompetitionEntity> getPagedCompetitions(int page, int pageSize) {
+        List<CompetitionEntity> content = findAllOrderByBeginDateDesc();
+        return pageableService.getPage(page, pageSize, content);
+    }
+
+    private int getPage(LocalDateTime date, int pageSize, List<CompetitionEntity> content) {
+        int page;
+
+        Map<Long, Integer> compareMap = new HashMap<>();
+        for (int i = 0; i < content.size(); i++) {
+            CompetitionEntity competition = content.get(i);
+            LocalDateTime competitionDate = LocalDateTime.parse(
+                    String.format("%s %s",
+                            competition.getBeginDate(), date.format(DateTimeFormatter.ofPattern("HH:mm:ss"))),
+                    DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"));
+            long hours = Math.abs(ChronoUnit.HOURS.between(date, competitionDate));
+            compareMap.put(hours, i);
+        }
+        int index = compareMap.get(Collections.min(compareMap.keySet()));
+        page = index / pageSize;
+        return page;
     }
 }

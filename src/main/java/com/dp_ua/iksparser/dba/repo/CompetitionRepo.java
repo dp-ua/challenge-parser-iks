@@ -1,8 +1,6 @@
 package com.dp_ua.iksparser.dba.repo;
 
 import com.dp_ua.iksparser.dba.element.CompetitionEntity;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -19,9 +17,5 @@ public interface CompetitionRepo extends CrudRepository<CompetitionEntity, Long>
     List<CompetitionEntity> findAll();
 
     void flush();
-
-    Page<CompetitionEntity> findAllByOrderByBeginDateDesc(Pageable pageable);
-
-    Page<CompetitionEntity> findByNameContainingIgnoreCase(String name, Pageable pageable);
 }
 

@@ -35,10 +35,10 @@ public abstract class BaseCommand implements CommandInterface {
 
     protected abstract void perform(Message message);
 
-    public long getCommandArgument(String text) {
+    public int getCommandArgument(String text) {
         if (text.startsWith("/" + command())) {
             String argument = text.substring(command().length() + 1).trim();
-            return argument.isEmpty() ? DEFAULT_NO_PAGE_ARGUMENT : Long.parseLong(argument);
+            return argument.isEmpty() ? DEFAULT_NO_PAGE_ARGUMENT : Integer.parseInt(argument);
         }
         return 0;
     }

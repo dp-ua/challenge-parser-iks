@@ -3,7 +3,7 @@ package com.dp_ua.iksparser.bot.abilities.competition;
 import com.dp_ua.iksparser.exeption.ParsingException;
 
 public interface CompetitionFacade {
-    void showCompetitions(String chatId, long page, Integer editMessageId) throws ParsingException;
+    void showCompetitions(String chatId, int page, Integer editMessageId) throws ParsingException;
 
     void showCompetition(String chatId, long commandArgument, Integer editMessageId);
 

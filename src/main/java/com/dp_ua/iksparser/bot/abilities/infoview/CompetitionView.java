@@ -1,10 +1,12 @@
 package com.dp_ua.iksparser.bot.abilities.infoview;
 
 import com.dp_ua.iksparser.bot.Icon;
+import com.dp_ua.iksparser.bot.command.impl.competition.CommandCompetition;
 import com.dp_ua.iksparser.bot.command.impl.competition.CommandCompetitions;
 import com.dp_ua.iksparser.dba.element.CompetitionEntity;
 import com.dp_ua.iksparser.dba.element.CompetitionStatus;
 import com.dp_ua.iksparser.dba.element.HeatLineEntity;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -12,12 +14,123 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static com.dp_ua.iksparser.bot.Icon.*;
 import static com.dp_ua.iksparser.service.MessageCreator.*;
 
 @Component
 public class CompetitionView {
+    private static final int COMPETITION_BUTTON_LIMIT = 40;
+
+    public String getTextForCompetitionsPage(Page<CompetitionEntity> page) {
+        List<CompetitionEntity> competitions = page.getContent();
+        StringBuilder result = new StringBuilder();
+        result
+                .append(CHAMPIONSHIP)
+                .append(BOLD)
+                .append("Список змагань:")
+                .append(BOLD)
+                .append(END_LINE)
+                .append(END_LINE);
+
+        result.append(
+                IntStream.range(0, competitions.size())
+                        .mapToObj(i -> {
+                            int count = i + 1;
+                            StringBuilder sb = new StringBuilder();
+                            sb.append(BOLD).append(Icon.getIconForNumber(count)).append(" ").append(BOLD); // number
+                            CompetitionEntity competition = competitions.get(i);
+                            sb
+                                    .append(info(competition))
+                                    .append(END_LINE);
+
+                            return sb.toString();
+                        })
+                        .reduce((s1, s2) -> s1 + END_LINE + s2)
+                        .orElse("Список пустий")
+        );
+
+        result.append(END_LINE).append(END_LINE);
+        result
+                .append(PAGE_WITH_CURL)
+                .append(" Сторінка ")
+                .append("(")
+                .append(BOLD)
+                .append(page.getNumber() + 1)
+                .append(BOLD)
+                .append(")")
+                .append(" з ")
+                .append(BOLD)
+                .append(page.getTotalPages())
+                .append(BOLD);
+
+        result
+                .append("     ")
+                .append(ITALIC)
+                .append("[оберіть змагання]")
+                .append(ITALIC);
+
+        return result.toString();
+    }
+
+    public InlineKeyboardMarkup getKeyboardForCompetitionsPage(Page<CompetitionEntity> page) {
+        List<CompetitionEntity> competitions = page.getContent();
+        InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
+
+        rows.add(getRowWithPages(page));
+
+        List<InlineKeyboardButton> row = new ArrayList<>();
+        IntStream.range(0, competitions.size()).forEach(i -> {
+            CompetitionEntity competition = competitions.get(i);
+            int count = i + 1;
+            InlineKeyboardButton button = SERVICE.getKeyboardButton(
+                    getShortName(Icon.getIconForNumber(count).toString(), COMPETITION_BUTTON_LIMIT),
+                    "/" + CommandCompetition.command + " " + competition.getId()
+            );
+            row.add(button);
+        });
+        rows.add(row);
+
+        keyboard.setKeyboard(rows);
+        return keyboard;
+    }
+
+    private List<InlineKeyboardButton> getRowWithPages(Page page) {
+        List<InlineKeyboardButton> row = new ArrayList<>();
+
+        int number = page.getNumber();
+        int totalPages = page.getTotalPages();
+        if (number > 0) {
+            InlineKeyboardButton leftPage = SERVICE.getKeyboardButton(
+                    PREVIOUS.toString(),
+                    "/" + CommandCompetitions.command + " " + (number - 1)
+            );
+            row.add(leftPage);
+        }
+        if (number < totalPages - 1) {
+            InlineKeyboardButton rightPage = SERVICE.getKeyboardButton(
+                    NEXT.toString(),
+                    "/" + CommandCompetitions.command + " " + (number + 1)
+            );
+            row.add(rightPage);
+        }
+        return row;
+    }
+
+    private String getShortName(String text, int limit) {
+        if (limit == 0) {
+            return text;
+        }
+        if (text.length() <= limit) {
+            return text;
+        }
+        return SERVICE.cleanMarkdown(text)
+                .substring(0, limit) +
+                "...";
+    }
+
     public String info(CompetitionEntity competition) {
         String sb = name(competition) +
                 END_LINE +
