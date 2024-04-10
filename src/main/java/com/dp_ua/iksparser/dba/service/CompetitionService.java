@@ -12,10 +12,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 
 @Component
 @Transactional
@@ -116,5 +116,34 @@ public class CompetitionService {
         dto.setCity(competition.getCity());
         dto.setUrl(competition.getUrl());
         return dto;
+    }
+
+    public Page<CompetitionEntity> getPagedCompetitionsClosetToDate(LocalDateTime date, int pageSize) {
+        List<CompetitionEntity> content = findAllOrderByBeginDateDesc();
+        int page = getPage(date, pageSize, content);
+        return pageableService.getPage(page, pageSize, content);
+    }
+
+    public Page<CompetitionEntity> getPagedCompetitions(int page, int pageSize) {
+        List<CompetitionEntity> content = findAllOrderByBeginDateDesc();
+        return pageableService.getPage(page, pageSize, content);
+    }
+
+    private int getPage(LocalDateTime date, int pageSize, List<CompetitionEntity> content) {
+        int page;
+
+        Map<Long, Integer> compareMap = new HashMap<>();
+        for (int i = 0; i < content.size(); i++) {
+            CompetitionEntity competition = content.get(i);
+            LocalDateTime competitionDate = LocalDateTime.parse(
+                    String.format("%s %s",
+                            competition.getBeginDate(), date.format(DateTimeFormatter.ofPattern("HH:mm:ss"))),
+                    DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"));
+            long hours = Math.abs(ChronoUnit.HOURS.between(date, competitionDate));
+            compareMap.put(hours, i);
+        }
+        int index = compareMap.get(Collections.min(compareMap.keySet()));
+        page = index / pageSize;
+        return page;
     }
 }

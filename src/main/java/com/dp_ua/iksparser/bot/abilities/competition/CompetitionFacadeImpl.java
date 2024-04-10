@@ -1,6 +1,5 @@
 package com.dp_ua.iksparser.bot.abilities.competition;
 
-import com.dp_ua.iksparser.bot.Icon;
 import com.dp_ua.iksparser.bot.abilities.StateService;
 import com.dp_ua.iksparser.bot.abilities.infoview.CompetitionView;
 import com.dp_ua.iksparser.bot.abilities.infoview.HeatLineView;
@@ -8,6 +7,7 @@ import com.dp_ua.iksparser.bot.abilities.infoview.ParticipantView;
 import com.dp_ua.iksparser.bot.abilities.infoview.SubscriptionView;
 import com.dp_ua.iksparser.bot.abilities.subscribe.SubscribeFacade;
 import com.dp_ua.iksparser.bot.command.impl.*;
+import com.dp_ua.iksparser.bot.command.impl.competition.CommandCompetitions;
 import com.dp_ua.iksparser.bot.event.SendMessageEvent;
 import com.dp_ua.iksparser.bot.event.UpdateCompetitionEvent;
 import com.dp_ua.iksparser.dba.element.*;
@@ -15,11 +15,13 @@ import com.dp_ua.iksparser.dba.service.CoachService;
 import com.dp_ua.iksparser.dba.service.CompetitionService;
 import com.dp_ua.iksparser.exeption.ParsingException;
 import com.dp_ua.iksparser.service.JsonReader;
+import com.dp_ua.iksparser.service.PageableService;
 import com.dp_ua.iksparser.service.parser.MainParserService;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendChatAction;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -27,11 +29,8 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static com.dp_ua.iksparser.bot.Icon.*;
 import static com.dp_ua.iksparser.bot.event.SendMessageEvent.MsgType.CHAT_ACTION;
@@ -41,7 +40,6 @@ import static com.dp_ua.iksparser.service.MessageCreator.*;
 @Slf4j
 public class CompetitionFacadeImpl implements CompetitionFacade {
     public static final int COMPETITIONS_PAGE_SIZE = 3;
-    private static final int COMPETITION_BUTTON_LIMIT = 40;
     public static final int MAX_PARTICIPANTS_SIZE_TO_FIND = 5;
     private static final int MAX_CHUNK_SIZE = 4096;
 
@@ -67,15 +65,23 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
     HeatLineView heatLineView;
     @Autowired
     ParticipantView participantView;
+    @Autowired
+    PageableService pageableService;
+
 
     @Override
-    public void showCompetitions(String chatId, long pageNumber, Integer editMessageId) {
+    public void showCompetitions(String chatId, int pageNumber, Integer editMessageId) {
         log.info("showCompetitions. Page {}, chatId:{} ", pageNumber, chatId);
         sendTypingAction(chatId);
+        Page<CompetitionEntity> content = getCompetitionsPage(pageNumber);
+        publishEvent(getMessageForCompetitions(content, chatId, editMessageId));
+    }
 
-        List<CompetitionEntity> competitions = getCompetitions();
-
-        publishEvent(getMessageForCompetitions(competitions, chatId, editMessageId, pageNumber));
+    private Page<CompetitionEntity> getCompetitionsPage(int page) {
+        if (page < 0) {
+            return competitionService.getPagedCompetitionsClosetToDate(LocalDateTime.now(), COMPETITIONS_PAGE_SIZE);
+        }
+        return competitionService.getPagedCompetitions(page, COMPETITIONS_PAGE_SIZE);
     }
 
     @Override
@@ -495,7 +501,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
 
-        List<InlineKeyboardButton> row = getBackButton("/competitions");
+        List<InlineKeyboardButton> row = getBackButton("/" + CommandCompetitions.command);
         rows.add(row);
 
         keyboard.setKeyboard(rows);
@@ -506,7 +512,9 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
 
-        List<InlineKeyboardButton> row = getBackButton("/competition " + competitionId);
+        List<InlineKeyboardButton> row = getBackButton(
+                "/" + CommandCompetitions.command + " " + competitionId
+        );
         rows.add(row);
 
         keyboard.setKeyboard(rows);
@@ -583,149 +591,16 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
     }
 
     private SendMessageEvent getMessageForCompetitions(
-            List<CompetitionEntity> competitions, String chatId, Integer messageId, long page) {
+            Page<CompetitionEntity> content, String chatId, Integer messageId) {
 
-        if (page < 0) {
-            LocalDateTime now = LocalDateTime.now();
-            Map<Long, Integer> compareMap = new HashMap<>();
-            for (int i = 0; i < competitions.size(); i++) {
-                CompetitionEntity competition = competitions.get(i);
-                LocalDateTime competitionDate = LocalDateTime.parse(
-                        String.format("%s %s",
-                                competition.getBeginDate(), now.format(DateTimeFormatter.ofPattern("HH:mm:ss"))),
-                        DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"));
-                long hours = Math.abs(ChronoUnit.HOURS.between(now, competitionDate));
-                compareMap.put(hours, i);
-            }
-            int index = compareMap.get(Collections.min(compareMap.keySet()));
-            page = index / COMPETITIONS_PAGE_SIZE;
-        }
-        List<CompetitionEntity> pageList = getPage(competitions, page, COMPETITIONS_PAGE_SIZE);
-
-        int totalCompetitions = competitions.size();
-        String text = getText(pageList, page, totalCompetitions);
-        InlineKeyboardMarkup keyboard = getKeyboard(pageList, page, totalCompetitions);
+        String text = competitionView.getTextForCompetitionsPage(content);
+        InlineKeyboardMarkup keyboard = competitionView.getKeyboardForCompetitionsPage(content);
 
         return prepareSendMessageEvent(chatId, messageId, text, keyboard);
     }
 
-    private InlineKeyboardMarkup getKeyboard(List<CompetitionEntity> competitions, long page, int totalSize) {
-        InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
-        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
-
-        rows.add(getRowWithPages(page, totalSize));
-
-        List<InlineKeyboardButton> row = new ArrayList<>();
-        IntStream.range(0, competitions.size()).forEach(i -> {
-            CompetitionEntity competition = competitions.get(i);
-            int count = i + 1;
-            InlineKeyboardButton button = SERVICE.getKeyboardButton(
-                    getShortName(Icon.getIconForNumber(count).toString(), COMPETITION_BUTTON_LIMIT),
-                    "/competition " + competition.getId()
-            );
-            row.add(button);
-        });
-        rows.add(row);
-
-        keyboard.setKeyboard(rows);
-        return keyboard;
-    }
-
-    private List<InlineKeyboardButton> getRowWithPages(long page, int totalSize) {
-        List<InlineKeyboardButton> row = new ArrayList<>();
-
-        if (page > 0) {
-            InlineKeyboardButton leftPage = SERVICE.getKeyboardButton(
-                    PREVIOUS.toString(),
-                    "/competitions " + (page - 1)
-            );
-            row.add(leftPage);
-        }
-        if (page < getTotalPages(totalSize) - 1) {
-            InlineKeyboardButton rightPage = SERVICE.getKeyboardButton(
-                    NEXT.toString(),
-                    "/competitions " + (page + 1)
-            );
-            row.add(rightPage);
-        }
-        return row;
-    }
-
-    private static int getTotalPages(int totalSize) {
-        return (int) Math.ceil((double) totalSize / COMPETITIONS_PAGE_SIZE);
-    }
-
-
-    private String getText(List<CompetitionEntity> competitions, long page, int totalCompetitions) {
-        StringBuilder result = new StringBuilder();
-        result
-                .append(CHAMPIONSHIP)
-                .append(BOLD)
-                .append("Список змагань:")
-                .append(BOLD)
-                .append(END_LINE)
-                .append(END_LINE);
-
-        result.append(
-                IntStream.range(0, competitions.size())
-                        .mapToObj(i -> {
-                            int count = i + 1;
-                            StringBuilder sb = new StringBuilder();
-                            sb.append(BOLD).append(Icon.getIconForNumber(count)).append(" ").append(BOLD); // number
-                            CompetitionEntity competition = competitions.get(i);
-                            sb
-                                    .append(competitionView.info(competition))
-                                    .append(END_LINE);
-
-                            return sb.toString();
-                        })
-                        .reduce((s1, s2) -> s1 + END_LINE + s2)
-                        .orElse("Список пустий")
-        );
-
-        result.append(END_LINE).append(END_LINE);
-        result
-                .append(PAGE_WITH_CURL)
-                .append(" Сторінка ")
-                .append("(")
-                .append(BOLD)
-                .append(page + 1)
-                .append(BOLD)
-                .append(")")
-                .append(" з ")
-                .append(BOLD)
-                .append(getTotalPages(totalCompetitions))
-                .append(BOLD);
-
-        result
-                .append("     ")
-                .append(ITALIC)
-                .append("[оберіть змагання]")
-                .append(ITALIC);
-
-        return result.toString();
-    }
-
-    private String getShortName(String text, int limit) {
-        if (limit == 0) {
-            return text;
-        }
-        if (text.length() <= limit) {
-            return text;
-        }
-        return SERVICE.cleanMarkdown(text)
-                .substring(0, limit) +
-                "...";
-    }
-
-    private List<CompetitionEntity> getPage(List<CompetitionEntity> competitions, long pageNumber, int pageSize) {
-        long fromIndex = pageNumber * pageSize;
-        long toIndex = Math.min((pageNumber + 1) * pageSize, competitions.size());
-
-        if (fromIndex >= competitions.size() || fromIndex < 0 || toIndex < 0) {
-            throw new IllegalArgumentException("Invalid page parameters");
-        }
-        return competitions.subList((int) fromIndex, (int) toIndex);
+    private Page<CompetitionEntity> getPage(List<CompetitionEntity> competitions, long pageNumber, int pageSize) {
+        return pageableService.getPage((int) pageNumber, pageSize, competitions);
     }
 
     private List<CompetitionEntity> getCompetitions() {

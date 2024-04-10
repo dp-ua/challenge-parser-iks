@@ -42,7 +42,7 @@ public class CommandCompetitions extends BaseCommand {
     @Override
     protected void perform(Message message) {
         String chatId = message.getChatId();
-        long commandArgument = getCommandArgument(message.getMessageText());
+        int commandArgument = getCommandArgument(message.getMessageText());
         try {
             competitionFacade.showCompetitions(chatId, commandArgument, message.getEditMessageId());
         } catch (ParsingException e) {
