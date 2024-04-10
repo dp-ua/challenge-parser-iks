@@ -97,7 +97,7 @@ public class CompetitionView {
         return keyboard;
     }
 
-    private List<InlineKeyboardButton> getRowWithPages(Page page) {
+    private List<InlineKeyboardButton> getRowWithPages(Page<CompetitionEntity> page) {
         List<InlineKeyboardButton> row = new ArrayList<>();
 
         int number = page.getNumber();
