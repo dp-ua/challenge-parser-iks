@@ -1,10 +1,14 @@
 package com.dp_ua.iksparser.dba.service;
 
 import com.dp_ua.iksparser.dba.element.HeatEntity;
+import com.dp_ua.iksparser.dba.element.HeatLineEntity;
+import com.dp_ua.iksparser.dba.element.dto.HeatDto;
 import com.dp_ua.iksparser.dba.repo.HeatRepo;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 @Transactional
@@ -22,5 +26,20 @@ public class HeatService {
 
     public void delete(HeatEntity heat) {
         repo.delete(heat);
+    }
+
+    public HeatEntity findById(Long id) {
+        return repo.findById(id).orElse(null);
+    }
+
+    public HeatDto convertToDto(HeatEntity heat) {
+        HeatDto dto = new HeatDto();
+        dto.setName(heat.getName());
+        dto.setHeatLines(heat.getHeatLines().stream().map(HeatLineEntity::getId).toList());
+        return dto;
+    }
+
+    public List<HeatDto> convertToDtoList(List<HeatEntity> heats) {
+        return heats.stream().map(this::convertToDto).toList();
     }
 }
