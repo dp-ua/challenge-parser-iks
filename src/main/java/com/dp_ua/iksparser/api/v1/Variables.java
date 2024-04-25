@@ -5,4 +5,5 @@ public class Variables {
     public static final String DEFAULT_PAGE_SIZE = "20";
     public static final String COMPETITIONS_URI = "/competitions";
     public static final String DAY_URI = "/day";
+    public static final String EVENT_URI = "/event";
 }

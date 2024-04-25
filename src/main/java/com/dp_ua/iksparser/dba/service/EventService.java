@@ -27,11 +27,15 @@ public class EventService {
         return repo.findAll();
     }
 
+    public EventEntity findById(Long id) {
+        return repo.findById(id).orElse(null);
+    }
+
     public List<EventDto> convertToDtoList(List<EventEntity> events) {
         return events.stream().map(this::convertToDto).toList();
     }
 
-    private EventDto convertToDto(EventEntity eventEntity) {
+    public EventDto convertToDto(EventEntity eventEntity) {
         EventDto eventDto = new EventDto();
         eventDto.setTime(eventEntity.getTime());
         eventDto.setEventName(eventEntity.getEventName());
