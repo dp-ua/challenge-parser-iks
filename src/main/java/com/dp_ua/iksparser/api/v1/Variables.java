@@ -6,4 +6,5 @@ public class Variables {
     public static final String COMPETITIONS_URI = "/competitions";
     public static final String DAY_URI = "/day";
     public static final String EVENT_URI = "/event";
+    public static final String HEAT_URI = "/heat";
 }
