@@ -12,9 +12,12 @@ import java.util.List;
 @Component
 @Slf4j
 public class PageableService {
-    public <T> Page<T> getPage(int page, int size, List<T> content) {
+    public <T> Page<T> getPage(List<T> content, int page, int size) {
         Pageable pageRequest = createPageRequestUsing(page, size);
+        return getPage(content, pageRequest);
+    }
 
+    public <T> Page<T> getPage(List<T> content, Pageable pageRequest) {
         int start = (int) pageRequest.getOffset();
         int end = Math.min((start + pageRequest.getPageSize()), content.size());
 

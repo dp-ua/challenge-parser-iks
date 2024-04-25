@@ -100,7 +100,7 @@ public class CompetitionService {
                     )
                     .toList();
         }
-        Page<CompetitionEntity> result = pageableService.getPage(page, size, content);
+        Page<CompetitionEntity> result = pageableService.getPage(content, page, size);
         return result.map(this::convertToDto);
     }
 
@@ -121,12 +121,12 @@ public class CompetitionService {
     public Page<CompetitionEntity> getPagedCompetitionsClosetToDate(LocalDateTime date, int pageSize) {
         List<CompetitionEntity> content = findAllOrderByBeginDateDesc();
         int page = getPage(date, pageSize, content);
-        return pageableService.getPage(page, pageSize, content);
+        return pageableService.getPage(content, page, pageSize);
     }
 
     public Page<CompetitionEntity> getPagedCompetitions(int page, int pageSize) {
         List<CompetitionEntity> content = findAllOrderByBeginDateDesc();
-        return pageableService.getPage(page, pageSize, content);
+        return pageableService.getPage(content, page, pageSize);
     }
 
     private int getPage(LocalDateTime date, int pageSize, List<CompetitionEntity> content) {
