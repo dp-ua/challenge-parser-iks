@@ -2,6 +2,7 @@ package com.dp_ua.iksparser.dba.service;
 
 import com.dp_ua.iksparser.dba.element.ParticipantEntity;
 import com.dp_ua.iksparser.dba.repo.ParticipantRepo;
+import com.dp_ua.iksparser.service.PageableService;
 import com.dp_ua.iksparser.service.SqlPreprocessorService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,7 +44,7 @@ public class ParticipantServiceTest {
 
     @Test
     public void shouldFind_OneParticipant_OnlyName() {
-        List<ParticipantEntity> found = service.findBySurnameAndNameParts(List.of("Kolya"));
+        List<ParticipantEntity> found = service.findAllBySurnameAndNameParts(List.of("Kolya"));
         assertEquals(1, found.size());
         assertEquals("Kolya", found.get(0).getName());
         assertEquals("Targetov", found.get(0).getSurname());
@@ -51,7 +52,7 @@ public class ParticipantServiceTest {
 
     @Test
     public void shouldFind_OneParticipant_NameAndSurname() {
-        List<ParticipantEntity> found = service.findBySurnameAndNameParts(List.of("Kolya", "Targetov"));
+        List<ParticipantEntity> found = service.findAllBySurnameAndNameParts(List.of("Kolya", "Targetov"));
         assertEquals(1, found.size());
         assertEquals("Kolya", found.get(0).getName());
         assertEquals("Targetov", found.get(0).getSurname());
@@ -59,7 +60,7 @@ public class ParticipantServiceTest {
 
     @Test
     public void shouldFind_One_ByNameAndPartOfSurname() {
-        List<ParticipantEntity> found = service.findBySurnameAndNameParts(List.of("vasya", "target"));
+        List<ParticipantEntity> found = service.findAllBySurnameAndNameParts(List.of("vasya", "target"));
         assertEquals(1, found.size());
         assertEquals("Vasya", found.get(0).getName());
         assertEquals("Kotargetanov", found.get(0).getSurname());
@@ -67,13 +68,13 @@ public class ParticipantServiceTest {
 
     @Test
     public void shouldFind_TwoParticipant_ByName() {
-        List<ParticipantEntity> found = service.findBySurnameAndNameParts(List.of("Vasya"));
+        List<ParticipantEntity> found = service.findAllBySurnameAndNameParts(List.of("Vasya"));
         assertEquals(2, found.size());
     }
 
     @Test
     public void shouldFind_TwoParticipant_ByPartOfSurname() {
-        List<ParticipantEntity> found = service.findBySurnameAndNameParts(List.of("target"));
+        List<ParticipantEntity> found = service.findAllBySurnameAndNameParts(List.of("target"));
         assertEquals(2, found.size());
     }
 
@@ -87,6 +88,11 @@ public class ParticipantServiceTest {
         @Bean
         public ParticipantService participantService(ParticipantRepo participantRepo) {
             return new ParticipantService(participantRepo);
+        }
+
+        @Bean
+        public PageableService pageableService() {
+            return new PageableService();
         }
     }
 }

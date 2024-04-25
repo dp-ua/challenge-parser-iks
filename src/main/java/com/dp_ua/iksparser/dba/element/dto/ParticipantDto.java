@@ -5,20 +5,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-
-@Getter
 @Setter
+@Getter
 @EqualsAndHashCode
 @NoArgsConstructor
-public class CompetitionDto {
-    private long id;
-    private List<Long> days;
+public class ParticipantDto {
+    private String surname;
     private String name;
-    private String status;
-    private String beginDate;
-    private String endDate;
-    private String country;
-    private String city;
+    private String team;
+    private String region;
+    private String born;
     private String url;
 }

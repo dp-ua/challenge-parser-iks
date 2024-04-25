@@ -1,6 +1,8 @@
 package com.dp_ua.iksparser.dba.repo;
 
 import com.dp_ua.iksparser.dba.element.ParticipantEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -14,4 +16,6 @@ public interface ParticipantRepo extends CrudRepository<ParticipantEntity, Long>
 
     @Query("SELECT p FROM ParticipantEntity p WHERE lower(p.name) LIKE lower(concat('%', :word, '%')) OR lower(p.surname) LIKE lower(concat('%', :word,'%'))")
     List<ParticipantEntity> findByNameAndSurnameByPart(@Param("word") String word);
+
+    Page<ParticipantEntity> findAll(Pageable pageable);
 }
