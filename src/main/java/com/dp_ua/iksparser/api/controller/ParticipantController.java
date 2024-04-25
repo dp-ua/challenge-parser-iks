@@ -19,12 +19,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-import static com.dp_ua.iksparser.api.v1.Variables.API_V1;
+import static com.dp_ua.iksparser.api.v1.Variables.API_V1_URI;
 import static com.dp_ua.iksparser.api.v1.Variables.DEFAULT_PAGE_SIZE;
 
 @RestController
 @Slf4j
-@RequestMapping(API_V1)
+@RequestMapping(API_V1_URI)
 public class ParticipantController {
 
     private final ParticipantService service;

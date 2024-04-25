@@ -14,24 +14,19 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static com.dp_ua.iksparser.api.v1.Variables.API_V1;
-import static com.dp_ua.iksparser.api.v1.Variables.DEFAULT_PAGE_SIZE;
+import static com.dp_ua.iksparser.api.v1.Variables.*;
 
 @RestController
 @Slf4j
-@RequestMapping(API_V1)
+@RequestMapping(API_V1_URI)
 public class CompetitionController {
 
-    private final CompetitionService competitionService;
-
     @Autowired
-    public CompetitionController(CompetitionService competitionService) {
-        this.competitionService = competitionService;
-    }
+    private CompetitionService competitionService;
 
     @Operation(summary = "Get all competitions",
             description = "Get all competitions with pagination and search by name")
-    @GetMapping("/competitions")
+    @GetMapping(COMPETITIONS_URI)
     public Page<CompetitionDto> getAllCompetitions(
             HttpServletRequest request,
             @Schema(description = "Page number for results pagination", defaultValue = "0")
@@ -52,7 +47,7 @@ public class CompetitionController {
 
     @Operation(summary = "Get competition by id",
             description = "Get competition by id")
-    @GetMapping("/competitions/{id}")
+    @GetMapping(COMPETITIONS_URI + "/{id}")
     @Transactional
     public ResponseEntity<CompetitionDto> getCompetitionById(
             HttpServletRequest request,
