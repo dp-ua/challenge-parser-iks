@@ -5,6 +5,7 @@ import com.dp_ua.iksparser.dba.element.dto.ParticipantDto;
 import com.dp_ua.iksparser.dba.service.ParticipantService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ import static com.dp_ua.iksparser.api.v1.Variables.DEFAULT_PAGE_SIZE;
 @RestController
 @Slf4j
 @RequestMapping(API_V1_URI)
+@Tag(name = "Participant Management")
 public class ParticipantController {
 
     private final ParticipantService service;

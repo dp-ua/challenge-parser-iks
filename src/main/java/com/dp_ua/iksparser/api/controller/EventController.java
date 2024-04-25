@@ -5,6 +5,7 @@ import com.dp_ua.iksparser.dba.element.dto.EventDto;
 import com.dp_ua.iksparser.dba.service.EventService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,7 @@ import static com.dp_ua.iksparser.api.v1.Variables.EVENT_URI;
 @RestController
 @Slf4j
 @RequestMapping(API_V1_URI)
+@Tag(name = "Event Management")
 public class EventController {
     @Autowired
     private EventService eventService;
