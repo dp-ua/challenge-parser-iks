@@ -1,11 +1,15 @@
 package com.dp_ua.iksparser.dba.service;
 
 import com.dp_ua.iksparser.dba.element.ParticipantEntity;
+import com.dp_ua.iksparser.dba.element.dto.ParticipantDto;
 import com.dp_ua.iksparser.dba.repo.ParticipantRepo;
+import com.dp_ua.iksparser.service.PageableService;
 import com.dp_ua.iksparser.service.SqlPreprocessorService;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
@@ -21,6 +25,8 @@ public class ParticipantService {
     private final ParticipantRepo repo;
     @Autowired
     private SqlPreprocessorService sqlPreprocessorService;
+    @Autowired
+    PageableService pageableService;
 
     @Autowired
     public ParticipantService(ParticipantRepo repo) {
@@ -55,7 +61,12 @@ public class ParticipantService {
         return participants.get(0);
     }
 
-    public List<ParticipantEntity> findBySurnameAndNameParts(List<String> parts) {
+    public Page<ParticipantEntity> getBySurnameAndNameParts(List<String> parts, Pageable pageable) {
+        List<ParticipantEntity> content = findAllBySurnameAndNameParts(parts);
+        return pageableService.getPage(content, pageable);
+    }
+
+    public List<ParticipantEntity> findAllBySurnameAndNameParts(List<String> parts) {
         List<String> maskedLowerCaseParts = getMaskedLowerCaseParts(parts);
 
         Set<ParticipantEntity> result = new HashSet<>();
@@ -83,7 +94,7 @@ public class ParticipantService {
         return true;
     }
 
-    private static boolean isNotContainsInNameOrSurname(ParticipantEntity participant, String part) {
+    private boolean isNotContainsInNameOrSurname(ParticipantEntity participant, String part) {
         return !(participant.getName().toLowerCase().contains(part)
                 ||
                 participant.getSurname().toLowerCase().contains(part));
@@ -95,5 +106,21 @@ public class ParticipantService {
 
     public Iterable<ParticipantEntity> findAll() {
         return repo.findAll();
+    }
+
+    public Page<ParticipantDto> getAll(Pageable pageable) {
+        return repo.findAll(pageable)
+                .map(this::toDto);
+    }
+
+    public ParticipantDto toDto(ParticipantEntity participant) {
+        ParticipantDto dto = new ParticipantDto();
+        dto.setSurname(participant.getSurname());
+        dto.setName(participant.getName());
+        dto.setTeam(participant.getTeam());
+        dto.setRegion(participant.getRegion());
+        dto.setBorn(participant.getBorn());
+        dto.setUrl(participant.getUrl());
+        return dto;
     }
 }
