@@ -1,12 +1,16 @@
 package com.dp_ua.iksparser.dba.element.dto;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
 
 @Getter
 @Setter
+@EqualsAndHashCode
+@NoArgsConstructor
 public class CompetitionDto {
     private long id;
     private List<Long> days;
