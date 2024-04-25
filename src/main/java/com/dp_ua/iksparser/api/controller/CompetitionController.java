@@ -1,18 +1,18 @@
 package com.dp_ua.iksparser.api.controller;
 
 
+import com.dp_ua.iksparser.dba.element.CompetitionEntity;
 import com.dp_ua.iksparser.dba.element.dto.CompetitionDto;
 import com.dp_ua.iksparser.dba.service.CompetitionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import static com.dp_ua.iksparser.api.v1.Variables.API_V1;
 import static com.dp_ua.iksparser.api.v1.Variables.DEFAULT_PAGE_SIZE;
@@ -48,5 +48,27 @@ public class CompetitionController {
                 request.getHeader("User-Agent"));
 
         return competitionService.getAllCompetitions(text, page, size);
+    }
+
+    @Operation(summary = "Get competition by id",
+            description = "Get competition by id")
+    @GetMapping("/competitions/{id}")
+    @Transactional
+    public ResponseEntity<CompetitionDto> getCompetitionById(
+            HttpServletRequest request,
+            @Schema(description = "Competition id")
+            @PathVariable Long id) {
+
+        log.info("URI: {}, id: {} Request from IP: {}, User-Agent: {}",
+                request.getRequestURI(),
+                id,
+                request.getRemoteAddr(),
+                request.getHeader("User-Agent"));
+
+        CompetitionEntity competition = competitionService.findById(id);
+        if (competition == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(competitionService.convertToDto(competition));
     }
 }

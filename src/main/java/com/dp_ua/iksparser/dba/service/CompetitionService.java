@@ -90,6 +90,7 @@ public class CompetitionService {
         return getAllCompetitions(null, page, size);
     }
 
+    @Transactional
     public Page<CompetitionDto> getAllCompetitions(String text, int page, int size) {
         List<CompetitionEntity> content = findAllOrderByBeginDateDesc();
         if (text != null) {
@@ -104,7 +105,7 @@ public class CompetitionService {
         return result.map(this::convertToDto);
     }
 
-    private CompetitionDto convertToDto(CompetitionEntity competition) {
+    public CompetitionDto convertToDto(CompetitionEntity competition) {
         CompetitionDto dto = new CompetitionDto();
         dto.setId(competition.getId());
         dto.setDays(competition.getDays().stream().map(DayEntity::getId).toList());
