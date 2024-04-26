@@ -1,9 +1,8 @@
-package com.dp_ua.iksparser.dba.element;
+package com.dp_ua.iksparser.dba.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

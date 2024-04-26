@@ -1,6 +1,6 @@
 package com.dp_ua.iksparser.dba.service;
 
-import com.dp_ua.iksparser.dba.element.UpdateStatusEntity;
+import com.dp_ua.iksparser.dba.entity.UpdateStatusEntity;
 import com.dp_ua.iksparser.dba.repo.UpdateStatusRepo;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;

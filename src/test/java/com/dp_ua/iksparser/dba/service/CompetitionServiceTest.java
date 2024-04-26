@@ -1,7 +1,7 @@
 package com.dp_ua.iksparser.dba.service;
 
-import com.dp_ua.iksparser.dba.element.CompetitionEntity;
-import com.dp_ua.iksparser.dba.element.dto.CompetitionDto;
+import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
+import com.dp_ua.iksparser.dba.dto.CompetitionDto;
 import com.dp_ua.iksparser.dba.repo.CompetitionRepo;
 import com.dp_ua.iksparser.service.PageableService;
 import com.dp_ua.iksparser.service.SqlPreprocessorService;

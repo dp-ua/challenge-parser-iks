@@ -1,6 +1,6 @@
 package com.dp_ua.iksparser.api.controller;
 
-import com.dp_ua.iksparser.dba.element.dto.HeatLineDto;
+import com.dp_ua.iksparser.dba.dto.HeatLineDto;
 import com.dp_ua.iksparser.dba.service.HeatLineService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;

@@ -1,7 +1,7 @@
 package com.dp_ua.iksparser.dba.service;
 
-import com.dp_ua.iksparser.dba.element.ParticipantEntity;
-import com.dp_ua.iksparser.dba.element.SubscriberEntity;
+import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
+import com.dp_ua.iksparser.dba.entity.SubscriberEntity;
 import com.dp_ua.iksparser.dba.repo.SubscriberRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

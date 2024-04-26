@@ -1,6 +1,6 @@
 package com.dp_ua.iksparser.dba.repo;
 
-import com.dp_ua.iksparser.dba.element.CoachEntity;
+import com.dp_ua.iksparser.dba.entity.CoachEntity;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

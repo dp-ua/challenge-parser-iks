@@ -1,7 +1,7 @@
 package com.dp_ua.iksparser.dba.service;
 
-import com.dp_ua.iksparser.dba.element.ParticipantEntity;
-import com.dp_ua.iksparser.dba.element.dto.ParticipantDto;
+import com.dp_ua.iksparser.dba.dto.ParticipantDto;
+import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
 import com.dp_ua.iksparser.dba.repo.ParticipantRepo;
 import com.dp_ua.iksparser.service.PageableService;
 import com.dp_ua.iksparser.service.SqlPreprocessorService;
@@ -12,10 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -61,13 +58,15 @@ public class ParticipantService {
         return participants.get(0);
     }
 
-    public Page<ParticipantEntity> getBySurnameAndNameParts(List<String> parts, Pageable pageable) {
+    public Page<ParticipantEntity> findAllBySurnameAndNameParts(List<String> parts, Pageable pageable) {
         List<ParticipantEntity> content = findAllBySurnameAndNameParts(parts);
+        content.sort(Comparator.comparing(ParticipantEntity::getSurname).thenComparing(ParticipantEntity::getName));
         return pageableService.getPage(content, pageable);
     }
 
-    public List<ParticipantEntity> findAllBySurnameAndNameParts(List<String> parts) {
+    protected List<ParticipantEntity> findAllBySurnameAndNameParts(List<String> parts) {
         List<String> maskedLowerCaseParts = getMaskedLowerCaseParts(parts);
+        log.debug("Masked parts: {}", maskedLowerCaseParts);
 
         Set<ParticipantEntity> result = new HashSet<>();
         for (String part : maskedLowerCaseParts) {
@@ -75,11 +74,14 @@ public class ParticipantService {
         }
         return result.stream()
                 .filter(participant -> containsParts(participant, maskedLowerCaseParts))
-                .toList();
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     private List<String> getMaskedLowerCaseParts(List<String> parts) {
         return List.copyOf(parts.stream()
+                .map(part -> part.split(" "))
+                .flatMap(Arrays::stream)
+                .filter(part -> !part.isBlank())
                 .map(String::toLowerCase)
                 .map(sqlPreprocessorService::escapeSpecialCharacters)
                 .collect(Collectors.toSet()));
@@ -110,11 +112,12 @@ public class ParticipantService {
 
     public Page<ParticipantDto> getAll(Pageable pageable) {
         return repo.findAll(pageable)
-                .map(this::toDto);
+                .map(this::convertToDto);
     }
 
-    public ParticipantDto toDto(ParticipantEntity participant) {
+    public ParticipantDto convertToDto(ParticipantEntity participant) {
         ParticipantDto dto = new ParticipantDto();
+        dto.setId(participant.getId());
         dto.setSurname(participant.getSurname());
         dto.setName(participant.getName());
         dto.setTeam(participant.getTeam());

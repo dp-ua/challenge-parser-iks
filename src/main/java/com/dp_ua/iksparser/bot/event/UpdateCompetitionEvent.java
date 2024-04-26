@@ -1,6 +1,6 @@
 package com.dp_ua.iksparser.bot.event;
 
-import com.dp_ua.iksparser.dba.element.UpdateStatusEntity;
+import com.dp_ua.iksparser.dba.entity.UpdateStatusEntity;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 

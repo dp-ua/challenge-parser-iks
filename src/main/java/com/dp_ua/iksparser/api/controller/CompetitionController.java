@@ -1,8 +1,8 @@
 package com.dp_ua.iksparser.api.controller;
 
 
-import com.dp_ua.iksparser.dba.element.CompetitionEntity;
-import com.dp_ua.iksparser.dba.element.dto.CompetitionDto;
+import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
+import com.dp_ua.iksparser.dba.dto.CompetitionDto;
 import com.dp_ua.iksparser.dba.service.CompetitionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;

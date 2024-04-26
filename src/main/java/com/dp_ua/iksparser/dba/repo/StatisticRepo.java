@@ -1,6 +1,6 @@
 package com.dp_ua.iksparser.dba.repo;
 
-import com.dp_ua.iksparser.dba.element.StatisticEntity;
+import com.dp_ua.iksparser.dba.entity.StatisticEntity;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;

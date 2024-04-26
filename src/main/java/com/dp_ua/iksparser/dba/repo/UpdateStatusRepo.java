@@ -1,6 +1,6 @@
 package com.dp_ua.iksparser.dba.repo;
 
-import com.dp_ua.iksparser.dba.element.UpdateStatusEntity;
+import com.dp_ua.iksparser.dba.entity.UpdateStatusEntity;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

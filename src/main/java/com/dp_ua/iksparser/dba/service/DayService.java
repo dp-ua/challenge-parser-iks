@@ -1,7 +1,7 @@
 package com.dp_ua.iksparser.dba.service;
 
-import com.dp_ua.iksparser.dba.element.DayEntity;
-import com.dp_ua.iksparser.dba.element.dto.DayDto;
+import com.dp_ua.iksparser.dba.entity.DayEntity;
+import com.dp_ua.iksparser.dba.dto.DayDto;
 import com.dp_ua.iksparser.dba.repo.DayRepo;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;

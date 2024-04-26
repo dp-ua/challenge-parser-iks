@@ -1,7 +1,7 @@
 package com.dp_ua.iksparser.service.parser;
 
-import com.dp_ua.iksparser.dba.element.DayEntity;
-import com.dp_ua.iksparser.dba.element.EventEntity;
+import com.dp_ua.iksparser.dba.entity.DayEntity;
+import com.dp_ua.iksparser.dba.entity.EventEntity;
 import com.dp_ua.iksparser.exeption.ParsingException;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Document;

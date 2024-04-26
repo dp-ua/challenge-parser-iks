@@ -1,0 +1,84 @@
+@startuml
+title Data structure
+left footer Created by: Pavlo Reshetylo
+hide empty members
+
+class Competition {
+# Long id
+- String name
+- String status
+- String beginDate
+- String endDate
+- String country
+- String city
+- String url
+- List<Day> days
+}
+
+class Day{
+# Long id
+- String date
+- String dateId
+- String dayName
+- String dayNameEn
+- Competition competition
+- List<Event> events
+}
+class Event{
+# Long id
+- String time
+- String eventName
+- String category
+- String round
+- String startListUrl
+- String resultUrl
+- List<Heat> heats
+- Day day
+}
+
+class Heat{
+# Long id
+- String name
+- List<HeatLine> heatLines
+- Event event
+}
+
+class HeatLine{
+# Long id
+- String lane
+- String bib
+- Participant participant
+- List<Coach> coaches
+- Heat heat
+}
+class Participant{
+# Long id
+- String surname
+- String name
+- String team
+- String region
+- String born
+- String url
+- List<HeatLine> heatLines
+}
+class Coach{
+# Long id
+- String name
+- List<HeatLine> heatLines
+}
+top to bottom direction
+Competition::days --> Day
+Day::competition -up.> Competition
+Day::events -> Event::id
+Event::heats -> Heat::id
+Event::day .> Day
+Heat::heatLines -> HeatLine::id
+Heat::event .> Event
+HeatLine::heat ..> Heat
+Participant::heatLines ..> HeatLine
+Coach::heatLines .> HeatLine
+HeatLine::participant --> Participant::id
+HeatLine::coaches -> Coach::id
+
+
+@enduml

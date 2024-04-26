@@ -1,4 +1,4 @@
-package com.dp_ua.iksparser.dba.element.dto;
+package com.dp_ua.iksparser.dba.dto;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -10,6 +10,7 @@ import lombok.Setter;
 @EqualsAndHashCode
 @NoArgsConstructor
 public class ParticipantDto {
+    private long id;
     private String surname;
     private String name;
     private String team;

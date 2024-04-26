@@ -1,4 +1,4 @@
-package com.dp_ua.iksparser.dba.element.dto;
+package com.dp_ua.iksparser.dba.dto;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -12,6 +12,7 @@ import java.util.List;
 @EqualsAndHashCode
 @NoArgsConstructor
 public class EventDto {
+    private Long id;
     private String time;
     private String eventName;
     private String category;

@@ -10,7 +10,7 @@ import com.dp_ua.iksparser.bot.command.impl.*;
 import com.dp_ua.iksparser.bot.command.impl.competition.CommandCompetitions;
 import com.dp_ua.iksparser.bot.event.SendMessageEvent;
 import com.dp_ua.iksparser.bot.event.UpdateCompetitionEvent;
-import com.dp_ua.iksparser.dba.element.*;
+import com.dp_ua.iksparser.dba.entity.*;
 import com.dp_ua.iksparser.dba.service.CoachService;
 import com.dp_ua.iksparser.dba.service.CompetitionService;
 import com.dp_ua.iksparser.exeption.ParsingException;

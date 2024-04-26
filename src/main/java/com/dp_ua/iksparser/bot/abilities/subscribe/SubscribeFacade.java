@@ -1,7 +1,7 @@
 package com.dp_ua.iksparser.bot.abilities.subscribe;
 
-import com.dp_ua.iksparser.dba.element.HeatLineEntity;
-import com.dp_ua.iksparser.dba.element.ParticipantEntity;
+import com.dp_ua.iksparser.dba.entity.HeatLineEntity;
+import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
 
 import java.util.List;
 

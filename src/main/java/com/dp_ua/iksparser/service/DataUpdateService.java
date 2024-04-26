@@ -6,7 +6,7 @@ import com.dp_ua.iksparser.bot.event.GetMessageEvent;
 import com.dp_ua.iksparser.bot.event.SubscribeEvent;
 import com.dp_ua.iksparser.bot.event.UpdateCompetitionEvent;
 import com.dp_ua.iksparser.bot.message.SelfMessage;
-import com.dp_ua.iksparser.dba.element.*;
+import com.dp_ua.iksparser.dba.entity.*;
 import com.dp_ua.iksparser.dba.service.*;
 import com.dp_ua.iksparser.exeption.ParsingException;
 import com.dp_ua.iksparser.service.parser.CompetitionPageParser;
@@ -27,7 +27,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.dp_ua.iksparser.dba.element.CompetitionStatus.*;
+import static com.dp_ua.iksparser.dba.entity.CompetitionStatus.*;
 import static com.dp_ua.iksparser.service.DataUpdateService.UpdateStatus.*;
 
 

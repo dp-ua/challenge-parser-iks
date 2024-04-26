@@ -1,7 +1,7 @@
 package com.dp_ua.iksparser.api.controller;
 
-import com.dp_ua.iksparser.dba.element.DayEntity;
-import com.dp_ua.iksparser.dba.element.dto.DayDto;
+import com.dp_ua.iksparser.dba.entity.DayEntity;
+import com.dp_ua.iksparser.dba.dto.DayDto;
 import com.dp_ua.iksparser.dba.service.DayService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;

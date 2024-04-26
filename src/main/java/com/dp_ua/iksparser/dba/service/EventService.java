@@ -1,7 +1,7 @@
 package com.dp_ua.iksparser.dba.service;
 
-import com.dp_ua.iksparser.dba.element.EventEntity;
-import com.dp_ua.iksparser.dba.element.dto.EventDto;
+import com.dp_ua.iksparser.dba.entity.EventEntity;
+import com.dp_ua.iksparser.dba.dto.EventDto;
 import com.dp_ua.iksparser.dba.repo.EventRepo;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +37,7 @@ public class EventService {
 
     public EventDto convertToDto(EventEntity eventEntity) {
         EventDto eventDto = new EventDto();
+        eventDto.setId(eventEntity.getId());
         eventDto.setTime(eventEntity.getTime());
         eventDto.setEventName(eventEntity.getEventName());
         eventDto.setCategory(eventEntity.getCategory());
