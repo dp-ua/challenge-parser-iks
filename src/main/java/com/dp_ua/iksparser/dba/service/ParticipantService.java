@@ -110,10 +110,10 @@ public class ParticipantService {
 
     public Page<ParticipantDto> getAll(Pageable pageable) {
         return repo.findAll(pageable)
-                .map(this::toDto);
+                .map(this::convertToDto);
     }
 
-    public ParticipantDto toDto(ParticipantEntity participant) {
+    public ParticipantDto convertToDto(ParticipantEntity participant) {
         ParticipantDto dto = new ParticipantDto();
         dto.setSurname(participant.getSurname());
         dto.setName(participant.getName());

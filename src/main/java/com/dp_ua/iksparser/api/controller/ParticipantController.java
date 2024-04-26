@@ -13,10 +13,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -29,11 +27,11 @@ import static com.dp_ua.iksparser.api.v1.Variables.DEFAULT_PAGE_SIZE;
 @Tag(name = "Participant Management")
 public class ParticipantController {
 
-    private final ParticipantService service;
+    private final ParticipantService participantService;
 
     @Autowired
     public ParticipantController(ParticipantService service) {
-        this.service = service;
+        this.participantService = service;
     }
 
     @Operation(summary = "Get all participants",
@@ -54,6 +52,47 @@ public class ParticipantController {
                 request.getHeader("User-Agent"));
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("surname", "name"));
-        return service.getAll(pageable);
+        return participantService.getAll(pageable);
+    }
+
+    @Operation(summary = "Get participant by ID",
+            description = "Get participant by ID")
+    @GetMapping("/participants/{id}")
+    public ResponseEntity<ParticipantDto> getParticipantById(
+            HttpServletRequest request,
+            @Schema(description = "Participant ID")
+            @RequestParam Long id) {
+
+        log.info("URI: {}, id: {} Request from IP: {}, User-Agent: {}",
+                request.getRequestURI(),
+                id,
+                request.getRemoteAddr(),
+                request.getHeader("User-Agent"));
+
+        return participantService.findById(id)
+                .map(p -> participantService.convertToDto(p))
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @Operation(summary = "Get participants by list ids",
+            description = "Get participants by list ids")
+    @PostMapping("/participants/list")
+    public ResponseEntity<List<ParticipantDto>> getParticipantsByIds(
+            HttpServletRequest request,
+            @RequestBody List<Long> ids) {
+
+        log.info("URI: {}, ids: {} Request from IP: {}, User-Agent: {}",
+                request.getRequestURI(),
+                ids,
+                request.getRemoteAddr(),
+                request.getHeader("User-Agent"));
+
+        List<ParticipantDto> participants = ids.stream()
+                .map(participantService::findById)
+                .filter(p -> p.isPresent())
+                .map(p -> participantService.convertToDto(p.get()))
+                .toList();
+        return ResponseEntity.ok(participants);
     }
 }
