@@ -65,16 +65,22 @@ public class ParticipantService {
     }
 
     protected List<ParticipantEntity> findAllBySurnameAndNameParts(List<String> parts) {
-        List<String> maskedLowerCaseParts = getMaskedLowerCaseParts(parts);
-        log.debug("Masked parts: {}", maskedLowerCaseParts);
-
         Set<ParticipantEntity> result = new HashSet<>();
-        for (String part : maskedLowerCaseParts) {
-            result.addAll(repo.findByNameAndSurnameByPart(part));
+
+        if (parts==null || parts.isEmpty()) {
+            repo.findAll().forEach(result::add);
+            return new ArrayList<>(result);
+        } else {
+            List<String> maskedLowerCaseParts = getMaskedLowerCaseParts(parts);
+            log.info("Masked parts: {}", maskedLowerCaseParts);
+
+            for (String part : maskedLowerCaseParts) {
+                result.addAll(repo.findByNameAndSurnameByPart(part));
+            }
+            return result.stream()
+                    .filter(participant -> containsParts(participant, maskedLowerCaseParts))
+                    .collect(Collectors.toCollection(ArrayList::new));
         }
-        return result.stream()
-                .filter(participant -> containsParts(participant, maskedLowerCaseParts))
-                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     private List<String> getMaskedLowerCaseParts(List<String> parts) {
