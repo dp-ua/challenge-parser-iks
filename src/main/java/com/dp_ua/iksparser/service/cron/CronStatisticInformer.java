@@ -1,7 +1,7 @@
 package com.dp_ua.iksparser.service.cron;
 
 import com.dp_ua.iksparser.bot.controller.BotController;
-import com.dp_ua.iksparser.dba.element.StatisticEntity;
+import com.dp_ua.iksparser.dba.entity.StatisticEntity;
 import com.dp_ua.iksparser.dba.service.StatisticService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

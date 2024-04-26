@@ -1,6 +1,6 @@
 package com.dp_ua.iksparser.dba.service;
 
-import com.dp_ua.iksparser.dba.element.StatisticEntity;
+import com.dp_ua.iksparser.dba.entity.StatisticEntity;
 import com.dp_ua.iksparser.dba.repo.StatisticRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

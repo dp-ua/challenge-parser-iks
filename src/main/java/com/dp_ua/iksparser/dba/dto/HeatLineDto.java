@@ -1,6 +1,6 @@
-package com.dp_ua.iksparser.dba.element.dto;
+package com.dp_ua.iksparser.dba.dto;
 
-import com.dp_ua.iksparser.dba.element.ParticipantEntity;
+import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

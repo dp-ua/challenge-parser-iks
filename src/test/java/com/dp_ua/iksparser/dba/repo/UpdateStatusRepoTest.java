@@ -1,7 +1,7 @@
 package com.dp_ua.iksparser.dba.repo;
 
 import com.dp_ua.iksparser.App;
-import com.dp_ua.iksparser.dba.element.UpdateStatusEntity;
+import com.dp_ua.iksparser.dba.entity.UpdateStatusEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;

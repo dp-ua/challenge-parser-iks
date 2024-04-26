@@ -2,10 +2,10 @@ package com.dp_ua.iksparser.bot.abilities.subscribe;
 
 import com.dp_ua.iksparser.bot.abilities.infoview.SubscriptionView;
 import com.dp_ua.iksparser.bot.event.SendMessageEvent;
-import com.dp_ua.iksparser.dba.element.CompetitionEntity;
-import com.dp_ua.iksparser.dba.element.HeatLineEntity;
-import com.dp_ua.iksparser.dba.element.ParticipantEntity;
-import com.dp_ua.iksparser.dba.element.SubscriberEntity;
+import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
+import com.dp_ua.iksparser.dba.entity.HeatLineEntity;
+import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
+import com.dp_ua.iksparser.dba.entity.SubscriberEntity;
 import com.dp_ua.iksparser.dba.service.SubscriberService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

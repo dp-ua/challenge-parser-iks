@@ -2,7 +2,7 @@ package com.dp_ua.iksparser.bot.abilities.participant;
 
 import com.dp_ua.iksparser.bot.abilities.infoview.ParticipantView;
 import com.dp_ua.iksparser.bot.abilities.subscribe.SubscribeFacade;
-import com.dp_ua.iksparser.dba.element.ParticipantEntity;
+import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
 import com.dp_ua.iksparser.dba.service.ParticipantService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

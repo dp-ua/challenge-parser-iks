@@ -1,4 +1,4 @@
-package com.dp_ua.iksparser.dba.element.dto;
+package com.dp_ua.iksparser.dba.dto;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

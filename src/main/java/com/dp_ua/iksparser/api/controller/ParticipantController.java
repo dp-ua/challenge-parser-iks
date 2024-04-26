@@ -1,7 +1,7 @@
 package com.dp_ua.iksparser.api.controller;
 
 
-import com.dp_ua.iksparser.dba.element.dto.ParticipantDto;
+import com.dp_ua.iksparser.dba.dto.ParticipantDto;
 import com.dp_ua.iksparser.dba.service.ParticipantService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;

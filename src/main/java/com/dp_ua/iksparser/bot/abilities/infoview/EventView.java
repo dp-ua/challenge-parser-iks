@@ -1,7 +1,7 @@
 package com.dp_ua.iksparser.bot.abilities.infoview;
 
-import com.dp_ua.iksparser.dba.element.DayEntity;
-import com.dp_ua.iksparser.dba.element.EventEntity;
+import com.dp_ua.iksparser.dba.entity.DayEntity;
+import com.dp_ua.iksparser.dba.entity.EventEntity;
 import org.springframework.stereotype.Component;
 
 import static com.dp_ua.iksparser.bot.Icon.RESULT;

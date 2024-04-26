@@ -3,9 +3,9 @@ package com.dp_ua.iksparser.service.cron;
 import com.dp_ua.iksparser.SpringApp;
 import com.dp_ua.iksparser.bot.abilities.competition.CompetitionFacade;
 import com.dp_ua.iksparser.bot.event.UpdateCompetitionEvent;
-import com.dp_ua.iksparser.dba.element.CompetitionEntity;
-import com.dp_ua.iksparser.dba.element.EventEntity;
-import com.dp_ua.iksparser.dba.element.UpdateStatusEntity;
+import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
+import com.dp_ua.iksparser.dba.entity.EventEntity;
+import com.dp_ua.iksparser.dba.entity.UpdateStatusEntity;
 import com.dp_ua.iksparser.dba.service.CompetitionService;
 import com.dp_ua.iksparser.dba.service.EventService;
 import com.dp_ua.iksparser.exeption.ParsingException;
@@ -24,8 +24,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.dp_ua.iksparser.dba.element.CompetitionStatus.C_CANCELED;
-import static com.dp_ua.iksparser.dba.element.CompetitionStatus.C_FINISHED;
+import static com.dp_ua.iksparser.dba.entity.CompetitionStatus.C_CANCELED;
+import static com.dp_ua.iksparser.dba.entity.CompetitionStatus.C_FINISHED;
 
 @Component
 @Slf4j

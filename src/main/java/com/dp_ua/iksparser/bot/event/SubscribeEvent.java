@@ -1,7 +1,7 @@
 package com.dp_ua.iksparser.bot.event;
 
-import com.dp_ua.iksparser.dba.element.HeatLineEntity;
-import com.dp_ua.iksparser.dba.element.ParticipantEntity;
+import com.dp_ua.iksparser.dba.entity.HeatLineEntity;
+import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 

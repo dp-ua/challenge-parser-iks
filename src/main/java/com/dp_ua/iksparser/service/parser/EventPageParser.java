@@ -1,9 +1,9 @@
 package com.dp_ua.iksparser.service.parser;
 
-import com.dp_ua.iksparser.dba.element.CoachEntity;
-import com.dp_ua.iksparser.dba.element.HeatEntity;
-import com.dp_ua.iksparser.dba.element.HeatLineEntity;
-import com.dp_ua.iksparser.dba.element.ParticipantEntity;
+import com.dp_ua.iksparser.dba.entity.CoachEntity;
+import com.dp_ua.iksparser.dba.entity.HeatEntity;
+import com.dp_ua.iksparser.dba.entity.HeatLineEntity;
+import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
 import com.dp_ua.iksparser.dba.service.CoachService;
 import com.dp_ua.iksparser.dba.service.HeatLineService;
 import com.dp_ua.iksparser.dba.service.HeatService;

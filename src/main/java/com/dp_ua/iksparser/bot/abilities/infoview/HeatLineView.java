@@ -1,7 +1,7 @@
 package com.dp_ua.iksparser.bot.abilities.infoview;
 
-import com.dp_ua.iksparser.dba.element.HeatEntity;
-import com.dp_ua.iksparser.dba.element.HeatLineEntity;
+import com.dp_ua.iksparser.dba.entity.HeatEntity;
+import com.dp_ua.iksparser.dba.entity.HeatLineEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

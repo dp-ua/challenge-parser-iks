@@ -2,7 +2,7 @@ package com.dp_ua.iksparser.dba;
 
 import com.dp_ua.iksparser.App;
 import com.dp_ua.iksparser.bot.command.CommandProvider;
-import com.dp_ua.iksparser.dba.element.*;
+import com.dp_ua.iksparser.dba.entity.*;
 import com.dp_ua.iksparser.dba.service.*;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;

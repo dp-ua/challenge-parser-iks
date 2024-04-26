@@ -1,7 +1,7 @@
 package com.dp_ua.iksparser.dba.service;
 
-import com.dp_ua.iksparser.dba.element.EventEntity;
-import com.dp_ua.iksparser.dba.element.dto.EventDto;
+import com.dp_ua.iksparser.dba.entity.EventEntity;
+import com.dp_ua.iksparser.dba.dto.EventDto;
 import com.dp_ua.iksparser.dba.repo.EventRepo;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;

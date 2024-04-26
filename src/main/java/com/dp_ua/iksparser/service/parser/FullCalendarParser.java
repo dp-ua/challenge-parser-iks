@@ -1,6 +1,6 @@
 package com.dp_ua.iksparser.service.parser;
 
-import com.dp_ua.iksparser.dba.element.CompetitionEntity;
+import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
 import com.dp_ua.iksparser.exeption.ParsingException;
 import com.dp_ua.iksparser.service.Downloader;
 import lombok.extern.slf4j.Slf4j;

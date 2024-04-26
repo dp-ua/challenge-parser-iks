@@ -1,7 +1,7 @@
 package com.dp_ua.iksparser.dba.service;
 
-import com.dp_ua.iksparser.dba.element.ParticipantEntity;
-import com.dp_ua.iksparser.dba.element.dto.ParticipantDto;
+import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
+import com.dp_ua.iksparser.dba.dto.ParticipantDto;
 import com.dp_ua.iksparser.dba.repo.ParticipantRepo;
 import com.dp_ua.iksparser.service.PageableService;
 import com.dp_ua.iksparser.service.SqlPreprocessorService;

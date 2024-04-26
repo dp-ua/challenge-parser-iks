@@ -1,7 +1,7 @@
 package com.dp_ua.iksparser.dba.service;
 
-import com.dp_ua.iksparser.dba.element.HeatLineEntity;
-import com.dp_ua.iksparser.dba.element.dto.HeatLineDto;
+import com.dp_ua.iksparser.dba.entity.HeatLineEntity;
+import com.dp_ua.iksparser.dba.dto.HeatLineDto;
 import com.dp_ua.iksparser.dba.repo.HeatLineRepo;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;

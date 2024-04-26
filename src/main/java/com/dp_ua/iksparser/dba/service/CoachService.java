@@ -1,6 +1,6 @@
 package com.dp_ua.iksparser.dba.service;
 
-import com.dp_ua.iksparser.dba.element.CoachEntity;
+import com.dp_ua.iksparser.dba.entity.CoachEntity;
 import com.dp_ua.iksparser.dba.repo.CoachRepo;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;

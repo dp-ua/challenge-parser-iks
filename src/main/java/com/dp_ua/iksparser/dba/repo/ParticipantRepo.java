@@ -1,6 +1,6 @@
 package com.dp_ua.iksparser.dba.repo;
 
-import com.dp_ua.iksparser.dba.element.ParticipantEntity;
+import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;

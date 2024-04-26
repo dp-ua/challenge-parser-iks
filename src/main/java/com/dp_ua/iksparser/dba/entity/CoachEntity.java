@@ -1,4 +1,4 @@
-package com.dp_ua.iksparser.dba.element;
+package com.dp_ua.iksparser.dba.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToMany;

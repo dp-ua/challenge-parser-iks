@@ -2,7 +2,7 @@ package com.dp_ua.iksparser.bot.abilities.infoview;
 
 import com.dp_ua.iksparser.bot.Icon;
 import com.dp_ua.iksparser.bot.command.impl.CommandParticipants;
-import com.dp_ua.iksparser.dba.element.ParticipantEntity;
+import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
