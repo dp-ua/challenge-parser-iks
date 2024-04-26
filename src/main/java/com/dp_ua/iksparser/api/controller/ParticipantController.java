@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,7 +34,7 @@ public class ParticipantController {
     }
 
     @Operation(summary = "Get all participants",
-            description = "Get all participants with pagination. Ordered by Surname and Name")
+            description = "Get all participants with pagination. Filtred by name parts. Ordered by [Surname,Name")
     @GetMapping("/participants")
     public Page<ParticipantDto> getAllParticipants(
             HttpServletRequest request,
@@ -51,8 +50,9 @@ public class ParticipantController {
                 request.getRemoteAddr(),
                 request.getHeader("User-Agent"));
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by("surname", "name"));
-        return participantService.getAll(pageable);
+        Pageable pageable = PageRequest.of(page, size);
+        return participantService.getBySurnameAndNameParts(nameParts, pageable)
+                .map(participantService::convertToDto);
     }
 
     @Operation(summary = "Get participant by ID",

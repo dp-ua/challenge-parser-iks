@@ -12,10 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -63,11 +60,13 @@ public class ParticipantService {
 
     public Page<ParticipantEntity> getBySurnameAndNameParts(List<String> parts, Pageable pageable) {
         List<ParticipantEntity> content = findAllBySurnameAndNameParts(parts);
+        content.sort(Comparator.comparing(ParticipantEntity::getSurname).thenComparing(ParticipantEntity::getName));
         return pageableService.getPage(content, pageable);
     }
 
     public List<ParticipantEntity> findAllBySurnameAndNameParts(List<String> parts) {
         List<String> maskedLowerCaseParts = getMaskedLowerCaseParts(parts);
+        log.debug("Masked parts: {}", maskedLowerCaseParts);
 
         Set<ParticipantEntity> result = new HashSet<>();
         for (String part : maskedLowerCaseParts) {
@@ -75,11 +74,14 @@ public class ParticipantService {
         }
         return result.stream()
                 .filter(participant -> containsParts(participant, maskedLowerCaseParts))
-                .toList();
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     private List<String> getMaskedLowerCaseParts(List<String> parts) {
         return List.copyOf(parts.stream()
+                .map(part -> part.split(" "))
+                .flatMap(Arrays::stream)
+                .filter(part -> !part.isBlank())
                 .map(String::toLowerCase)
                 .map(sqlPreprocessorService::escapeSpecialCharacters)
                 .collect(Collectors.toSet()));
