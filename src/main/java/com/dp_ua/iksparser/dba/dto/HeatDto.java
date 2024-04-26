@@ -12,6 +12,7 @@ import java.util.List;
 @EqualsAndHashCode
 @NoArgsConstructor
 public class HeatDto {
+    private long id;
     private String name;
     private List<Long> heatLines;
 }

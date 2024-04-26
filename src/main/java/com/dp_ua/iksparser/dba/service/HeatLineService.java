@@ -31,6 +31,7 @@ public class HeatLineService {
 
     public HeatLineDto convertToDto(HeatLineEntity heatLineEntity) {
         HeatLineDto dto = new HeatLineDto();
+        dto.setId(heatLineEntity.getId());
         dto.setLane(heatLineEntity.getLane());
         dto.setBib(heatLineEntity.getBib());
         dto.setParticipant(heatLineEntity.getParticipant());

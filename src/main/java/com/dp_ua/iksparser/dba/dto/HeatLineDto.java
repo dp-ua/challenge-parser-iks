@@ -13,6 +13,7 @@ import java.util.List;
 @EqualsAndHashCode
 @NoArgsConstructor
 public class HeatLineDto {
+    private long id;
     private String lane;
     private String bib;
     private ParticipantEntity participant;

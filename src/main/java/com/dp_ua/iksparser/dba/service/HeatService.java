@@ -34,6 +34,7 @@ public class HeatService {
 
     public HeatDto convertToDto(HeatEntity heat) {
         HeatDto dto = new HeatDto();
+        dto.setId(heat.getId());
         dto.setName(heat.getName());
         dto.setHeatLines(heat.getHeatLines().stream().map(HeatLineEntity::getId).toList());
         return dto;

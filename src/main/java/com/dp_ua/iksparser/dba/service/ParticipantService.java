@@ -115,6 +115,7 @@ public class ParticipantService {
 
     public ParticipantDto convertToDto(ParticipantEntity participant) {
         ParticipantDto dto = new ParticipantDto();
+        dto.setId(participant.getId());
         dto.setSurname(participant.getSurname());
         dto.setName(participant.getName());
         dto.setTeam(participant.getTeam());

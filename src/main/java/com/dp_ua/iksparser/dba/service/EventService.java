@@ -37,6 +37,7 @@ public class EventService {
 
     public EventDto convertToDto(EventEntity eventEntity) {
         EventDto eventDto = new EventDto();
+        eventDto.setId(eventEntity.getId());
         eventDto.setTime(eventEntity.getTime());
         eventDto.setEventName(eventEntity.getEventName());
         eventDto.setCategory(eventEntity.getCategory());

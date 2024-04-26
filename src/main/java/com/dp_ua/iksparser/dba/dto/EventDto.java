@@ -12,6 +12,7 @@ import java.util.List;
 @EqualsAndHashCode
 @NoArgsConstructor
 public class EventDto {
+    private Long id;
     private String time;
     private String eventName;
     private String category;
