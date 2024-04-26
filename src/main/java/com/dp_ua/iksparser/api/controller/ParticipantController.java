@@ -51,7 +51,7 @@ public class ParticipantController {
                 request.getHeader("User-Agent"));
 
         Pageable pageable = PageRequest.of(page, size);
-        return participantService.getBySurnameAndNameParts(nameParts, pageable)
+        return participantService.findAllBySurnameAndNameParts(nameParts, pageable)
                 .map(participantService::convertToDto);
     }
 

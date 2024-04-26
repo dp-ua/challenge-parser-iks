@@ -1,7 +1,7 @@
 package com.dp_ua.iksparser.dba.service;
 
-import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
 import com.dp_ua.iksparser.dba.dto.ParticipantDto;
+import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
 import com.dp_ua.iksparser.dba.repo.ParticipantRepo;
 import com.dp_ua.iksparser.service.PageableService;
 import com.dp_ua.iksparser.service.SqlPreprocessorService;
@@ -58,13 +58,13 @@ public class ParticipantService {
         return participants.get(0);
     }
 
-    public Page<ParticipantEntity> getBySurnameAndNameParts(List<String> parts, Pageable pageable) {
+    public Page<ParticipantEntity> findAllBySurnameAndNameParts(List<String> parts, Pageable pageable) {
         List<ParticipantEntity> content = findAllBySurnameAndNameParts(parts);
         content.sort(Comparator.comparing(ParticipantEntity::getSurname).thenComparing(ParticipantEntity::getName));
         return pageableService.getPage(content, pageable);
     }
 
-    public List<ParticipantEntity> findAllBySurnameAndNameParts(List<String> parts) {
+    protected List<ParticipantEntity> findAllBySurnameAndNameParts(List<String> parts) {
         List<String> maskedLowerCaseParts = getMaskedLowerCaseParts(parts);
         log.debug("Masked parts: {}", maskedLowerCaseParts);
 
