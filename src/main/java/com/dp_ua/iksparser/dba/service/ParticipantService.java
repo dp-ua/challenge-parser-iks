@@ -1,6 +1,7 @@
 package com.dp_ua.iksparser.dba.service;
 
 import com.dp_ua.iksparser.dba.dto.ParticipantDto;
+import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
 import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
 import com.dp_ua.iksparser.dba.repo.ParticipantRepo;
 import com.dp_ua.iksparser.service.PageableService;
@@ -135,4 +136,6 @@ public class ParticipantService {
         dto.setUrl(participant.getUrl());
         return dto;
     }
+
+
 }

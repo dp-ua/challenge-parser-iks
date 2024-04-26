@@ -1,12 +1,16 @@
 package com.dp_ua.iksparser.api.controller;
 
 
+import com.dp_ua.iksparser.bot.abilities.competition.CompetitionFacade;
+import com.dp_ua.iksparser.dba.dto.CompetitionDto;
 import com.dp_ua.iksparser.dba.dto.ParticipantDto;
+import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
 import com.dp_ua.iksparser.dba.service.ParticipantService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -16,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.dp_ua.iksparser.api.v1.Variables.API_V1_URI;
 import static com.dp_ua.iksparser.api.v1.Variables.DEFAULT_PAGE_SIZE;
@@ -27,6 +32,8 @@ import static com.dp_ua.iksparser.api.v1.Variables.DEFAULT_PAGE_SIZE;
 public class ParticipantController {
 
     private final ParticipantService participantService;
+    @Autowired
+    CompetitionFacade competitionFacade;
 
     @Autowired
     public ParticipantController(ParticipantService service) {
@@ -94,5 +101,29 @@ public class ParticipantController {
                 .map(p -> participantService.convertToDto(p.get()))
                 .toList();
         return ResponseEntity.ok(participants);
+    }
+
+    @Operation(summary = "Get competitions for participant",
+            description = "Get competitions for participant")
+    @GetMapping("/participants/{id}/competitions")
+    @Transactional
+    public ResponseEntity<CompetitionDto> getCompetitionsForParticipant(
+            HttpServletRequest request,
+            @Schema(description = "Participant ID")
+            @RequestParam Long id) {
+
+        log.info("URI: {}, id: {} Request from IP: {}, User-Agent: {}",
+                request.getRequestURI(),
+                id,
+                request.getRemoteAddr(),
+                request.getHeader("User-Agent"));
+
+        Optional<ParticipantEntity> participant = participantService.findById(id);
+        if (participant.isPresent()) {
+            List<CompetitionDto> competitions = competitionFacade.getCompetitionsForParticipant(participant.get());
+            return ResponseEntity.ok(competitions.get(0));
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

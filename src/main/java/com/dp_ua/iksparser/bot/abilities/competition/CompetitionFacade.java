@@ -1,6 +1,10 @@
 package com.dp_ua.iksparser.bot.abilities.competition;
 
+import com.dp_ua.iksparser.dba.dto.CompetitionDto;
+import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
 import com.dp_ua.iksparser.exeption.ParsingException;
+
+import java.util.List;
 
 public interface CompetitionFacade {
     void showCompetitions(String chatId, int page, Integer editMessageId) throws ParsingException;
@@ -20,4 +24,6 @@ public interface CompetitionFacade {
     void updateCompetitionsList(int year) throws ParsingException;
 
     String getInfoAboutCompetitions();
+
+    List<CompetitionDto> getCompetitionsForParticipant(ParticipantEntity participant);
 }

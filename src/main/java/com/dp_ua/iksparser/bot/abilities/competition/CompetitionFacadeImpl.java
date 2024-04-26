@@ -10,6 +10,7 @@ import com.dp_ua.iksparser.bot.command.impl.*;
 import com.dp_ua.iksparser.bot.command.impl.competition.CommandCompetitions;
 import com.dp_ua.iksparser.bot.event.SendMessageEvent;
 import com.dp_ua.iksparser.bot.event.UpdateCompetitionEvent;
+import com.dp_ua.iksparser.dba.dto.CompetitionDto;
 import com.dp_ua.iksparser.dba.entity.*;
 import com.dp_ua.iksparser.dba.service.CoachService;
 import com.dp_ua.iksparser.dba.service.CompetitionService;
@@ -616,5 +617,14 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         }).distinct().sorted().map(String::valueOf).toList();
 
         return competitionView.getCompetitionsInfo(competitions, years);
+    }
+
+    @Override
+    public List<CompetitionDto> getCompetitionsForParticipant(ParticipantEntity participant) {
+        return participant.getHeatLines().stream()
+                .map(heatLine -> heatLine.getHeat().getEvent().getDay().getCompetition())
+                .distinct()
+                .map(c -> competitionService.convertToDto(c))
+                .collect(Collectors.toList());
     }
 }
