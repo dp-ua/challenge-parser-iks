@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+import java.text.Collator;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -60,7 +61,9 @@ public class ParticipantService {
 
     public Page<ParticipantEntity> findAllBySurnameAndNameParts(List<String> parts, Pageable pageable) {
         List<ParticipantEntity> content = findAllBySurnameAndNameParts(parts);
-        content.sort(Comparator.comparing(ParticipantEntity::getSurname).thenComparing(ParticipantEntity::getName));
+        Collator collator = Collator.getInstance(new Locale("uk", "UA"));
+
+        content.sort(Comparator.comparing(ParticipantEntity::getSurname,collator).thenComparing(ParticipantEntity::getName,collator));
         return pageableService.getPage(content, pageable);
     }
 
