@@ -22,7 +22,7 @@ public class CorsFilterTest {
         mockMvc.perform(get("/test")
                         .header("Origin", "http://localhost")) // Mocking request with origin header
                 .andExpect(status().isOk())
-                .andExpect(header().string("Access-Control-Allow-Methods", "GET"))
+                .andExpect(header().string("Access-Control-Allow-Methods", "GET, POST"))
                 .andExpect(header().string("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With"));
     }
 }
