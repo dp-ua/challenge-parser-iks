@@ -1,7 +1,7 @@
 package com.dp_ua.iksparser.dba.service;
 
-import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
 import com.dp_ua.iksparser.dba.dto.CompetitionDto;
+import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
 import com.dp_ua.iksparser.dba.repo.CompetitionRepo;
 import com.dp_ua.iksparser.service.PageableService;
 import com.dp_ua.iksparser.service.SqlPreprocessorService;
@@ -33,27 +33,27 @@ public class CompetitionServiceTest {
 
     @Test
     public void shouldLoadCompetition_FirstPage_Limit2() {
-        Page<CompetitionDto> allCompetitions = service.getAllCompetitions(0, 2);
+        Page<CompetitionDto> allCompetitions = service.getCompetitions(null, null, 0, 2);
         assertEquals(2, allCompetitions.getContent().size());
     }
 
     @Test
     public void shouldLoadCompetition_SecondPage_Limit3() {
-        Page<CompetitionDto> allCompetitions = service.getAllCompetitions(1, 3);
+        Page<CompetitionDto> allCompetitions = service.getCompetitions(null, null, 1, 3);
         assertEquals(1, allCompetitions.getContent().size());
         assertEquals("Test competition alfa", allCompetitions.getContent().get(0).getName());
     }
 
     @Test
     public void shouldLoadCompetition_OnlyOne_TextInput() {
-        Page<CompetitionDto> allCompetitions = service.getAllCompetitions("alfa", 0, 4);
+        Page<CompetitionDto> allCompetitions = service.getCompetitions("alfa", null, 0, 4);
         assertEquals(1, allCompetitions.getContent().size());
         assertEquals("Test competition alfa", allCompetitions.getContent().get(0).getName());
     }
 
     @Test
     public void shouldLoadCompetitions_Matched_All() {
-        Page<CompetitionDto> allCompetitions = service.getAllCompetitions("Test", 0, 4);
+        Page<CompetitionDto> allCompetitions = service.getCompetitions("Test", null, 0, 4);
         List<CompetitionDto> content = allCompetitions.getContent();
         assertEquals(4, content.size());
         assertEquals("Test competition delta", content.get(0).getName());
@@ -64,7 +64,14 @@ public class CompetitionServiceTest {
 
     @Test
     public void shouldLoadCompetition_OnlyOne_TextInput_IgnoreCase() {
-        Page<CompetitionDto> allCompetitions = service.getAllCompetitions("Alfa", 0, 4);
+        Page<CompetitionDto> allCompetitions = service.getCompetitions("Alfa", null, 0, 4);
+        assertEquals(1, allCompetitions.getContent().size());
+        assertEquals("Test competition alfa", allCompetitions.getContent().get(0).getName());
+    }
+
+    @Test
+    public void shouldLoadCompetition_OnlyOne_TextInputTwoWorlds_IgnoreCase() {
+        Page<CompetitionDto> allCompetitions = service.getCompetitions("Alfa test", null, 0, 4);
         assertEquals(1, allCompetitions.getContent().size());
         assertEquals("Test competition alfa", allCompetitions.getContent().get(0).getName());
     }

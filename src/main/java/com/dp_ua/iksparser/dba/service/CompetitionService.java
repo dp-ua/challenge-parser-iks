@@ -1,8 +1,9 @@
 package com.dp_ua.iksparser.dba.service;
 
-import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
-import com.dp_ua.iksparser.dba.entity.DayEntity;
 import com.dp_ua.iksparser.dba.dto.CompetitionDto;
+import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
+import com.dp_ua.iksparser.dba.entity.CompetitionStatus;
+import com.dp_ua.iksparser.dba.entity.DayEntity;
 import com.dp_ua.iksparser.dba.repo.CompetitionRepo;
 import com.dp_ua.iksparser.service.PageableService;
 import com.dp_ua.iksparser.service.SqlPreprocessorService;
@@ -86,21 +87,50 @@ public class CompetitionService {
         return repo.count();
     }
 
-    public Page<CompetitionDto> getAllCompetitions(int page, int size) {
-        return getAllCompetitions(null, page, size);
+    @Transactional
+    public Page<CompetitionDto> getCompetitions(String text, String status, int page, int size) {
+        List<CompetitionEntity> content = findAllOrderByBeginDateDesc();
+        if (status != null && !status.isEmpty()) {
+            content = getCompetitionFilteredByStatus(status, content);
+        }
+        if (text != null) {
+            content = getCompetitionsFilteredByText(text, content);
+        }
+        return getCompetitionDtos(content, page, size);
     }
 
-    @Transactional
-    public Page<CompetitionDto> getAllCompetitions(String text, int page, int size) {
-        List<CompetitionEntity> content = findAllOrderByBeginDateDesc();
-        if (text != null) {
-            String escapedText = sqlPreprocessorService.escapeSpecialCharacters(text).trim().toLowerCase();
-            content = content.stream().filter(
-                            competition ->
-                                    competition.getName().toLowerCase().contains(escapedText)
-                    )
-                    .toList();
-        }
+    private List<CompetitionEntity> getCompetitionFilteredByStatus(String status, List<CompetitionEntity> content) {
+        List<String> filter = getParts(sqlPreprocessorService.escapeSpecialCharacters(status).toLowerCase());
+
+        content = content.stream().filter(
+                        competition ->
+                                filter.stream().anyMatch(
+                                        part ->
+                                                competition.getStatus().toLowerCase().contains(part)
+                                )
+                )
+                .toList();
+        return content;
+    }
+
+    private List<CompetitionEntity> getCompetitionsFilteredByText(String text, List<CompetitionEntity> content) {
+        List<String> parts = getParts(sqlPreprocessorService.escapeSpecialCharacters(text).toLowerCase());
+        content = content.stream().filter(
+                        competition ->
+                                parts.stream().allMatch(
+                                        part ->
+                                                competition.getName().toLowerCase().contains(part)
+                                )
+                )
+                .toList();
+        return content;
+    }
+
+    private List<String> getParts(String text) {
+        return Arrays.asList(text.split(" "));
+    }
+
+    private Page<CompetitionDto> getCompetitionDtos(List<CompetitionEntity> content, int page, int size) {
         Page<CompetitionEntity> result = pageableService.getPage(content, page, size);
         return result.map(this::convertToDto);
     }
@@ -146,5 +176,9 @@ public class CompetitionService {
         int index = compareMap.get(Collections.min(compareMap.keySet()));
         page = index / pageSize;
         return page;
+    }
+
+    public List<String> getAllStatuses() {
+        return Arrays.asList(CompetitionStatus.values()).stream().map(CompetitionStatus::getName).toList();
     }
 }
