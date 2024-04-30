@@ -63,4 +63,21 @@ public class CoachController {
         return ResponseEntity.ok(coachService.getCoachesDtoList(ids));
     }
 
+    @Operation(summary = "Get coach by name",
+            description = "Get coach by name")
+    @GetMapping(COACH_URI + "/name/{name}")
+    @Transactional
+    public ResponseEntity<List<CoachDto>> getCoachByName(
+            HttpServletRequest request,
+            @Schema(description = "Coach name(or part) to search by. Case insensitive.")
+            @PathVariable String name) {
+
+        log.info("URI: {}, name: {} Request from IP: {}, User-Agent: {}",
+                request.getRequestURI(),
+                name,
+                request.getRemoteAddr(),
+                request.getHeader("User-Agent"));
+
+        return ResponseEntity.ok(coachService.getByNamePartialMatch(name));
+    }
 }

@@ -3,6 +3,7 @@ package com.dp_ua.iksparser.dba.service;
 import com.dp_ua.iksparser.dba.dto.CoachDto;
 import com.dp_ua.iksparser.dba.entity.CoachEntity;
 import com.dp_ua.iksparser.dba.repo.CoachRepo;
+import com.dp_ua.iksparser.service.SqlPreprocessorService;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,9 @@ public class CoachService {
     public CoachService(CoachRepo repo) {
         this.repo = repo;
     }
+
+    @Autowired
+    private SqlPreprocessorService sqlPreprocessorService;
 
     @Transactional
     public CoachEntity save(CoachEntity coach) {
@@ -64,5 +68,13 @@ public class CoachService {
         coachDto.setId(coach.getId());
         coachDto.setName(coach.getName());
         return coachDto;
+    }
+
+
+    public List<CoachDto> getByNamePartialMatch(String name) {
+        String namePart = sqlPreprocessorService.escapeSpecialCharacters(name);
+        return searchByNamePartialMatch(namePart).stream()
+                .map(this::convertToDto)
+                .toList();
     }
 }
