@@ -22,8 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
-import static com.dp_ua.iksparser.api.v1.Variables.API_V1_URI;
-import static com.dp_ua.iksparser.api.v1.Variables.DEFAULT_PAGE_SIZE;
+import static com.dp_ua.iksparser.api.v1.Variables.*;
 
 @RestController
 @Slf4j
@@ -42,7 +41,7 @@ public class ParticipantController {
 
     @Operation(summary = "Get all participants",
             description = "Get all participants with pagination. Filtred by name parts. Ordered by [Surname,Name")
-    @GetMapping("/participants")
+    @GetMapping(PARTICIPANT_URI)
     public Page<ParticipantDto> getAllParticipants(
             HttpServletRequest request,
             @Schema(description = "Page number for results pagination", defaultValue = "0")
@@ -64,7 +63,7 @@ public class ParticipantController {
 
     @Operation(summary = "Get participant by ID",
             description = "Get participant by ID")
-    @GetMapping("/participants/{id}")
+    @GetMapping(PARTICIPANT_URI + "/{id}")
     public ResponseEntity<ParticipantDto> getParticipantById(
             HttpServletRequest request,
             @Schema(description = "Participant ID")
@@ -84,7 +83,7 @@ public class ParticipantController {
 
     @Operation(summary = "Get participants by list ids",
             description = "Get participants by list ids")
-    @PostMapping("/participants/list")
+    @PostMapping(PARTICIPANT_URI + "/list")
     public ResponseEntity<List<ParticipantDto>> getParticipantsByIds(
             HttpServletRequest request,
             @RequestBody List<Long> ids) {
@@ -105,7 +104,7 @@ public class ParticipantController {
 
     @Operation(summary = "Get competitions for participant",
             description = "Get competitions for participant")
-    @GetMapping("/participants/{id}/competitions")
+    @GetMapping("PARTICIPANT_URI+ /{id}/competitions")
     @Transactional
     public ResponseEntity<CompetitionDto> getCompetitionsForParticipant(
             HttpServletRequest request,
