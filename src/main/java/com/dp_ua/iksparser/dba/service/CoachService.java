@@ -1,7 +1,9 @@
 package com.dp_ua.iksparser.dba.service;
 
+import com.dp_ua.iksparser.dba.dto.CoachDto;
 import com.dp_ua.iksparser.dba.entity.CoachEntity;
 import com.dp_ua.iksparser.dba.repo.CoachRepo;
+import com.dp_ua.iksparser.service.SqlPreprocessorService;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,9 @@ public class CoachService {
     public CoachService(CoachRepo repo) {
         this.repo = repo;
     }
+
+    @Autowired
+    private SqlPreprocessorService sqlPreprocessorService;
 
     @Transactional
     public CoachEntity save(CoachEntity coach) {
@@ -38,5 +43,38 @@ public class CoachService {
 
     public List<CoachEntity> searchByNamePartialMatch(String partialName) {
         return repo.findByNameContainingIgnoreCase(partialName);
+    }
+
+    public CoachEntity findById(Long id) {
+        return repo.findById(id).orElse(null);
+    }
+
+    public CoachDto getCoachDto(Long id) {
+        return convertToDto(findById(id));
+    }
+
+    public List<CoachDto> getCoachesDtoList(List<Long> ids) {
+        return ids.stream()
+                .map(this::getCoachDto)
+                .filter(coachDto -> coachDto != null)
+                .toList();
+    }
+
+    public CoachDto convertToDto(CoachEntity coach) {
+        if (coach == null) {
+            return null;
+        }
+        CoachDto coachDto = new CoachDto();
+        coachDto.setId(coach.getId());
+        coachDto.setName(coach.getName());
+        return coachDto;
+    }
+
+
+    public List<CoachDto> getByNamePartialMatch(String name) {
+        String namePart = sqlPreprocessorService.escapeSpecialCharacters(name);
+        return searchByNamePartialMatch(namePart).stream()
+                .map(this::convertToDto)
+                .toList();
     }
 }
