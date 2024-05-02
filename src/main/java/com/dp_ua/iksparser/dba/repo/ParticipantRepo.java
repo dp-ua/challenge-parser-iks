@@ -19,6 +19,6 @@ public interface ParticipantRepo extends CrudRepository<ParticipantEntity, Long>
 
     Page<ParticipantEntity> findAll(Pageable pageable);
 
-    @Query("SELECT p FROM ParticipantEntity p GROUP BY p.surname, p.name, p.born HAVING COUNT(p) > 1")
+    @Query("SELECT p FROM ParticipantEntity p WHERE (p.surname, p.name, p.born) IN (SELECT p.surname, p.name, p.born FROM ParticipantEntity p GROUP BY p.surname, p.name, p.born HAVING COUNT(p) > 1)")
     List<ParticipantEntity> findDuplicates();
 }
