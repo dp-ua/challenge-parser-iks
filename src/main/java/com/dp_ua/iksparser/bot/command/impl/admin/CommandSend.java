@@ -1,4 +1,4 @@
-package com.dp_ua.iksparser.bot.command.impl;
+package com.dp_ua.iksparser.bot.command.impl.admin;
 
 import com.dp_ua.iksparser.bot.command.AdminAccessCommand;
 import com.dp_ua.iksparser.bot.controller.BotController;

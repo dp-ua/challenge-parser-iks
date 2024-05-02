@@ -72,7 +72,7 @@ public class CronCompetitionUpdater implements ApplicationListener<ContextRefres
                 .filter(EventEntity::isNotFilled)
                 .forEach(event -> needToUpdateCompetitionIds.add(event.getDay().getCompetition()));
         needToUpdateCompetitionIds.forEach(competition -> {
-            log.info("Need to update competition with id: {}", competition.getId());
+            log.info("[CNFE] Need to update competition with id: {} begin date: {}", competition.getId(), competition.getBeginDate());
             runEventToUpdateCompetition(competition);
         });
     }
@@ -85,7 +85,7 @@ public class CronCompetitionUpdater implements ApplicationListener<ContextRefres
         competitions.stream()
                 .filter(CompetitionEntity::isNeedToUpdate)
                 .forEach(competition -> {
-                    log.info("Need to update competition with id: {}", competition.getId());
+                    log.info("[UACD] Need to update competition with id: {}, begin date: {}", competition.getId(), competition.getBeginDate());
                     runEventToUpdateCompetition(competition);
                 });
     }
@@ -104,7 +104,7 @@ public class CronCompetitionUpdater implements ApplicationListener<ContextRefres
                     return !LocalDate.parse(competition.getBeginDate(), CompetitionService.FORMATTER).isAfter(now.plusWeeks(1));
                 })
                 .forEach(competition -> {
-                    log.info("Need to update competition with id: {}, begin date: {}", competition.getId(), competition.getBeginDate());
+                    log.info("[UCCD]Need to update competition with id: {}, begin date: {}", competition.getId(), competition.getBeginDate());
                     runEventToUpdateCompetition(competition);
                 });
     }
