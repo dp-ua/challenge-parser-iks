@@ -135,4 +135,8 @@ public class ParticipantService {
     public List<ParticipantEntity> findDuplicates() {
         return repo.findDuplicates();
     }
+
+    public void delete(ParticipantEntity p) {
+        repo.delete(p);
+    }
 }
