@@ -57,7 +57,7 @@ public class CompetitionEntity extends DomainElement {
     }
 
     public boolean isFilled() {
-        return getDays().isEmpty();
+        return !getDays().isEmpty();
     }
 
     public boolean isURLEmpty() {
