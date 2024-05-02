@@ -1,4 +1,4 @@
-package com.dp_ua.iksparser.bot.command.impl.competition;
+package com.dp_ua.iksparser.bot.command.impl.admin;
 
 import com.dp_ua.iksparser.bot.abilities.competition.CompetitionFacade;
 import com.dp_ua.iksparser.bot.command.AdminAccessCommand;
