@@ -12,7 +12,7 @@ import java.util.List;
 
 @Repository
 public interface ParticipantRepo extends CrudRepository<ParticipantEntity, Long> {
-    List<ParticipantEntity> findAllBySurnameAndNameAndTeamAndRegionAndBorn(String surname, String name, String team, String region, String born);
+    List<ParticipantEntity> findAllBySurnameAndNameAndBorn(String surname, String name, String born);
 
     @Query("SELECT p FROM ParticipantEntity p WHERE lower(p.name) LIKE lower(concat('%', :word, '%')) OR lower(p.surname) LIKE lower(concat('%', :word,'%'))")
     List<ParticipantEntity> findByNameAndSurnameByPart(@Param("word") String word);
