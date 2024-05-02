@@ -74,6 +74,8 @@ public class ParticipantsFacadeImpl implements ParticipantFacade {
         log.info("Found " + duplicates.size() + " duplicates");
         bot.sendMessageToAdmin("Found " + duplicates.size() + " duplicates");
         operateDuplicates(duplicates);
+        bot.sendMessageToAdmin("All duplicates processed");
+
     }
 
     @Autowired
