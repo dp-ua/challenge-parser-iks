@@ -48,7 +48,7 @@ public class EventEntity extends DomainElement {
     }
 
     public boolean isNotFilled() {
-        return startListUrl.isEmpty() || resultUrl.isEmpty();
+        return startListUrl.isEmpty() && resultUrl.isEmpty();
     }
 
     @Override
