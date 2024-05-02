@@ -18,4 +18,7 @@ public interface ParticipantRepo extends CrudRepository<ParticipantEntity, Long>
     List<ParticipantEntity> findByNameAndSurnameByPart(@Param("word") String word);
 
     Page<ParticipantEntity> findAll(Pageable pageable);
+
+    @Query("SELECT p FROM ParticipantEntity p GROUP BY p.surname, p.name, p.born HAVING COUNT(p) > 1")
+    List<ParticipantEntity> findDuplicates();
 }

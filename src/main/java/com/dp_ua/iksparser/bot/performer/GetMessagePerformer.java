@@ -3,9 +3,9 @@ package com.dp_ua.iksparser.bot.performer;
 import com.dp_ua.iksparser.bot.abilities.StateService;
 import com.dp_ua.iksparser.bot.command.CommandInterface;
 import com.dp_ua.iksparser.bot.command.TextCommandDetectorService;
+import com.dp_ua.iksparser.bot.event.GetMessageEvent;
 import com.dp_ua.iksparser.bot.message.Message;
 import com.dp_ua.iksparser.bot.message.SelfMessage;
-import com.dp_ua.iksparser.bot.event.GetMessageEvent;
 import com.dp_ua.iksparser.exeption.NotForMeException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ public class GetMessagePerformer implements ApplicationListener<GetMessageEvent>
         log.info("GetMessageEvent: {}", message);
         try {
             List<CommandInterface> commands = commandDetector.getParsedCommands(message.getMessageText());
-            log.info("commands: {}", commands);
+            log.info("commands: {}", commands.stream().map(o -> o.getClass().getSimpleName()).toList());
             if (commands.isEmpty()) {
                 String state = stateService.getState(message.getChatId());
                 if (state != null) {

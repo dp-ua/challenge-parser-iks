@@ -8,4 +8,6 @@ public interface ParticipantFacade {
     String getInfoAboutParticipants();
 
     void showParticipants(String chatId, long commandArgument, Integer editMessageId);
+
+    void operateDuplicates();
 }

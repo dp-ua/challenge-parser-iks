@@ -2,12 +2,14 @@ package com.dp_ua.iksparser.bot.abilities.participant;
 
 import com.dp_ua.iksparser.bot.abilities.infoview.ParticipantView;
 import com.dp_ua.iksparser.bot.abilities.subscribe.SubscribeFacade;
+import com.dp_ua.iksparser.bot.controller.BotController;
 import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
 import com.dp_ua.iksparser.dba.service.ParticipantService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -51,5 +53,16 @@ public class ParticipantsFacadeImpl implements ParticipantFacade {
     public void showParticipants(String chatId, long commandArgument, Integer editMessageId) {
         log.info("SHOW PARTICIPANTS chatId: {}, commandArgument: {}", chatId, commandArgument);
         throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+
+    @Autowired
+    BotController bot;
+
+    @Override
+    public void operateDuplicates() {
+        List<ParticipantEntity> duplicates = participantService.findDuplicates();
+        log.info("Found " + duplicates.size() + " duplicates");
+        bot.sendMessageToAdmin("Found " + duplicates.size() + " duplicates");
     }
 }
