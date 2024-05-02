@@ -120,7 +120,7 @@ public class ParticipantsFacadeImpl implements ParticipantFacade {
                     .map(p -> subscribeService.findAllByParticipant(p))
                     .flatMap(List::stream)
                     .map(s -> s.getChatId())
-                    .collect(Set::of, Set::add, Set::addAll);
+                    .collect(Collectors.toSet());
 
 
             // get url from one person
