@@ -1,7 +1,6 @@
 package com.dp_ua.iksparser.dba.service;
 
 import com.dp_ua.iksparser.dba.dto.ParticipantDto;
-import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
 import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
 import com.dp_ua.iksparser.dba.repo.ParticipantRepo;
 import com.dp_ua.iksparser.service.PageableService;
@@ -60,14 +59,14 @@ public class ParticipantService {
         List<ParticipantEntity> content = findAllBySurnameAndNameParts(parts);
         Collator collator = Collator.getInstance(new Locale("uk", "UA"));
 
-        content.sort(Comparator.comparing(ParticipantEntity::getSurname,collator).thenComparing(ParticipantEntity::getName,collator));
+        content.sort(Comparator.comparing(ParticipantEntity::getSurname, collator).thenComparing(ParticipantEntity::getName, collator));
         return pageableService.getPage(content, pageable);
     }
 
     protected List<ParticipantEntity> findAllBySurnameAndNameParts(List<String> parts) {
         Set<ParticipantEntity> result = new HashSet<>();
 
-        if (parts==null || parts.isEmpty()) {
+        if (parts == null || parts.isEmpty()) {
             repo.findAll().forEach(result::add);
             return new ArrayList<>(result);
         } else {
@@ -133,5 +132,7 @@ public class ParticipantService {
         return dto;
     }
 
-
+    public List<ParticipantEntity> findDuplicates() {
+        return repo.findDuplicates();
+    }
 }
