@@ -145,6 +145,7 @@ public class CompetitionView {
 
     public String notFilledInfo() {
         String sb = WARNING +
+                END_LINE +
                 " Детальна інформація про змагання відсутня " +
                 WARNING +
                 END_LINE;
