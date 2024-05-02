@@ -9,9 +9,11 @@ import com.dp_ua.iksparser.bot.abilities.subscribe.SubscribeFacade;
 import com.dp_ua.iksparser.bot.command.impl.*;
 import com.dp_ua.iksparser.bot.command.impl.competition.CommandCompetitions;
 import com.dp_ua.iksparser.bot.event.SendMessageEvent;
-import com.dp_ua.iksparser.bot.event.UpdateCompetitionEvent;
 import com.dp_ua.iksparser.dba.dto.CompetitionDto;
-import com.dp_ua.iksparser.dba.entity.*;
+import com.dp_ua.iksparser.dba.entity.CoachEntity;
+import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
+import com.dp_ua.iksparser.dba.entity.HeatLineEntity;
+import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
 import com.dp_ua.iksparser.dba.service.CoachService;
 import com.dp_ua.iksparser.dba.service.CompetitionService;
 import com.dp_ua.iksparser.exeption.ParsingException;
@@ -106,8 +108,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                     .append(END_LINE);
         } else {
             sb
-                    .append(competitionView.notFilledInfo())
-                    .append(updatingMessageText());
+                    .append(competitionView.notFilledInfo());
         }
         InlineKeyboardMarkup keyboard = getCompetitionDetailsKeyboard(competition, competitionFilled);
 
@@ -117,10 +118,6 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                 sb.toString(),
                 keyboard
         ));
-        if (!competitionFilled) {
-            log.info("Competition[{}] is not filled. Going to update", competition.getId());
-            publishUpdateCompetitionMessage(chatId, editMessageId, competition);
-        }
     }
 
     @Override
@@ -484,16 +481,6 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         return sb;
     }
 
-    private void publishUpdateCompetitionMessage(String chatId, Integer editMessageId, CompetitionEntity competition) {
-        // todo move to separate class
-        UpdateStatusEntity message = new UpdateStatusEntity();
-        message.setChatId(chatId);
-        message.setCompetitionId(competition.getId());
-        message.setEditMessageId(editMessageId);
-        UpdateCompetitionEvent updateCompetitionEvent = new UpdateCompetitionEvent(this, message);
-        publisher.publishEvent(updateCompetitionEvent);
-    }
-
     private InlineKeyboardMarkup getBackToCompetitionsKeyboard() {
         InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
@@ -566,20 +553,6 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         row.add(button);
         return row;
     }
-
-    private StringBuilder updatingMessageText() {
-        StringBuilder sb = new StringBuilder();
-        sb
-                .append(END_LINE)
-                .append(INFO)
-                .append(" Оновлюю дані. Це може зайняти деякий час ")
-                .append(INFO)
-                .append(END_LINE)
-                .append(END_LINE)
-                .append("Вам прийде повідомлення, якщо дані вже доступні");
-        return sb;
-    }
-
 
     private void sendTypingAction(String chatId) {
         log.info("sendTyping for chat: " + chatId);
