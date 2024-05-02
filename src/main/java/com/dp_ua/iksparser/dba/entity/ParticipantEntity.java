@@ -29,6 +29,7 @@ public class ParticipantEntity extends DomainElement {
     @Override
     public String toString() {
         return "ParticipantEntity{" +
+                "id=" + id +
                 "surname='" + surname + '\'' +
                 ", name='" + name + '\'' +
                 ", team='" + team + '\'' +

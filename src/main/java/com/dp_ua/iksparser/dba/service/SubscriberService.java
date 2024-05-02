@@ -48,4 +48,7 @@ public class SubscriberService {
         return repo.findByChatId(chatId);
     }
 
+    public void unsubscribeAll(ParticipantEntity p) {
+        repo.deleteAllByParticipant(p);
+    }
 }
