@@ -7,6 +7,7 @@ import com.dp_ua.iksparser.bot.abilities.infoview.ParticipantView;
 import com.dp_ua.iksparser.bot.abilities.infoview.SubscriptionView;
 import com.dp_ua.iksparser.bot.abilities.subscribe.SubscribeFacade;
 import com.dp_ua.iksparser.bot.command.impl.*;
+import com.dp_ua.iksparser.bot.command.impl.competition.CommandCompetition;
 import com.dp_ua.iksparser.bot.command.impl.competition.CommandCompetitions;
 import com.dp_ua.iksparser.bot.event.SendMessageEvent;
 import com.dp_ua.iksparser.dba.dto.CompetitionDto;
@@ -135,8 +136,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         }
         String competitionId = competition.getId().toString();
         setStateForSearchingByName(chatId, competitionId);
-        StringBuilder sb = getFindByNameMessage(competition);
-        publishChunkMessage(chatId, sb, getBackToCompetitionKeyboard(competitionId));
+        publishTextMessage(chatId, getFindByNameMessage(competition), getBackToCompetitionKeyboard(competitionId));
     }
 
     private InlineKeyboardMarkup getEnoughKeyboard() {
@@ -183,7 +183,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                 .toList();
         if (heatLines.isEmpty()) {
             log.warn("No participants found");
-            publishChunkMessage(chatId, new StringBuilder("Учасників не знайдено"), null);
+            publishTextMessage(chatId, "Учасників не знайдено", null);
             publishFindMore(chatId, competitionId);
             return;
         }
@@ -199,33 +199,33 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
             return;
         }
         participants.forEach(participant -> {
-            StringBuilder sb = new StringBuilder();
-            sb
+            StringBuilder message = new StringBuilder();
+            message
                     .append(LOOK)
                     .append(BOLD)
                     .append("Знайдено спортсмена: ")
                     .append(BOLD)
                     .append(END_LINE);
-            sb
+            message
                     .append(participantView.info(participant))
                     .append(END_LINE)
                     .append(END_LINE);
 
-            sb
+            message
                     .append(competitionView.nameAndDate(competition))
                     .append(END_LINE)
                     .append(END_LINE);
-            sb
+            message
                     .append(HEAT)
                     .append("Приймає участь у змаганнях: ")
                     .append(END_LINE);
 
             heatLines.stream()
                     .filter(heatLine -> heatLine.getParticipant().equals(participant))
-                    .forEach(heatLine -> sb.append(heatLineView.info(heatLine)));
+                    .forEach(heatLine -> message.append(heatLineView.info(heatLine)));
 
             boolean subscribed = subscribeFacade.isSubscribed(chatId, participant);
-            publishChunkMessage(chatId, sb, subscriptionView.button(participant, subscribed));
+            publishTextMessage(chatId, message.toString(), subscriptionView.button(participant, subscribed));
         });
         publishFindMore(chatId, competitionId);
     }
@@ -261,26 +261,23 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         }
         String competitionId = competition.getId().toString();
         setStateSearchingByCoach(chatId, competitionId);
-        StringBuilder sb = getFindByCoachMessage(competition);
-        publishChunkMessage(chatId, sb, getBackToCompetitionKeyboard(competitionId));
+        publishTextMessage(chatId, getFindByCoachMessage(competition), getBackToCompetitionKeyboard(competitionId));
     }
 
     private void setStateSearchingByCoach(String chatId, String competitionId) {
         stateService.setState(chatId, CommandSearchByCoachWithName.getTextForState(competitionId));
     }
 
-    private StringBuilder getFindByCoachMessage(CompetitionEntity competition) {
-        StringBuilder sb = new StringBuilder();
-        sb
-                .append(LOOK)
-                .append("Напишіть в чат прізвище тренера(або частину), якого шукаєте")
-                .append(END_LINE)
-                .append(END_LINE)
-                .append(FIND)
-                .append(" Пошук спортсменів по тренеру буде проводитись в івенті: ")
-                .append(END_LINE)
-                .append(competitionView.info(competition))
-                .append(END_LINE);
+    private String getFindByCoachMessage(CompetitionEntity competition) {
+        String sb = LOOK +
+                "Напишіть в чат прізвище тренера(або частину), якого шукаєте" +
+                END_LINE +
+                END_LINE +
+                FIND +
+                " Пошук спортсменів по тренеру буде проводитись в івенті: " +
+                END_LINE +
+                competitionView.info(competition) +
+                END_LINE;
         return sb;
     }
 
@@ -299,7 +296,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         if (!isValidInputNameConditions(chatId, competition, competitionId, coachName)) return;
 
         List<CoachEntity> foundCoaches = coachService.searchByNamePartialMatch(coachName);
-        if (checkFoundCoaches(foundCoaches, coachName)) {
+        if (isNotFoundCoaches(foundCoaches, coachName)) {
             publishEvent(prepareSendMessageEvent(
                     chatId, editMessageId,
                     "Тренера не знайдено.", null));
@@ -312,6 +309,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                 .flatMap(event -> event.getHeats().stream())
                 .flatMap(heap -> heap.getHeatLines().stream())
                 .toList();
+
         Map<CoachEntity, List<HeatLineEntity>> coachHeatLinesMap = new HashMap<>();
         foundCoaches.forEach(coach -> {
             List<HeatLineEntity> coachHeatLines = heatLines.stream()
@@ -321,7 +319,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         });
         if (coachHeatLinesMap.isEmpty()) {
             log.warn("No participants found");
-            publishChunkMessage(chatId, new StringBuilder("Учасників не знайдено"), null);
+            publishTextMessage(chatId, "Учасників не знайдено", null);
             publishFindMore(chatId, competitionId);
             return;
         }
@@ -334,62 +332,80 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                 participantHeatLines.add(heatLine);
             });
 
-            StringBuilder header = new StringBuilder();
-            header
-                    .append(LOOK)
-                    .append(BOLD)
-                    .append("Знайдено тренера: ")
-                    .append(BOLD)
-                    .append(END_LINE)
-                    .append(COACH)
-                    .append(BOLD)
-                    .append(coach.getName())
-                    .append(BOLD)
-                    .append(END_LINE)
-                    .append(END_LINE);
+            String header = getMessageHeader(coach, coachHeatLines, competition);
+            List<StringBuilder> participantsInfo = getParticipantsInfo(participantHeatLinesMap);
 
-            header
-                    .append(competitionView.nameAndDate(competition))
-                    .append(END_LINE)
-                    .append(END_LINE);
+            sendChunkedMessages(chatId, header, participantsInfo);
+        });
+        publishFindMore(chatId, competitionId);
+    }
+
+    private String getMessageHeader(CoachEntity coach, List<HeatLineEntity> coachHeatLines, CompetitionEntity competition) {
+        StringBuilder header = new StringBuilder();
+        header
+                .append(LOOK)
+                .append(BOLD)
+                .append("Знайдено тренера: ")
+                .append(BOLD)
+                .append(END_LINE)
+                .append(COACH)
+                .append(BOLD)
+                .append(coach.getName())
+                .append(BOLD)
+                .append(END_LINE)
+                .append(END_LINE);
+
+        header
+                .append(BOLD)
+                .append("В змаганні: ")
+                .append(BOLD)
+                .append(competitionView.nameAndDate(competition))
+                .append(END_LINE)
+                .append(END_LINE);
+
+        if (coachHeatLines.size() > 0) {
             header
                     .append(ITALIC)
                     .append("Заявлені такі спортсмени: ")
                     .append(ITALIC)
                     .append(END_LINE)
                     .append(END_LINE);
-
-            List<StringBuilder> participantsInfo = prepareParticipantsInfoList(participantHeatLinesMap);
-            sendChunkedMessages(chatId, header, participantsInfo);
-        });
-        publishFindMore(chatId, competitionId);
+        } else {
+            header
+                    .append(ITALIC)
+                    .append("Тренер не заявив спортсменів")
+                    .append(ITALIC)
+                    .append(END_LINE)
+                    .append(END_LINE);
+        }
+        return header.toString();
     }
 
-    private void sendChunkedMessages(String chatId, StringBuilder header, List<StringBuilder> participantsInfo) {
+    private void sendChunkedMessages(String chatId, String header, List<StringBuilder> participantsInfo) {
         StringBuilder message = new StringBuilder();
         message.append(header);
         participantsInfo.forEach(participantInfo -> {
             if (message.toString().length() + participantInfo.toString().length() >= MAX_CHUNK_SIZE) {
-                publishChunkMessage(chatId, message, null);
+                publishTextMessage(chatId, message.toString(), null);
                 message.setLength(0);
                 message.append(header);
             }
             message.append(participantInfo);
         });
 
-        publishChunkMessage(chatId, message, null);
+        publishTextMessage(chatId, message.toString(), null);
     }
 
-    private void publishChunkMessage(String chatId, StringBuilder message, InlineKeyboardMarkup keyboard) {
+    private void publishTextMessage(String chatId, String message, InlineKeyboardMarkup keyboard) {
         publishEvent(prepareSendMessageEvent(
                 chatId,
                 null,
-                message.toString(),
+                message,
                 keyboard
         ));
     }
 
-    private List<StringBuilder> prepareParticipantsInfoList(Map<ParticipantEntity, List<HeatLineEntity>> participantHeatLinesMap) {
+    private List<StringBuilder> getParticipantsInfo(Map<ParticipantEntity, List<HeatLineEntity>> participantHeatLinesMap) {
         List<StringBuilder> result = new ArrayList<>();
         participantHeatLinesMap.forEach((participant, participantHeatLines) -> {
             StringBuilder participantInfo = new StringBuilder();
@@ -432,9 +448,9 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
     }
 
 
-    private boolean checkFoundCoaches(List<CoachEntity> foundCoaches, String coachName) {
+    private boolean isNotFoundCoaches(List<CoachEntity> foundCoaches, String coachName) {
         if (foundCoaches.isEmpty()) {
-            log.warn("No coaches found: {}", coachName);
+            log.info("No coaches found: {}", coachName);
             return true;
         }
         return false;
@@ -443,41 +459,39 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
     private boolean isValidInputNameConditions(String chatId, CompetitionEntity competition, String id, String name) {
         if (competition == null) {
             log.warn("Competition[{}] not found", id);
-            publishChunkMessage(chatId, new StringBuilder("Змагання не знайдено"), getBackToCompetitionsKeyboard());
+            publishTextMessage(chatId, "Змагання не знайдено", getBackToCompetitionsKeyboard());
             return false;
         }
         if (name.isEmpty()) {
             log.warn("Name is empty");
-            publishChunkMessage(chatId, new StringBuilder("Ви не вказали прізвище"), null);
+            publishTextMessage(chatId, "Ви не вказали прізвище", null);
             publishFindMore(chatId, id);
             return false;
         }
         if (name.length() < 3) {
             log.warn("Name is too short");
-            publishChunkMessage(chatId, new StringBuilder("Ви вказали занадто коротке прізвище"), null);
+            publishTextMessage(chatId, "Ви вказали занадто коротке прізвище", null);
             publishFindMore(chatId, id);
             return false;
         }
         if (!name.matches("[а-яА-Яa-zA-Z-ґҐєЄіІїЇ']+")) {
             log.warn("Name contains invalid symbols: " + name);
-            publishChunkMessage(chatId, new StringBuilder("Ви вказали некоректне прізвище"), null);
+            publishTextMessage(chatId, "Ви вказали некоректне прізвище", null);
             publishFindMore(chatId, id);
             return false;
         }
         return true;
     }
 
-    private StringBuilder getFindByNameMessage(CompetitionEntity competition) {
-        StringBuilder sb = new StringBuilder();
-        sb
-                .append("Напишіть в чат прізвище спортсмена(або частину), якого шукаєте")
-                .append(LOOK)
-                .append(END_LINE)
-                .append(END_LINE)
-                .append(FIND)
-                .append("Пошук участі спортсмена буде проводитись в івенті: ")
-                .append(END_LINE)
-                .append(competitionView.info(competition));
+    private String getFindByNameMessage(CompetitionEntity competition) {
+        String sb = "Напишіть в чат прізвище спортсмена(або частину), якого шукаєте" +
+                LOOK +
+                END_LINE +
+                END_LINE +
+                FIND +
+                "Пошук участі спортсмена буде проводитись в івенті: " +
+                END_LINE +
+                competitionView.info(competition);
         return sb;
     }
 
@@ -497,7 +511,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
 
         List<InlineKeyboardButton> row = getBackButton(
-                "/" + CommandCompetitions.command + " " + competitionId
+                "/" + CommandCompetition.command + " " + competitionId
         );
         rows.add(row);
 
@@ -505,8 +519,8 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         return keyboard;
     }
 
-    private void publishEvent(SendMessageEvent chatId) {
-        publisher.publishEvent(chatId);
+    private void publishEvent(SendMessageEvent messageEvent) {
+        publisher.publishEvent(messageEvent);
     }
 
     private SendMessageEvent prepareSendMessageEvent(String chatId, Integer editMessageId, String text, InlineKeyboardMarkup keyboard) {

@@ -37,25 +37,21 @@ public class ParticipantService {
         return repo.save(participant);
     }
 
-    public ParticipantEntity findBySurnameAndNameAndTeamAndRegionAndBorn(
+    public ParticipantEntity findParticipant(
             String surname,
             String name,
-            String team,
-            String region,
             String born
     ) {
-        List<ParticipantEntity> participants = repo.findAllBySurnameAndNameAndTeamAndRegionAndBorn(
+        List<ParticipantEntity> participants = repo.findAllBySurnameAndNameAndBorn(
                 surname,
                 name,
-                team,
-                region,
                 born
         );
         if (participants.isEmpty()) {
             return null;
         }
         if (participants.size() > 1) {
-            log.warn("Found " + participants.size() + " participants with surname " + surname + " name " + name + " team " + team + " region " + region + " born " + born);
+            log.warn("Found " + participants.size() + " participants with surname " + surname + " name " + name + " born " + born);
         }
         return participants.get(0);
     }

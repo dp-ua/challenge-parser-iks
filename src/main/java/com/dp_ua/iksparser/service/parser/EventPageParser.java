@@ -45,60 +45,22 @@ public class EventPageParser {
 
             Elements rows = heatTable.select("tr");
             rows.stream().map(row -> row.select("td")).filter(cells -> cells.size() == 11).forEach(cells -> {
-                HeatLineEntity heatLine = new HeatLineEntity();
-                heatLine.setLane(cells.get(0).text());
-                heatLine.setBib(cells.get(1).text());
-                heatLineService.save(heatLine);
 
-                heat.addHeatLine(heatLine);
-                heatLine.setHeat(heat);
+                HeatLineEntity heatLine = getHeatLineFromRow(cells);
+                setRelationsBetweenHeatAndHeatLine(heat, heatLine);
 
-                String surname = cells.get(5).childNode(0).childNode(0).toString();
-                String name = cells.get(6).childNode(0).childNode(0).toString();
-                String team = cells.get(9).text();
-                String region = cells.get(8).text();
-                String born = cells.get(7).text();
-                String url = cells.get(4).select("a").attr("href");
-                ParticipantEntity participant = participantService.findBySurnameAndNameAndTeamAndRegionAndBorn(
-                        surname,
-                        name,
-                        team,
-                        region,
-                        born
-                );
-                if (participant == null) {
-                    participant = new ParticipantEntity();
-                    participant.setUrl(url);
-                    participant.setSurname(surname);
-                    participant.setName(name);
-                    participant.setBorn(born);
-                    participant.setRegion(region);
-                    participant.setTeam(team);
-                    participantService.save(participant);
-                }
-                if ((participant.getUrl() == null || participant.getUrl().isEmpty())
-                        && url != null && !url.isEmpty()) {
-                    log.debug("Participant {} has no url. Set url: {}", participant, url);
-                    participant.setUrl(url);
-                    participantService.save(participant);
-                }
+                ParticipantEntity participant = getParticipantFromRow(cells);
+
                 saveRelationBetweenHeatLineAndParticipant(heatLine, participant);
 
-                String[] coaches = cells.get(10).text().split(",");
-                for (String coachName : coaches) {
-                    name = coachName.trim();
-                    if (name.isEmpty()) {
-                        continue;
-                    }
-                    CoachEntity coach = coachService.findByName(name);
+                List<String> coaches = getCoachesFromRow(cells);
+                coaches.forEach(coachName -> {
+                    CoachEntity coach = coachService.findByName(coachName);
                     if (coach == null) {
-                        coach = new CoachEntity();
-                        coach.setName(name);
-                        coachService.save(coach);
-
+                        coach = createNewCoach(coachName);
                     }
                     saveRelationsBetweenCoachAndHeatLine(heatLine, coach);
-                }
+                });
             });
 
             if (!heat.getHeatLines().isEmpty()) {
@@ -108,6 +70,73 @@ public class EventPageParser {
             }
         });
         return heats;
+    }
+
+    private CoachEntity createNewCoach(String coachName) {
+        CoachEntity coach;
+        coach = new CoachEntity();
+        coach.setName(coachName);
+        coachService.save(coach);
+        return coach;
+    }
+
+    private static List<String> getCoachesFromRow(Elements cells) {
+        return List.of(cells.get(10).text().split(","))
+                .stream()
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .toList();
+    }
+
+    private ParticipantEntity getParticipantFromRow(Elements cells) {
+        String surname = cells.get(5).childNode(0).childNode(0).toString();
+        String name = cells.get(6).childNode(0).childNode(0).toString();
+        String team = cells.get(9).text();
+        String region = cells.get(8).text();
+        String born = cells.get(7).text();
+        String url = cells.get(4).select("a").attr("href");
+
+        ParticipantEntity participant = participantService.findParticipant(surname, name, born);
+        if (participant == null) {
+            participant = createNewParticipant(url, surname, name, born, region, team);
+        }
+        updateParticipantUrl(participant, url);
+        return participant;
+    }
+
+    private void setRelationsBetweenHeatAndHeatLine(HeatEntity heat, HeatLineEntity heatLine) {
+        heat.addHeatLine(heatLine);
+        heatLine.setHeat(heat);
+    }
+
+    private HeatLineEntity getHeatLineFromRow(Elements cells) {
+        HeatLineEntity heatLine = new HeatLineEntity();
+        heatLine.setLane(cells.get(0).text());
+        heatLine.setBib(cells.get(1).text());
+        heatLineService.save(heatLine);
+        return heatLine;
+    }
+
+    private ParticipantEntity createNewParticipant(String url, String surname, String name, String born, String region, String team) {
+        ParticipantEntity participant;
+        participant = new ParticipantEntity();
+        participant.setUrl(url);
+        participant.setSurname(surname);
+        participant.setName(name);
+        participant.setBorn(born);
+        participant.setRegion(region);
+        participant.setTeam(team);
+        participantService.save(participant);
+        return participant;
+    }
+
+    private void updateParticipantUrl(ParticipantEntity participant, String url) {
+        if ((participant.getUrl() == null || participant.getUrl().isEmpty())
+                && url != null && !url.isEmpty()) {
+            log.debug("Participant {} has no url. Set url: {}", participant, url);
+            participant.setUrl(url);
+            participantService.save(participant);
+        }
     }
 
     private void saveRelationBetweenHeatLineAndParticipant(HeatLineEntity heatLine, ParticipantEntity participant) {
