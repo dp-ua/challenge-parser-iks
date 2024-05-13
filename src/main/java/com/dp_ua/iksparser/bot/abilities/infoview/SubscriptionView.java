@@ -3,10 +3,7 @@ package com.dp_ua.iksparser.bot.abilities.infoview;
 import com.dp_ua.iksparser.bot.command.impl.subscribe.CommandSubscribe;
 import com.dp_ua.iksparser.bot.command.impl.subscribe.CommandSubscriptionsList;
 import com.dp_ua.iksparser.bot.command.impl.subscribe.CommandUnsubscribe;
-import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
-import com.dp_ua.iksparser.dba.entity.HeatLineEntity;
-import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
-import com.dp_ua.iksparser.dba.entity.SubscriberEntity;
+import com.dp_ua.iksparser.dba.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -14,12 +11,16 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import static com.dp_ua.iksparser.bot.Icon.*;
 import static com.dp_ua.iksparser.service.MessageCreator.*;
 
 @Component
 public class SubscriptionView {
+    public static final String STATUS_NEW_ENROLL = "Нова заявка в івентах";
+    public static final String STATUS_HAS_RESULT = "Є результати змагання";
     @Autowired
     CompetitionView competitionView;
     @Autowired
@@ -36,17 +37,41 @@ public class SubscriptionView {
                 .append(participantView.info(participant))
                 .append(END_LINE).append("Приймає участь у змаганнях: ")
                 .append(competitionView.nameAndDate(competition))
+                .append(competitionView.link(competition))
                 .append(END_LINE)
-                .append(END_LINE)
-                .append("Нова заявка в івентах:")
                 .append(END_LINE);
-        for (HeatLineEntity heatLine : heatLines) {
-            sb
-                    .append(heatLineView.info(heatLine))
-                    .append(END_LINE);
-        }
+
+        separateHeatLinesByStatuses(heatLines).forEach((status, lines) -> {
+            if (!lines.isEmpty()) {
+                sb.append(status).append(":").append(END_LINE);
+                lines.forEach(heatLine -> sb.append(heatLineView.info(heatLine)));
+                sb.append(END_LINE);
+            }
+        });
+
         return sb.toString();
     }
+
+    private Map<String, List<HeatLineEntity>> separateHeatLinesByStatuses(List<HeatLineEntity> heatLines) {
+        Map<String, List<HeatLineEntity>> result = getPreparedMap();
+        for (HeatLineEntity heatLine : heatLines) {
+            EventEntity event = heatLine.getHeat().getEvent();
+            if (event.hasResultUrl()) {
+                result.get(STATUS_HAS_RESULT).add(heatLine);
+            } else {
+                result.get(STATUS_NEW_ENROLL).add(heatLine);
+            }
+        }
+        return result;
+    }
+
+    private static Map<String, List<HeatLineEntity>> getPreparedMap() {
+        Map<String, List<HeatLineEntity>> result = new TreeMap<>();
+        result.put(STATUS_NEW_ENROLL, new ArrayList<>());
+        result.put(STATUS_HAS_RESULT, new ArrayList<>());
+        return result;
+    }
+
 
     public String subscriptionText(ParticipantEntity participant, boolean subscribed) {
         String text = participantView.info(participant);

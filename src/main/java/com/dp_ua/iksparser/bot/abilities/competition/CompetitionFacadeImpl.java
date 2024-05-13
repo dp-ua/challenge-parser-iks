@@ -599,7 +599,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         List<CompetitionEntity> competitions = competitionService.findAllOrderByBeginDateDesc();
         List<String> years = competitions.stream().map(c -> {
             String beginDate = c.getBeginDate();
-            LocalDate date = LocalDate.parse(beginDate, CompetitionService.FORMATTER);
+            LocalDate date = competitionService.getParsedDate(beginDate);
             return date.getYear();
         }).distinct().sorted().map(String::valueOf).toList();
 
