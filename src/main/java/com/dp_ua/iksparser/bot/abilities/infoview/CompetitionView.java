@@ -199,8 +199,9 @@ public class CompetitionView {
         StringBuilder sb = new StringBuilder();
         if (competition.getUrl().isEmpty()) return sb.toString();
         sb
+                .append(SPACE)
                 .append(LINK)
-                .append(", посилання")
+                .append("посилання")
                 .append(Icon.URL)
                 .append(LINK_END)
                 .append(LINK_SEPARATOR)
