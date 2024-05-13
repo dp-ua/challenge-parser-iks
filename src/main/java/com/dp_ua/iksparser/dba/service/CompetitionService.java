@@ -47,10 +47,14 @@ public class CompetitionService {
     }
 
     private final Comparator<String> dateComparator = (o1, o2) -> {
-        LocalDate date1 = LocalDate.parse(o1, FORMATTER);
-        LocalDate date2 = LocalDate.parse(o2, FORMATTER);
+        LocalDate date1 = getParsedDate(o1);
+        LocalDate date2 = getParsedDate(o2);
         return date1.compareTo(date2);
     };
+
+    public LocalDate getParsedDate(String textDate) {
+        return LocalDate.parse(textDate, FORMATTER);
+    }
 
     public CompetitionEntity saveOrUpdate(CompetitionEntity competition) {
         CompetitionEntity competitionFromDb = repo.findByNameAndBeginDateAndUrl(

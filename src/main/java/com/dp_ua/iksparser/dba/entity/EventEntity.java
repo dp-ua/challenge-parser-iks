@@ -84,4 +84,10 @@ public class EventEntity extends DomainElement {
         }
         return isNotFilled();
     }
+    public boolean hasStartListUrl() {
+        return !startListUrl.isEmpty();
+    }
+    public boolean hasResultUrl() {
+        return !resultUrl.isEmpty();
+    }
 }

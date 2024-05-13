@@ -20,6 +20,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.locks.Lock;
@@ -115,6 +116,16 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
     }
 
     private boolean isNeedToInformSubscribers(CompetitionEntity competition) {
+        LocalDate date = competitionService.getParsedDate(competition.getEndDate());
+        LocalDate now = LocalDate.now();
+        if (
+                date.isEqual(now) ||                                    // today
+                        date.isEqual(now.minusDays(1)) || // yesterday
+                        date.isEqual(now.minusDays(2))    // day before yesterday
+        ) {
+            return true;
+        }
+
         String status = competition.getStatus();
         return C_IN_PROGRESS.getName().equals(status) ||
                 C_NOT_STARTED.getName().equals(status) ||
@@ -170,7 +181,7 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
     private Map<ParticipantEntity, List<HeatLineEntity>> operateEventsToParseHeats(List<EventEntity> events) throws ParsingException {
         Map<ParticipantEntity, List<HeatLineEntity>> participations = new HashMap<>();
         for (EventEntity event : events) {
-            if (event.getStartListUrl().isEmpty()) {
+            if (!event.hasStartListUrl()) {
                 log.debug("Event {} has no start list url", event.getEventName());
             } else {
                 Document eventDocument = downloader.getDocument(event.getStartListUrl());
@@ -207,30 +218,24 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
 
             if (oldEvents.isEmpty()) {
                 updatedEvents.forEach(event -> {
-                    if (!event.getStartListUrl().isEmpty()) {
+                    if (event.hasStartListUrl()) {
                         newEventResults.add(event);
                     }
-                    eventService.save(event);
-                    event.setDay(day);
-                    day.addEvent(event);
+                    saveEventAndSetRelationsToDay(event, day);
                 });
             } else {
                 updatedEvents.forEach(newEvent -> oldEvents.stream()
                         .filter(newEvent::isTheSame)
                         .findFirst()
                         .ifPresentOrElse(oldEvent -> {
-                                    if (isHaveNewResults(newEvent, oldEvent)) {
+                                    if (isHasNewInformation(newEvent, oldEvent)) {
                                         newEventResults.add(oldEvent);
-                                    }
-                                    if (isNeedToUpdateEvent(newEvent, oldEvent)) {
                                         oldEvent.updateEventDetails(newEvent);
                                     }
                                 },
                                 () -> {
-                                    eventService.save(newEvent);
-                                    newEvent.setDay(day);
-                                    day.addEvent(newEvent);
-                                    if (!newEvent.getStartListUrl().isEmpty()) {
+                                    saveEventAndSetRelationsToDay(newEvent, day);
+                                    if (newEvent.hasStartListUrl() || newEvent.hasResultUrl()) {
                                         newEventResults.add(newEvent);
                                     }
                                 }
@@ -240,13 +245,15 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
         return newEventResults;
     }
 
-    private static boolean isHaveNewResults(EventEntity newEvent, EventEntity oldEvent) {
-        return oldEvent.getStartListUrl().isEmpty() && !newEvent.getStartListUrl().isEmpty();
+    private void saveEventAndSetRelationsToDay(EventEntity event, DayEntity day) {
+        eventService.save(event);
+        event.setDay(day);
+        day.addEvent(event);
     }
 
-    private boolean isNeedToUpdateEvent(EventEntity newEvent, EventEntity oldEvent) {
-        return oldEvent.getStartListUrl().isEmpty() && !newEvent.getStartListUrl().isEmpty() ||
-                oldEvent.getResultUrl().isEmpty() && !newEvent.getResultUrl().isEmpty();
+    private static boolean isHasNewInformation(EventEntity newEvent, EventEntity oldEvent) {
+        return newEvent.hasResultUrl() && !oldEvent.hasResultUrl() ||
+                newEvent.hasStartListUrl() && !oldEvent.hasStartListUrl();
     }
 
     private void operateDaysAndAddItToCompetition(CompetitionEntity competition, Document document) throws ParsingException {
@@ -254,9 +261,7 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
         List<DayEntity> oldDays = competition.getDays();
         if (oldDays.isEmpty()) {
             updatedDays.forEach(day -> {
-                dayService.save(day);
-                day.setCompetition(competition);
-                competition.addDay(day);
+                saveDayAndSetRelationToCompetition(competition, day);
             });
         } else {
             updatedDays.forEach(newDay -> oldDays.stream()
@@ -264,12 +269,16 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
                     .findFirst()
                     .ifPresentOrElse(oldDay -> dayService.save(oldDay),
                             () -> {
-                                dayService.save(newDay);
-                                newDay.setCompetition(competition);
-                                competition.addDay(newDay);
+                                saveDayAndSetRelationToCompetition(competition, newDay);
                             }
                     ));
         }
+    }
+
+    private void saveDayAndSetRelationToCompetition(CompetitionEntity competition, DayEntity day) {
+        dayService.save(day);
+        day.setCompetition(competition);
+        competition.addDay(day);
     }
 
     private void changeStatus(long competitionId, UpdateStatus oldStatus, UpdateStatus

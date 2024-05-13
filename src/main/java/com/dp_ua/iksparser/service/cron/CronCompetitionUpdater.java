@@ -20,6 +20,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -38,6 +39,8 @@ public class CronCompetitionUpdater implements ApplicationListener<ContextRefres
     CompetitionFacade competitionFacade;
     @Autowired
     ApplicationEventPublisher publisher;
+    private final Set<String> finishedOrCanceledStatuses = new HashSet<>(Arrays.asList(C_FINISHED.getName(), C_CANCELED.getName()));
+
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
@@ -94,19 +97,21 @@ public class CronCompetitionUpdater implements ApplicationListener<ContextRefres
     public void updateClosestCompetitionDetails() {
         log.info("Start update closest competitions");
         List<CompetitionEntity> competitions = competitionService.findAllOrderByBeginDateDesc();
-        LocalDate now = LocalDate.now();
+        LocalDate date = LocalDate.now();
         competitions.stream()
-                .filter(competition -> {
-                    if (C_FINISHED.getName().equals(competition.getStatus()) ||
-                            C_CANCELED.getName().equals(competition.getStatus())) {
-                        return false;
-                    }
-                    return !LocalDate.parse(competition.getBeginDate(), CompetitionService.FORMATTER).isAfter(now.plusWeeks(1));
-                })
+                .filter(competition ->
+                        !finishedOrCanceledStatuses.contains(competition.getStatus()) && isWithinOneWeekFromBeginDate(competition, date))
                 .forEach(competition -> {
                     log.info("[UCCD]Need to update competition with id: {}, begin date: {}", competition.getId(), competition.getBeginDate());
                     runEventToUpdateCompetition(competition);
                 });
+    }
+
+    private boolean isWithinOneWeekFromBeginDate(CompetitionEntity competition, LocalDate date) {
+        LocalDate beginDate = competitionService.getParsedDate(competition.getBeginDate());
+        LocalDate oneWeekFromNow = date.plusWeeks(1);
+
+        return !beginDate.isAfter(oneWeekFromNow);
     }
 
     private void runEventToUpdateCompetition(CompetitionEntity competition) {

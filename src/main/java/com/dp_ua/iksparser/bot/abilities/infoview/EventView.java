@@ -48,9 +48,9 @@ public class EventView {
     }
 
     private String getLink(EventEntity event) {
-        return !event.getResultUrl().isEmpty() ? event.getResultUrl()
+        return event.hasResultUrl() ? event.getResultUrl()
                 :
-                !event.getStartListUrl().isEmpty()
+                event.hasStartListUrl()
                         ?
                         event.getStartListUrl()
                         :

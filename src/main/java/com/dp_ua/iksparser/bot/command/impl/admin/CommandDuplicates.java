@@ -1,8 +1,8 @@
 package com.dp_ua.iksparser.bot.command.impl.admin;
 
-import com.dp_ua.iksparser.bot.abilities.participant.ParticipantFacade;
 import com.dp_ua.iksparser.bot.command.AdminAccessCommand;
 import com.dp_ua.iksparser.bot.message.Message;
+import com.dp_ua.iksparser.service.db.DbServiceOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 public class CommandDuplicates extends AdminAccessCommand {
     public static final String command = "duplicates";
     @Autowired
-    ParticipantFacade participantFacade;
+    DbServiceOperation dbServiceOperation;
 
     @Override
     protected String getTextForCallBackAnswer(Message message) {
@@ -19,7 +19,7 @@ public class CommandDuplicates extends AdminAccessCommand {
 
     @Override
     protected void perform(Message message) {
-        participantFacade.operateDuplicates();
+        dbServiceOperation.operateDuplicates();
     }
 
     @Override

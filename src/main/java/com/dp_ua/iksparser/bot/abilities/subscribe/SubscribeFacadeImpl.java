@@ -67,7 +67,7 @@ public class SubscribeFacadeImpl implements SubscribeFacade {
     @Override
     public void operateParticipantWithHeatlines(ParticipantEntity participant, List<HeatLineEntity> heatLines) {
         subscriberService.findAllByParticipant(participant).forEach(subscriber -> {
-            log.debug("Informing subscriber: {} about participant: {} with heatlines: {}", subscriber, participant, heatLines.size());
+            log.info("Informing subscriber: {} about participant: {} with heatlines: {}", subscriber, participant, heatLines.size());
             sendMessageToSubscriber(subscriber, participant, heatLines);
         });
     }
