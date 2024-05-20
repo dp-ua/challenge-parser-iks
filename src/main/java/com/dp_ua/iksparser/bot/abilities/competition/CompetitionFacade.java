@@ -26,4 +26,8 @@ public interface CompetitionFacade {
     String getInfoAboutCompetitions();
 
     List<CompetitionDto> getCompetitionsForParticipant(ParticipantEntity participant);
+
+    void startSearchByBibNumber(String chatId, long commandArgument, Integer editMessageId);
+
+    void searchingByBibNumber(String chatId, String commandArgument, Integer editMessageId);
 }
