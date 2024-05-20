@@ -20,12 +20,12 @@ import com.dp_ua.iksparser.dba.service.CompetitionService;
 import com.dp_ua.iksparser.exeption.ParsingException;
 import com.dp_ua.iksparser.service.JsonReader;
 import com.dp_ua.iksparser.service.parser.MainParserService;
-import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.telegram.telegrambots.meta.api.methods.send.SendChatAction;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -122,6 +122,24 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
     }
 
     @Override
+    public void startSearchByBibNumber(String chatId, long commandArgument, Integer editMessageId) {
+        log.info("startSearchByBibNumber. CommandArgument {}, chatId:{} ", commandArgument, chatId);
+        sendTypingAction(chatId);
+
+        CompetitionEntity competition = competitionService.findById(commandArgument);
+        if (competition == null) {
+            log.warn("Competition[{}] not found", commandArgument);
+            publishEvent(prepareSendMessageEvent(
+                    chatId, editMessageId,
+                    "Змагання не знайдено", getBackToCompetitionsKeyboard()));
+            return;
+        }
+        String competitionId = competition.getId().toString();
+        setStateForSearchingByBibNumber(chatId, competitionId);
+        publishTextMessage(chatId, getFindByBibNumberMessage(competition), getBackToCompetitionKeyboard(competitionId));
+    }
+
+    @Override
     public void startSearchByName(String chatId, long commandArgument, Integer editMessageId) {
         log.info("startSearchByName. CommandArgument {}, chatId:{} ", commandArgument, chatId);
         sendTypingAction(chatId);
@@ -153,12 +171,59 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         return keyboard;
     }
 
+    private void setStateForSearchingByBibNumber(String chatId, String competitionId) {
+        stateService.setState(chatId, CommandSearchByBibNumberWithBib.getTextForState(competitionId));
+    }
+
     private void setStateForSearchingByName(String chatId, String competitionId) {
         stateService.setState(chatId, CommandSearchByNameWithName.getTextForState(competitionId));
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
+    public void searchingByBibNumber(String chatId, String commandArgument, Integer editMessageId) {
+        log.info("searchingByBibNumber. CommandArgument {}, chatId:{} ", commandArgument, chatId);
+        sendTypingAction(chatId);
+
+        String competitionId = jSonReader.getVal(commandArgument, "id");
+        String bib = jSonReader.getVal(commandArgument, "bib").trim();
+
+        CompetitionEntity competition = competitionService.findById(Integer.parseInt(competitionId));
+
+        setStateForSearchingByBibNumber(chatId, competitionId);
+
+        if (!isValidInputBibConditions(chatId, competition, competitionId, bib)) return;
+
+        List<HeatLineEntity> heatLines = competition.getDays().stream()
+                .flatMap(day -> day.getEvents().stream())
+                .flatMap(event -> event.getHeats().stream())
+                .flatMap(heap -> heap.getHeatLines().stream())
+                .filter(heatLine -> heatLine.getBib().equals(bib))
+                .toList();
+
+        if (heatLines.isEmpty()) {
+            publishTextMessage(chatId, "Учасників з номером " + bib + " не знайдено", null);
+        }
+        Set<ParticipantEntity> participants = heatLines.stream()
+                .map(HeatLineEntity::getParticipant)
+                .collect(Collectors.toSet());
+        if (participants.size() > MAX_PARTICIPANTS_SIZE_TO_FIND) {
+            publishEvent(prepareSendMessageEvent(
+                    chatId, editMessageId,
+                    "Знайдено забагато спортсменів під цим номером", getBackToCompetitionKeyboard(competitionId)));
+            publishFindMore(chatId, competitionId);
+            return;
+        }
+        participants.forEach(participant -> {
+            StringBuilder message = getTextParticipantInCompetitionWithHeatlines(participant, competition, heatLines);
+            boolean subscribed = subscribeFacade.isSubscribed(chatId, participant);
+            publishTextMessage(chatId, message.toString(), subscriptionView.button(participant, subscribed));
+        });
+        publishFindMore(chatId, competitionId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public void searchingByName(String chatId, String commandArgument, Integer editMessageId) {
         log.info("searchingByName. CommandArgument {}, chatId:{} ", commandArgument, chatId);
         sendTypingAction(chatId);
@@ -182,52 +247,57 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                 )
                 .toList();
         if (heatLines.isEmpty()) {
-            log.warn("No participants found");
             publishTextMessage(chatId, "Учасників не знайдено", null);
             publishFindMore(chatId, competitionId);
             return;
         }
+
         Set<ParticipantEntity> participants = heatLines.stream()
                 .map(HeatLineEntity::getParticipant)
                 .collect(Collectors.toSet());
+
         if (participants.size() > MAX_PARTICIPANTS_SIZE_TO_FIND) {
-            log.warn("More than one participant found");
             publishEvent(prepareSendMessageEvent(
                     chatId, editMessageId,
                     "Знайдено забагато спортсменів. Введіть повніше прізвище", getBackToCompetitionKeyboard(competitionId)));
             publishFindMore(chatId, competitionId);
             return;
         }
+
         participants.forEach(participant -> {
-            StringBuilder message = new StringBuilder();
-            message
-                    .append(LOOK)
-                    .append(BOLD)
-                    .append("Знайдено спортсмена: ")
-                    .append(BOLD)
-                    .append(END_LINE);
-            message
-                    .append(participantView.info(participant))
-                    .append(END_LINE)
-                    .append(END_LINE);
-
-            message
-                    .append(competitionView.nameAndDate(competition))
-                    .append(END_LINE)
-                    .append(END_LINE);
-            message
-                    .append(HEAT)
-                    .append("Приймає участь у змаганнях: ")
-                    .append(END_LINE);
-
-            heatLines.stream()
-                    .filter(heatLine -> heatLine.getParticipant().equals(participant))
-                    .forEach(heatLine -> message.append(heatLineView.info(heatLine)));
-
+            StringBuilder message = getTextParticipantInCompetitionWithHeatlines(participant, competition, heatLines);
             boolean subscribed = subscribeFacade.isSubscribed(chatId, participant);
             publishTextMessage(chatId, message.toString(), subscriptionView.button(participant, subscribed));
         });
         publishFindMore(chatId, competitionId);
+    }
+
+    private StringBuilder getTextParticipantInCompetitionWithHeatlines(ParticipantEntity participant, CompetitionEntity competition, List<HeatLineEntity> heatLines) {
+        StringBuilder message = new StringBuilder();
+        message
+                .append(LOOK)
+                .append(BOLD)
+                .append("Знайдено спортсмена: ")
+                .append(BOLD)
+                .append(END_LINE);
+        message
+                .append(participantView.info(participant))
+                .append(END_LINE)
+                .append(END_LINE);
+
+        message
+                .append(competitionView.nameAndDate(competition))
+                .append(END_LINE)
+                .append(END_LINE);
+        message
+                .append(HEAT)
+                .append("Приймає участь у змаганнях: ")
+                .append(END_LINE);
+
+        heatLines.stream()
+                .filter(heatLine -> heatLine.getParticipant().equals(participant))
+                .forEach(heatLine -> message.append(heatLineView.info(heatLine)));
+        return message;
     }
 
     private void publishFindMore(String chatId, String competitionId) {
@@ -456,12 +526,34 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         return false;
     }
 
-    private boolean isValidInputNameConditions(String chatId, CompetitionEntity competition, String id, String name) {
+    private boolean isValidInputBibConditions(String chatId, CompetitionEntity competition, String id, String bib) {
+        if (isValidCompetition(chatId, competition, id)) return false;
+        if (bib.isEmpty()) {
+            log.warn("Bib is empty");
+            publishTextMessage(chatId, "Ви не вказали біб-номер", null);
+            publishFindMore(chatId, id);
+            return false;
+        }
+        if (!bib.matches("[0-9]+")) {
+            log.warn("Bib contains invalid symbols: " + bib);
+            publishTextMessage(chatId, "Ви вказали некоректний біб-номер", null);
+            publishFindMore(chatId, id);
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isValidCompetition(String chatId, CompetitionEntity competition, String id) {
         if (competition == null) {
             log.warn("Competition[{}] not found", id);
             publishTextMessage(chatId, "Змагання не знайдено", getBackToCompetitionsKeyboard());
-            return false;
+            return true;
         }
+        return false;
+    }
+
+    private boolean isValidInputNameConditions(String chatId, CompetitionEntity competition, String id, String name) {
+        if (isValidCompetition(chatId, competition, id)) return false;
         if (name.isEmpty()) {
             log.warn("Name is empty");
             publishTextMessage(chatId, "Ви не вказали прізвище", null);
@@ -481,6 +573,18 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
             return false;
         }
         return true;
+    }
+
+    private String getFindByBibNumberMessage(CompetitionEntity competition) {
+        String sb = "Напишіть в чат нагрудний номер спортсмена, якого хочете знайти" +
+                LOOK +
+                END_LINE +
+                END_LINE +
+                FIND +
+                "Пошук участі спортсмена буде проводитись в івенті: " +
+                END_LINE +
+                competitionView.info(competition);
+        return sb;
     }
 
     private String getFindByNameMessage(CompetitionEntity competition) {
@@ -532,12 +636,24 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
         rows.add(getBackButton("/competitions"));
         if (competitionFilled) {
+            rows.add(lookAtBibNumber(competition));
             rows.add(lookAtCompetitionByNameButton(competition));
             rows.add(lookAtCompetitionByCoachButton(competition));
         }
         keyboard.setKeyboard(rows);
         return keyboard;
     }
+
+    private List<InlineKeyboardButton> lookAtBibNumber(CompetitionEntity competition) {
+        List<InlineKeyboardButton> row = new ArrayList<>();
+        InlineKeyboardButton button = SERVICE.getKeyboardButton(
+                FIND + " Пошук спортсмена по номеру " + NUMBER,
+                "/" + CommandSearchByBibNumber.command + " " + competition.getId()
+        );
+        row.add(button);
+        return row;
+    }
+
 
     private List<InlineKeyboardButton> lookAtCompetitionByNameButton(CompetitionEntity competition) {
         List<InlineKeyboardButton> row = new ArrayList<>();
