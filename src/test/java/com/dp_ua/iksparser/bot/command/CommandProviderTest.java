@@ -40,6 +40,8 @@ public class CommandProviderTest {
                         help
                         menu
                         participants
+                        searchbybibnumber
+                        searchbybibnumberwithbib
                         searchbycoach
                         searchbycoachwithname
                         searchbyname
