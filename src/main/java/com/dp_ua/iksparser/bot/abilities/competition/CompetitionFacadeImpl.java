@@ -33,6 +33,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static com.dp_ua.iksparser.bot.Icon.*;
@@ -90,35 +91,27 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         log.info("showCompetition. CommandArgument {}, chatId:{} ", commandArgument, chatId);
         sendTypingAction(chatId);
 
-        CompetitionEntity competition = competitionService.findById(commandArgument);
+        handleCompetition(chatId, commandArgument, editMessageId, competition -> {
+            StringBuilder sb = new StringBuilder();
+            boolean competitionFilled = competition.isFilled();
+            sb.append(competitionView.info(competition));
+            if (competitionFilled) {
+                sb
+                        .append(competitionView.details(competition))
+                        .append(END_LINE);
+            } else {
+                sb
+                        .append(competitionView.notFilledInfo());
+            }
+            InlineKeyboardMarkup keyboard = getCompetitionDetailsKeyboard(competition, competitionFilled);
 
-        if (competition == null) {
-            log.warn("Competition[{}] not found", commandArgument);
             publishEvent(prepareSendMessageEvent(
-                    chatId, editMessageId,
-                    "Змагання не знайдено", getBackToCompetitionsKeyboard()));
-            return;
-        }
-
-        StringBuilder sb = new StringBuilder();
-        boolean competitionFilled = competition.isFilled();
-        sb.append(competitionView.info(competition));
-        if (competitionFilled) {
-            sb
-                    .append(competitionView.details(competition))
-                    .append(END_LINE);
-        } else {
-            sb
-                    .append(competitionView.notFilledInfo());
-        }
-        InlineKeyboardMarkup keyboard = getCompetitionDetailsKeyboard(competition, competitionFilled);
-
-        publishEvent(prepareSendMessageEvent(
-                chatId,
-                editMessageId,
-                sb.toString(),
-                keyboard
-        ));
+                    chatId,
+                    editMessageId,
+                    sb.toString(),
+                    keyboard
+            ));
+        });
     }
 
     @Override
@@ -126,17 +119,11 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         log.info("startSearchByBibNumber. CommandArgument {}, chatId:{} ", commandArgument, chatId);
         sendTypingAction(chatId);
 
-        CompetitionEntity competition = competitionService.findById(commandArgument);
-        if (competition == null) {
-            log.warn("Competition[{}] not found", commandArgument);
-            publishEvent(prepareSendMessageEvent(
-                    chatId, editMessageId,
-                    "Змагання не знайдено", getBackToCompetitionsKeyboard()));
-            return;
-        }
-        String competitionId = competition.getId().toString();
-        setStateForSearchingByBibNumber(chatId, competitionId);
-        publishTextMessage(chatId, getFindByBibNumberMessage(competition), getBackToCompetitionKeyboard(competitionId));
+        handleCompetition(chatId, commandArgument, editMessageId, competition -> {
+            String competitionId = competition.getId().toString();
+            setStateForSearchingByBibNumber(chatId, competitionId);
+            publishTextMessage(chatId, getFindByBibNumberMessage(competition), getBackToCompetitionKeyboard(competitionId));
+        });
     }
 
     @Override
@@ -144,17 +131,11 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         log.info("startSearchByName. CommandArgument {}, chatId:{} ", commandArgument, chatId);
         sendTypingAction(chatId);
 
-        CompetitionEntity competition = competitionService.findById(commandArgument);
-        if (competition == null) {
-            log.warn("Competition[{}] not found", commandArgument);
-            publishEvent(prepareSendMessageEvent(
-                    chatId, editMessageId,
-                    "Змагання не знайдено", getBackToCompetitionsKeyboard()));
-            return;
-        }
-        String competitionId = competition.getId().toString();
-        setStateForSearchingByName(chatId, competitionId);
-        publishTextMessage(chatId, getFindByNameMessage(competition), getBackToCompetitionKeyboard(competitionId));
+        handleCompetition(chatId, commandArgument, editMessageId, competition -> {
+            String competitionId = competition.getId().toString();
+            setStateForSearchingByName(chatId, competitionId);
+            publishTextMessage(chatId, getFindByNameMessage(competition), getBackToCompetitionKeyboard(competitionId));
+        });
     }
 
     private InlineKeyboardMarkup getEnoughKeyboard() {
@@ -321,17 +302,11 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         log.info("startSearchByCoach. CommandArgument {}, chatId:{} ", commandArgument, chatId);
         sendTypingAction(chatId);
 
-        CompetitionEntity competition = competitionService.findById(commandArgument);
-        if (competition == null) {
-            log.warn("Competition[{}] not found", commandArgument);
-            publishEvent(prepareSendMessageEvent(
-                    chatId, editMessageId,
-                    "Змагання не знайдено", getBackToCompetitionsKeyboard()));
-            return;
-        }
-        String competitionId = competition.getId().toString();
-        setStateSearchingByCoach(chatId, competitionId);
-        publishTextMessage(chatId, getFindByCoachMessage(competition), getBackToCompetitionKeyboard(competitionId));
+        handleCompetition(chatId, commandArgument, editMessageId, competition -> {
+            String competitionId = competition.getId().toString();
+            setStateSearchingByCoach(chatId, competitionId);
+            publishTextMessage(chatId, getFindByCoachMessage(competition), getBackToCompetitionKeyboard(competitionId));
+        });
     }
 
     private void setStateSearchingByCoach(String chatId, String competitionId) {
@@ -494,27 +469,20 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         log.info("showNotLoadedInfo. CommandArgument {}, chatId:{} ", commandArgument, chatId);
         sendTypingAction(chatId);
 
-        CompetitionEntity competition = competitionService.findById(commandArgument);
+        handleCompetition(chatId, commandArgument, editMessageId, competition -> {
+            String sb = competitionView.info(competition) +
+                    END_LINE +
+                    competitionView.notFilledInfo();
 
-        if (competition == null) {
-            log.warn("Competition[{}] not found", commandArgument);
+            InlineKeyboardMarkup keyboard = getCompetitionDetailsKeyboard(competition, false);
+
             publishEvent(prepareSendMessageEvent(
-                    chatId, editMessageId,
-                    "Змагання не знайдено", getBackToCompetitionsKeyboard()));
-            return;
-        }
-        String sb = competitionView.info(competition) +
-                END_LINE +
-                competitionView.notFilledInfo();
-
-        InlineKeyboardMarkup keyboard = getCompetitionDetailsKeyboard(competition, false);
-
-        publishEvent(prepareSendMessageEvent(
-                chatId,
-                editMessageId,
-                sb,
-                keyboard
-        ));
+                    chatId,
+                    editMessageId,
+                    sb,
+                    keyboard
+            ));
+        });
     }
 
 
@@ -729,5 +697,18 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                 .distinct()
                 .map(c -> competitionService.convertToDto(c))
                 .collect(Collectors.toList());
+    }
+
+    private void handleCompetition(String chatId, long competitionId,
+                                   Integer editMessageId, Consumer<CompetitionEntity> callback) {
+        CompetitionEntity competition = competitionService.findById(competitionId);
+        if (competition == null) {
+            log.info("Competition[{}] not found", competitionId);
+            publishEvent(
+                    prepareSendMessageEvent(chatId, editMessageId, "Змагання не знайдено", getBackToCompetitionsKeyboard())
+            );
+            return;
+        }
+        callback.accept(competition);
     }
 }
