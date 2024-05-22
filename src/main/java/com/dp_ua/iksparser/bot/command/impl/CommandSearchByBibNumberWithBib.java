@@ -33,7 +33,7 @@ public class CommandSearchByBibNumberWithBib extends BaseCommand {
         competitionFacade.searchingByBibNumber(chatId, commandArgument, message.getEditMessageId());
     }
 
-    public static String getTextForState(String competitionId) {
+    public static String getTextForState(long competitionId) {
         return "/" + command + " {\"id\":\"" + competitionId + "\",\"bib\":\"{}\"}";
     }
 

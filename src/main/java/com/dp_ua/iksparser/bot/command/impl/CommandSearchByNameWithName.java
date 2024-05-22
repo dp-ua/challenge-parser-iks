@@ -34,7 +34,7 @@ public class CommandSearchByNameWithName extends BaseCommand {
         competitionFacade.searchingByName(chatId, commandArgument, message.getEditMessageId());
     }
 
-    public static String getTextForState(String competitionId) {
+    public static String getTextForState(long competitionId) {
         return "/" + command + " {\"id\":\"" + competitionId + "\",\"name\":\"{}\"}";
     }
 }
