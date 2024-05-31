@@ -36,9 +36,7 @@ public class SubscriptionView {
                 .append(END_LINE)
                 .append(participantView.info(participant))
                 .append(END_LINE).append("Приймає участь у змаганнях: ")
-                .append(competitionView.nameAndDate(competition))
-                .append(competitionView.link(competition))
-                .append(END_LINE)
+                .append(competitionView.info(competition))
                 .append(END_LINE);
 
         separateHeatLinesByStatuses(heatLines).forEach((status, lines) -> {
