@@ -137,6 +137,7 @@ public class CompetitionView {
                 date(competition) +
                 END_LINE +
                 area(competition) +
+                END_LINE +
                 link(competition) +
                 END_LINE;
 
