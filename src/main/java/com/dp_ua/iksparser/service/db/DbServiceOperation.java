@@ -1,8 +1,10 @@
 package com.dp_ua.iksparser.service.db;
 
 import com.dp_ua.iksparser.bot.controller.BotController;
+import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
 import com.dp_ua.iksparser.dba.entity.HeatLineEntity;
 import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
+import com.dp_ua.iksparser.dba.service.CompetitionService;
 import com.dp_ua.iksparser.dba.service.HeatLineService;
 import com.dp_ua.iksparser.dba.service.ParticipantService;
 import com.dp_ua.iksparser.dba.service.SubscriberService;
@@ -29,19 +31,62 @@ public class DbServiceOperation {
     HeatLineService heatLineService;
     @Autowired
     ParticipantService participantService;
+    @Autowired
+    CompetitionService competitionService;
 
     @Transactional
-    public void operateDuplicates() {
+    public void operateCompetitionsDuplicates() {
+        List<CompetitionEntity> competitions = competitionService.findAllOrderByBeginDateDesc();
+        bot.sendMessageToAdmin("Found " + competitions.size() + " competitions");
+        List<CompetitionEntity> needToDelete = getDuplicatesOfCompetition(competitions);
+        bot.sendMessageToAdmin("Found " + needToDelete.size() + " competitions to delete");
+        deleteDuplicatesCompetitions(needToDelete);
+        bot.sendMessageToAdmin("All duplicates processed");
+    }
+
+    private void deleteDuplicatesCompetitions(List<CompetitionEntity> needToDelete) {
+        needToDelete.forEach(c -> {
+            competitionService.delete(c);
+            log.info("Delete competition: " + c);
+        });
+    }
+
+    private static List<CompetitionEntity> getDuplicatesOfCompetition(List<CompetitionEntity> competitions) {
+        List<CompetitionEntity> needToDelete = new ArrayList<>();
+        while (competitions.size() > 1) {
+            CompetitionEntity competition = competitions.get(0);
+            List<CompetitionEntity> duplicates = competitions.stream()
+                    .filter(c -> c.getName().equals(competition.getName())
+                            && c.getBeginDate().equals(competition.getBeginDate())
+                            && c.getEndDate().equals(competition.getEndDate()))
+                    .collect(Collectors.toList());
+            if (duplicates.size() == 1) {
+                competitions.remove(competition);
+                continue;
+            }
+            duplicates.forEach(c ->
+                    {
+                        if (!c.isFilled() || c.isURLEmpty()) {
+                            needToDelete.add(c);
+                        }
+                        competitions.remove(c);
+                    }
+            );
+        }
+        return needToDelete;
+    }
+
+    @Transactional
+    public void operateParticipantsDuplicates() {
         List<ParticipantEntity> duplicates = participantService.findDuplicates();
         log.info("Found " + duplicates.size() + " duplicates");
         bot.sendMessageToAdmin("Found " + duplicates.size() + " duplicates");
-        operateDuplicates(duplicates);
+        operateParticipantsDuplicates(duplicates);
         bot.sendMessageToAdmin("All duplicates processed");
-
     }
 
 
-    private void operateDuplicates(List<ParticipantEntity> duplicates) {
+    private void operateParticipantsDuplicates(List<ParticipantEntity> duplicates) {
         int stop = 0;
         int breakCount = duplicates.size();
         log.info("Start duplicates processing. Duplicates count: " + duplicates.size());

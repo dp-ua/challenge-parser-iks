@@ -194,4 +194,8 @@ public class CompetitionService {
     public List<String> getAllStatuses() {
         return Arrays.asList(CompetitionStatus.values()).stream().map(CompetitionStatus::getName).toList();
     }
+
+    public void delete(CompetitionEntity c) {
+        repo.delete(c);
+    }
 }
