@@ -19,7 +19,8 @@ public class CommandDuplicates extends AdminAccessCommand {
 
     @Override
     protected void perform(Message message) {
-        dbServiceOperation.operateDuplicates();
+        dbServiceOperation.operateParticipantsDuplicates();
+        dbServiceOperation.operateCompetitionsDuplicates();
     }
 
     @Override

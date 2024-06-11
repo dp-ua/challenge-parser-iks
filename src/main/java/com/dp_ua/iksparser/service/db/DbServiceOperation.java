@@ -1,8 +1,11 @@
 package com.dp_ua.iksparser.service.db;
 
 import com.dp_ua.iksparser.bot.controller.BotController;
+import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
 import com.dp_ua.iksparser.dba.entity.HeatLineEntity;
 import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
+import com.dp_ua.iksparser.dba.entity.SubscriberEntity;
+import com.dp_ua.iksparser.dba.service.CompetitionService;
 import com.dp_ua.iksparser.dba.service.HeatLineService;
 import com.dp_ua.iksparser.dba.service.ParticipantService;
 import com.dp_ua.iksparser.dba.service.SubscriberService;
@@ -11,10 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -29,19 +29,62 @@ public class DbServiceOperation {
     HeatLineService heatLineService;
     @Autowired
     ParticipantService participantService;
+    @Autowired
+    CompetitionService competitionService;
 
     @Transactional
-    public void operateDuplicates() {
+    public void operateCompetitionsDuplicates() {
+        List<CompetitionEntity> competitions = competitionService.findAllOrderByBeginDateDesc();
+        bot.sendMessageToAdmin("Found " + competitions.size() + " competitions");
+        List<CompetitionEntity> needToDelete = getDuplicatesOfCompetition(competitions);
+        bot.sendMessageToAdmin("Found " + needToDelete.size() + " competitions to delete");
+        deleteDuplicatesCompetitions(needToDelete);
+        bot.sendMessageToAdmin("All duplicates processed");
+    }
+
+    private void deleteDuplicatesCompetitions(List<CompetitionEntity> needToDelete) {
+        needToDelete.forEach(c -> {
+            competitionService.delete(c);
+            log.info("Delete competition: " + c);
+        });
+    }
+
+    private static List<CompetitionEntity> getDuplicatesOfCompetition(List<CompetitionEntity> competitions) {
+        List<CompetitionEntity> needToDelete = new ArrayList<>();
+        while (competitions.size() > 1) {
+            CompetitionEntity competition = competitions.get(0);
+            List<CompetitionEntity> duplicates = competitions.stream()
+                    .filter(c -> c.getName().equals(competition.getName())
+                            && c.getBeginDate().equals(competition.getBeginDate())
+                            && c.getEndDate().equals(competition.getEndDate()))
+                    .toList();
+            if (duplicates.size() == 1) {
+                competitions.remove(competition);
+                continue;
+            }
+            duplicates.forEach(c ->
+                    {
+                        if (!c.isFilled() || c.isURLEmpty()) {
+                            needToDelete.add(c);
+                        }
+                        competitions.remove(c);
+                    }
+            );
+        }
+        return needToDelete;
+    }
+
+    @Transactional
+    public void operateParticipantsDuplicates() {
         List<ParticipantEntity> duplicates = participantService.findDuplicates();
         log.info("Found " + duplicates.size() + " duplicates");
         bot.sendMessageToAdmin("Found " + duplicates.size() + " duplicates");
-        operateDuplicates(duplicates);
+        operateParticipantsDuplicates(duplicates);
         bot.sendMessageToAdmin("All duplicates processed");
-
     }
 
 
-    private void operateDuplicates(List<ParticipantEntity> duplicates) {
+    private void operateParticipantsDuplicates(List<ParticipantEntity> duplicates) {
         int stop = 0;
         int breakCount = duplicates.size();
         log.info("Start duplicates processing. Duplicates count: " + duplicates.size());
@@ -77,34 +120,30 @@ public class DbServiceOperation {
             Set<String> chats = onePerson.stream()
                     .map(p -> subscribeService.findAllByParticipant(p))
                     .flatMap(List::stream)
-                    .map(s -> s.getChatId())
+                    .map(SubscriberEntity::getChatId)
                     .collect(Collectors.toSet());
 
 
             // get url from one person
             Optional<String> url = onePerson.stream()
-                    .map(p -> p.getUrl())
-                    .filter(u -> u != null) // get any url
+                    .map(ParticipantEntity::getUrl)
+                    .filter(Objects::nonNull) // get any url
                     .findFirst();
 
             // unsubscribe all chats
-            onePerson.forEach(p -> {
-                subscribeService.unsubscribeAll(p);
-            });
+            onePerson.forEach(p -> subscribeService.unsubscribeAll(p));
 
             // set all heatLines to one participant
             participant.setHeatLines(heatLines);
-            heatLines.stream().forEach(h -> {
+            heatLines.forEach(h -> {
                 h.setParticipant(participant);
                 heatLineService.save(h);
             });
 
             // set any url
-            url.ifPresent(u -> participant.setUrl(u));
+            url.ifPresent(participant::setUrl);
             // subscribe one participant to all chats
-            chats.stream().forEach(chatId -> {
-                subscribeService.subscribe(chatId, participant);
-            });
+            chats.forEach(chatId -> subscribeService.subscribe(chatId, participant));
             participantService.save(participant);
             log.info("Save participant: " + participant);
 
