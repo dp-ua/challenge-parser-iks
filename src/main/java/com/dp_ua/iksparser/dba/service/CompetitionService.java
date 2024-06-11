@@ -57,18 +57,27 @@ public class CompetitionService {
     }
 
     public CompetitionEntity saveOrUpdate(CompetitionEntity competition) {
-        CompetitionEntity competitionFromDb = repo.findByNameAndBeginDateAndUrl(
+        Optional<CompetitionEntity> competitionFromDb = getCompetitionFromDb(competition);
+        return competitionFromDb
+                .map(competitionEntity -> {
+                    competitionEntity.fillCompetition(competition);
+                    return repo.save(competitionEntity);
+                })
+                .orElseGet(() -> repo.save(competition));
+    }
+
+    private Optional<CompetitionEntity> getCompetitionFromDb(CompetitionEntity competition) {
+        List<CompetitionEntity> competitions = repo.findByNameAndBeginDateAndEndDate(
                 competition.getName(),
                 competition.getBeginDate(),
-                competition.getUrl()
+                competition.getEndDate()
         );
-        if (competitionFromDb == null) {
-            return repo.save(competition);
-        } else {
-            competitionFromDb.fillCompetition(competition);
-            repo.save(competitionFromDb);
+        if (competitions.size() == 1) {
+            return Optional.of(competitions.get(0));
         }
-        return competitionFromDb;
+        return competitions.stream()
+                .filter(c -> !c.isURLEmpty() || c.isFilled())
+                .findFirst();
     }
 
     public CompetitionEntity findById(long commandArgument) {

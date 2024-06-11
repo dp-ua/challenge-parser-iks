@@ -10,7 +10,7 @@ import java.util.List;
 public interface CompetitionRepo extends CrudRepository<CompetitionEntity, Long> {
     CompetitionEntity findByName(String name);
 
-    CompetitionEntity findByNameAndBeginDateAndUrl(String name, String beginDate, String url);
+    List<CompetitionEntity> findByNameAndBeginDateAndEndDate(String name, String beginDate, String endDate);
 
     List<CompetitionEntity> findAllByOrderByUpdated();
 
