@@ -51,7 +51,7 @@ public class CronCompetitionUpdater implements ApplicationListener<ContextRefres
         }
     }
 
-    @Scheduled(cron = "0 0 0/8 * * *") // update competitions list every 8 hours
+    @Scheduled(cron = "0 0 0/1 * * *") // update competitions list every 1 hour
     public void updateCompetitionsList() {
         LocalDate now = LocalDate.now();
         update(now.getYear());
