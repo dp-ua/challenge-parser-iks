@@ -35,38 +35,43 @@ public class DbServiceOperation {
     @Transactional
     public void operateCompetitionsDuplicates() {
         List<CompetitionEntity> competitions = competitionService.findAllOrderByBeginDateDesc();
-        bot.sendMessageToAdmin("Found " + competitions.size() + " competitions");
+        bot.sendMessageToAdmin("1.[competitions] Found " + competitions.size() + " competitions");
         List<CompetitionEntity> needToDelete = getDuplicatesOfCompetition(competitions);
-        bot.sendMessageToAdmin("Found " + needToDelete.size() + " competitions to delete");
+        bot.sendMessageToAdmin("2.[competitions] Found " + needToDelete.size() + " competitions to delete");
         deleteDuplicatesCompetitions(needToDelete);
-        bot.sendMessageToAdmin("All duplicates processed");
+        bot.sendMessageToAdmin("3.[competitions] All duplicates processed");
     }
 
     private void deleteDuplicatesCompetitions(List<CompetitionEntity> needToDelete) {
+        log.info("Start delete duplicates competitions. Size: " + needToDelete.size());
         needToDelete.forEach(c -> {
             competitionService.delete(c);
             log.info("Delete competition: " + c);
         });
     }
 
-    private static List<CompetitionEntity> getDuplicatesOfCompetition(List<CompetitionEntity> competitions) {
+    private List<CompetitionEntity> getDuplicatesOfCompetition(List<CompetitionEntity> competitions) {
         List<CompetitionEntity> needToDelete = new ArrayList<>();
         while (competitions.size() > 1) {
             CompetitionEntity competition = competitions.get(0);
+            log.info("Check competition: " + competition);
             List<CompetitionEntity> duplicates = competitions.stream()
                     .filter(c -> c.getName().equals(competition.getName())
                             && c.getBeginDate().equals(competition.getBeginDate())
                             && c.getEndDate().equals(competition.getEndDate()))
                     .toList();
             if (duplicates.size() == 1) {
+                log.info("No duplicates for the competition: " + competition);
                 competitions.remove(competition);
                 continue;
             }
             duplicates.forEach(c ->
                     {
                         if (!c.isFilled() || c.isURLEmpty()) {
+                            log.info("Need to delete. Found not filled competition: " + c);
                             needToDelete.add(c);
                         }
+                        log.info("Left competition: " + c);
                         competitions.remove(c);
                     }
             );
@@ -77,10 +82,10 @@ public class DbServiceOperation {
     @Transactional
     public void operateParticipantsDuplicates() {
         List<ParticipantEntity> duplicates = participantService.findDuplicates();
-        log.info("Found " + duplicates.size() + " duplicates");
-        bot.sendMessageToAdmin("Found " + duplicates.size() + " duplicates");
+        log.info("1.[participants] Found " + duplicates.size() + " duplicates");
+        bot.sendMessageToAdmin("1.[participants] Found " + duplicates.size() + " duplicates");
         operateParticipantsDuplicates(duplicates);
-        bot.sendMessageToAdmin("All duplicates processed");
+        bot.sendMessageToAdmin("2.[participants] All duplicates processed");
     }
 
 

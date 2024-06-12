@@ -21,7 +21,6 @@ import static com.dp_ua.iksparser.service.MessageCreator.*;
 
 @Component
 public class CompetitionView {
-    private static final int COMPETITION_BUTTON_LIMIT = 40;
 
     public String getTextForCompetitionsPage(Page<CompetitionEntity> page) {
         List<CompetitionEntity> competitions = page.getContent();
@@ -68,7 +67,7 @@ public class CompetitionView {
         result
                 .append("     ")
                 .append(ITALIC)
-                .append("[оберіть змагання]")
+                .append("[оберіть змагання за його номером]")
                 .append(ITALIC);
 
         return result.toString();
@@ -86,7 +85,7 @@ public class CompetitionView {
             CompetitionEntity competition = competitions.get(i);
             int count = i + 1;
             InlineKeyboardButton button = SERVICE.getKeyboardButton(
-                    getShortName(Icon.getIconForNumber(count).toString(), COMPETITION_BUTTON_LIMIT),
+                    Icon.getIconForNumber(count).toString(),
                     "/" + CommandCompetition.command + " " + competition.getId()
             );
             row.add(button);
@@ -104,14 +103,14 @@ public class CompetitionView {
         int totalPages = page.getTotalPages();
         if (number > 0) {
             InlineKeyboardButton leftPage = SERVICE.getKeyboardButton(
-                    PREVIOUS.toString(),
+                    PREVIOUS + " Свіжіші",
                     "/" + CommandCompetitions.command + " " + (number - 1)
             );
             row.add(leftPage);
         }
         if (number < totalPages - 1) {
             InlineKeyboardButton rightPage = SERVICE.getKeyboardButton(
-                    NEXT.toString(),
+                    "Старіші " + NEXT,
                     "/" + CommandCompetitions.command + " " + (number + 1)
             );
             row.add(rightPage);
@@ -119,20 +118,8 @@ public class CompetitionView {
         return row;
     }
 
-    private String getShortName(String text, int limit) {
-        if (limit == 0) {
-            return text;
-        }
-        if (text.length() <= limit) {
-            return text;
-        }
-        return SERVICE.cleanMarkdown(text)
-                .substring(0, limit) +
-                "...";
-    }
-
     public String info(CompetitionEntity competition) {
-        String sb = name(competition) +
+        return name(competition) +
                 END_LINE +
                 date(competition) +
                 END_LINE +
@@ -140,24 +127,20 @@ public class CompetitionView {
                 END_LINE +
                 link(competition) +
                 END_LINE;
-
-        return sb;
     }
 
     public String notFilledInfo() {
-        String sb = WARNING +
+        return WARNING +
                 END_LINE +
                 " Детальна інформація про змагання відсутня " +
                 WARNING +
                 END_LINE;
-        return sb;
     }
 
     public String name(CompetitionEntity competition) {
-        String sb = ITALIC +
+        return ITALIC +
                 competition.getName() +
                 ITALIC;
-        return sb;
     }
 
     public String date(CompetitionEntity competition) {
@@ -177,14 +160,13 @@ public class CompetitionView {
     }
 
     public String nameAndDate(CompetitionEntity competition) {
-        String sb = name(competition) +
+        return name(competition) +
                 END_LINE +
                 date(competition);
-        return sb;
     }
 
     public String area(CompetitionEntity competition) {
-        String sb = AREA +
+        return AREA +
                 ITALIC +
                 " Місце проведення: " +
                 ITALIC +
@@ -193,7 +175,6 @@ public class CompetitionView {
                 BOLD +
                 competition.getCity() +
                 BOLD;
-        return sb;
     }
 
     public String link(CompetitionEntity competition) {
