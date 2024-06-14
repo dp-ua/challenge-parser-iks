@@ -44,6 +44,8 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
     public static final int COMPETITIONS_PAGE_SIZE = 3;
     public static final int MAX_PARTICIPANTS_SIZE_TO_FIND = 5;
     private static final int MAX_CHUNK_SIZE = 4096;
+    public static final String INPUT_SURNAME = "Введіть прізвище";
+    public static final String INPUT_BIB = "Введіть номер учасника";
 
     @Autowired
     SubscribeFacade subscribeFacade;
@@ -173,7 +175,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
 
         setStateForSearchingByBibNumber(chatId, competitionId);
 
-        if (!isValidInputBibConditions(chatId, competition, competitionId, bib)) return;
+        if (isNotValidInputBibConditions(chatId, competition, competitionId, bib)) return;
 
         List<HeatLineEntity> heatLines = competition.getDays().stream()
                 .flatMap(day -> day.getEvents().stream())
@@ -192,7 +194,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
             publishEvent(prepareSendMessageEvent(
                     chatId, editMessageId,
                     "Знайдено забагато спортсменів під цим номером", getBackToCompetitionKeyboard(competitionId)));
-            publishFindMore(chatId, competitionId);
+            publishFindMore(chatId, competitionId, INPUT_BIB);
             return;
         }
         participants.forEach(participant -> {
@@ -200,7 +202,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
             boolean subscribed = subscribeFacade.isSubscribed(chatId, participant);
             publishTextMessage(chatId, message, subscriptionView.button(participant, subscribed));
         });
-        publishFindMore(chatId, competitionId);
+        publishFindMore(chatId, competitionId, INPUT_BIB);
     }
 
     @Override
@@ -215,7 +217,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         CompetitionEntity competition = competitionService.findById(competitionId);
         setStateForSearchingByName(chatId, competitionId);
 
-        if (!isValidInputNameConditions(chatId, competition, competitionId, name)) return;
+        if (isNotValidInputNameConditions(chatId, competition, competitionId, name)) return;
 
         List<HeatLineEntity> heatLines = competition.getDays().stream()
                 .flatMap(day -> day.getEvents().stream())
@@ -228,7 +230,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
                 .toList();
         if (heatLines.isEmpty()) {
             publishTextMessage(chatId, "Учасників не знайдено", null);
-            publishFindMore(chatId, competitionId);
+            publishFindMore(chatId, competitionId, INPUT_SURNAME);
             return;
         }
 
@@ -240,7 +242,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
             publishEvent(prepareSendMessageEvent(
                     chatId, editMessageId,
                     "Знайдено забагато спортсменів. Введіть повніше прізвище", getBackToCompetitionKeyboard(competitionId)));
-            publishFindMore(chatId, competitionId);
+            publishFindMore(chatId, competitionId, INPUT_SURNAME);
             return;
         }
 
@@ -249,22 +251,23 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
             boolean subscribed = subscribeFacade.isSubscribed(chatId, participant);
             publishTextMessage(chatId, message, subscriptionView.button(participant, subscribed));
         });
-        publishFindMore(chatId, competitionId);
+        publishFindMore(chatId, competitionId, INPUT_SURNAME);
     }
 
 
-    private void publishFindMore(String chatId, long competitionId) {
+    private void publishFindMore(String chatId, long competitionId, String text) {
         try {
             Thread.sleep(100);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
         InlineKeyboardMarkup keyboard = getBackToCompetitionKeyboard(competitionId);
-//        keyboard.getKeyboard().addAll(getEnoughKeyboard().getKeyboard());
         publishEvent(prepareSendMessageEvent(
                 chatId,
                 null,
-                FIND + "Шукати ще?\n\nВведіть прізвище",
+                FIND + "Шукати ще?" +
+                        END_LINE + END_LINE +
+                        text,
                 keyboard)
         );
     }
@@ -287,7 +290,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
 
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public void searchingByCoachWithName(String chatId, String commandArgument, Integer editMessageId) {
         log.info("searchingByCoachWithName. CommandArgument {}, chatId:{} ", commandArgument, chatId);
         sendTypingAction(chatId);
@@ -298,14 +301,14 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
 
         setStateSearchingByCoach(chatId, competitionId);
 
-        if (!isValidInputNameConditions(chatId, competition, competitionId, coachName)) return;
+        if (isNotValidInputNameConditions(chatId, competition, competitionId, coachName)) return;
 
         List<CoachEntity> foundCoaches = coachService.searchByNamePartialMatch(coachName);
         if (isNotFoundCoaches(foundCoaches, coachName)) {
             publishEvent(prepareSendMessageEvent(
                     chatId, editMessageId,
                     "Тренера не знайдено.", null));
-            publishFindMore(chatId, competitionId);
+            publishFindMore(chatId, competitionId, INPUT_SURNAME);
             return;
         }
 
@@ -325,7 +328,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         if (coachHeatLinesMap.isEmpty()) {
             log.warn("No participants found");
             publishTextMessage(chatId, "Учасників не знайдено", null);
-            publishFindMore(chatId, competitionId);
+            publishFindMore(chatId, competitionId, INPUT_SURNAME);
             return;
         }
         coachHeatLinesMap.forEach((coach, coachHeatLines) -> {
@@ -342,7 +345,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
 
             sendChunkedMessages(chatId, header, participantsInfo);
         });
-        publishFindMore(chatId, competitionId);
+        publishFindMore(chatId, competitionId, INPUT_SURNAME);
     }
 
 
@@ -414,24 +417,24 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         return false;
     }
 
-    private boolean isValidInputBibConditions(String chatId, CompetitionEntity competition, long id, String bib) {
-        if (isValidCompetition(chatId, competition, id)) return false;
+    private boolean isNotValidInputBibConditions(String chatId, CompetitionEntity competition, long id, String bib) {
+        if (isNotValidCompetition(chatId, competition, id)) return true;
         if (bib.isEmpty()) {
             log.warn("Bib is empty");
             publishTextMessage(chatId, "Ви не вказали біб-номер", null);
-            publishFindMore(chatId, id);
-            return false;
+            publishFindMore(chatId, id, INPUT_BIB);
+            return true;
         }
         if (!bib.matches("[0-9]+")) {
             log.warn("Bib contains invalid symbols: {}", bib);
             publishTextMessage(chatId, "Ви вказали некоректний біб-номер", null);
-            publishFindMore(chatId, id);
-            return false;
+            publishFindMore(chatId, id, INPUT_BIB);
+            return true;
         }
-        return true;
+        return false;
     }
 
-    private boolean isValidCompetition(String chatId, CompetitionEntity competition, long id) {
+    private boolean isNotValidCompetition(String chatId, CompetitionEntity competition, long id) {
         if (competition == null) {
             log.warn("Competition[{}] not found", id);
             publishTextMessage(chatId, "Змагання не знайдено", getBackToCompetitionsKeyboard());
@@ -440,27 +443,27 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         return false;
     }
 
-    private boolean isValidInputNameConditions(String chatId, CompetitionEntity competition, long id, String name) {
-        if (isValidCompetition(chatId, competition, id)) return false;
+    private boolean isNotValidInputNameConditions(String chatId, CompetitionEntity competition, long id, String name) {
+        if (isNotValidCompetition(chatId, competition, id)) return true;
         if (name.isEmpty()) {
             log.warn("Name is empty");
             publishTextMessage(chatId, "Ви не вказали прізвище", null);
-            publishFindMore(chatId, id);
-            return false;
+            publishFindMore(chatId, id, INPUT_SURNAME);
+            return true;
         }
         if (name.length() < 3) {
             log.warn("Name is too short");
             publishTextMessage(chatId, "Ви вказали занадто коротке прізвище", null);
-            publishFindMore(chatId, id);
-            return false;
+            publishFindMore(chatId, id, INPUT_SURNAME);
+            return true;
         }
         if (!name.matches("[а-яА-Яa-zA-Z-ґҐєЄіІїЇ']+")) {
             log.warn("Name contains invalid symbols: {}", name);
             publishTextMessage(chatId, "Ви вказали некоректне прізвище", null);
-            publishFindMore(chatId, id);
-            return false;
+            publishFindMore(chatId, id, INPUT_SURNAME);
+            return true;
         }
-        return true;
+        return false;
     }
 
 
