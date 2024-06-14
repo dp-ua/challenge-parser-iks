@@ -26,14 +26,17 @@ public class TextCommandDetectorImpl implements TextCommandDetectorService {
     @Override
     public List<CommandInterface> getParsedCommands(String text) throws NotForMeException {
         log.debug("getParsedCommands: {}", text);
-        if (text == null || text.length() < 2)
-            throw new IllegalArgumentException("Text is empty or blank or length < 2");
-
-        List<CommandInterface> simpleCommands = getParsedSimpleCommands(text);
-        if (simpleCommands != null) return simpleCommands;
-        // parse full string commands TODO
-        // parse part of string commands TODO
+        if (isCanBeCommand(text)) {
+            List<CommandInterface> simpleCommands = getParsedSimpleCommands(text);
+            if (simpleCommands != null) return simpleCommands;
+            // parse full string commands TODO
+            // parse part of string commands TODO
+        }
         return new ArrayList<>();
+    }
+
+    private boolean isCanBeCommand(String text) {
+        return text != null || text.length() > 1;
     }
 
     private List<CommandInterface> getParsedSimpleCommands(String text) throws NotForMeException {
