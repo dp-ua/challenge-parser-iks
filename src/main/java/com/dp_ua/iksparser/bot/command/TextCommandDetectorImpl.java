@@ -36,7 +36,7 @@ public class TextCommandDetectorImpl implements TextCommandDetectorService {
     }
 
     private boolean isCanBeCommand(String text) {
-        return text != null || text.length() > 1;
+        return text != null || text.length() > 2;
     }
 
     private List<CommandInterface> getParsedSimpleCommands(String text) throws NotForMeException {
