@@ -116,8 +116,8 @@ public class SearchView {
                 .append("Приймає участь у змаганнях: ")
                 .append(END_LINE);
 
-        List<String> strings = heatLineView.heatLinesListInfo(participant, heatLines);
-        strings.forEach(message::append);
+        heatLineView.heatLinesListInfo(participant, heatLines)
+                .forEach(message::append);
 
         return message.toString();
     }
