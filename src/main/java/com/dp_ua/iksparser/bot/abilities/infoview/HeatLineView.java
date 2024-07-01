@@ -39,7 +39,7 @@ public class HeatLineView {
 
     public List<String> heatLinesListInfo(ParticipantEntity participant, List<HeatLineEntity> heatLines) {
         List<String> heatLinesInfo = heatLines.stream()
-                .filter(heatLine -> !heatLine.getParticipant().equals(participant))
+                .filter(heatLine -> heatLine.getParticipant().equals(participant))
                 .map(this::info)
                 .toList();
 
