@@ -99,22 +99,26 @@ public class SearchView {
             CompetitionEntity competition,
             List<HeatLineEntity> heatLines) {
 
-        String message = LOOK +
-                BOLD +
-                "Знайдено спортсмена: " +
-                BOLD +
-                END_LINE +
-                participantView.info(participant) +
-                END_LINE +
-                END_LINE +
-                competitionView.nameAndDate(competition) +
-                END_LINE +
-                END_LINE +
-                HEAT +
-                "Приймає участь у змаганнях: " +
-                END_LINE;
-        heatLineView.heatLinesListInfo(participant, heatLines).forEach(message::concat);
+        StringBuilder message = new StringBuilder();
 
-        return message;
+        message.append(LOOK)
+                .append(BOLD)
+                .append("Знайдено спортсмена: ")
+                .append(BOLD)
+                .append(END_LINE)
+                .append(participantView.info(participant))
+                .append(END_LINE)
+                .append(END_LINE)
+                .append(competitionView.nameAndDate(competition))
+                .append(END_LINE)
+                .append(END_LINE)
+                .append(HEAT)
+                .append("Приймає участь у змаганнях: ")
+                .append(END_LINE);
+
+        List<String> strings = heatLineView.heatLinesListInfo(participant, heatLines);
+        strings.forEach(message::append);
+
+        return message.toString();
     }
 }
