@@ -198,7 +198,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
             return;
         }
         participants.forEach(participant -> {
-            String message = searchView.foundParticipantInCompetition(participant, competition, heatLines);
+            String message = searchView.foundParticipantInCompetitionMessage(participant, competition, heatLines);
             boolean subscribed = subscribeFacade.isSubscribed(chatId, participant);
             publishTextMessage(chatId, message, subscriptionView.button(participant, subscribed));
         });
@@ -247,7 +247,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         }
 
         participants.forEach(participant -> {
-            String message = searchView.foundParticipantInCompetition(participant, competition, heatLines);
+            String message = searchView.foundParticipantInCompetitionMessage(participant, competition, heatLines);
             boolean subscribed = subscribeFacade.isSubscribed(chatId, participant);
             publishTextMessage(chatId, message, subscriptionView.button(participant, subscribed));
         });
@@ -380,7 +380,8 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
             participantInfo
                     .append(participantView.info(participant))
                     .append(END_LINE);
-            participantHeatLines.forEach(heatLine -> participantInfo.append(heatLineView.info(heatLine)));
+            participantInfo
+                    .append(heatLineView.heatLinesListInfo(participant,participantHeatLines));
             participantInfo.append(END_LINE);
             result.add(participantInfo);
         });

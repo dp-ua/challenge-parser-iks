@@ -11,6 +11,11 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import static com.dp_ua.iksparser.bot.event.SendMessageEvent.MsgType.*;
 
 public enum MessageCreator {
@@ -110,5 +115,18 @@ public enum MessageCreator {
 
     public String maskApostrof(String text) {
         return text.replaceAll("'", "’");
+    }
+
+    public List<String> removeDuplicates(List<String> inputList) {
+        Set<String> seen = new HashSet<>();
+        List<String> resultList = new ArrayList<>();
+
+        for (String item : inputList) {
+            if (!seen.contains(item)) {
+                seen.add(item);
+                resultList.add(item);
+            }
+        }
+        return resultList;
     }
 }

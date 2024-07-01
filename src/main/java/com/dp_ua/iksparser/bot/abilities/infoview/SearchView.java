@@ -11,7 +11,6 @@ import java.util.List;
 
 import static com.dp_ua.iksparser.bot.Icon.*;
 import static com.dp_ua.iksparser.service.MessageCreator.*;
-import static com.dp_ua.iksparser.service.MessageCreator.ITALIC;
 
 @Component
 public class SearchView {
@@ -95,31 +94,27 @@ public class SearchView {
         return header.toString();
     }
 
-    public String foundParticipantInCompetition(ParticipantEntity participant, CompetitionEntity competition, List<HeatLineEntity> heatLines) {
-        StringBuilder message = new StringBuilder();
-        message
-                .append(LOOK)
-                .append(BOLD)
-                .append("Знайдено спортсмена: ")
-                .append(BOLD)
-                .append(END_LINE);
-        message
-                .append(participantView.info(participant))
-                .append(END_LINE)
-                .append(END_LINE);
+    public String foundParticipantInCompetitionMessage(
+            ParticipantEntity participant,
+            CompetitionEntity competition,
+            List<HeatLineEntity> heatLines) {
 
-        message
-                .append(competitionView.nameAndDate(competition))
-                .append(END_LINE)
-                .append(END_LINE);
-        message
-                .append(HEAT)
-                .append("Приймає участь у змаганнях: ")
-                .append(END_LINE);
+        String message = LOOK +
+                BOLD +
+                "Знайдено спортсмена: " +
+                BOLD +
+                END_LINE +
+                participantView.info(participant) +
+                END_LINE +
+                END_LINE +
+                competitionView.nameAndDate(competition) +
+                END_LINE +
+                END_LINE +
+                HEAT +
+                "Приймає участь у змаганнях: " +
+                END_LINE +
+                heatLineView.heatLinesListInfo(participant, heatLines);
 
-        heatLines.stream()
-                .filter(heatLine -> heatLine.getParticipant().equals(participant))
-                .forEach(heatLine -> message.append(heatLineView.info(heatLine)));
-        return message.toString();
+        return message;
     }
 }
