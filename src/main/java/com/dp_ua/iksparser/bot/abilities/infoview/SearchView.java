@@ -112,8 +112,8 @@ public class SearchView {
                 END_LINE +
                 HEAT +
                 "Приймає участь у змаганнях: " +
-                END_LINE +
-                heatLineView.heatLinesListInfo(participant, heatLines);
+                END_LINE;
+        heatLineView.heatLinesListInfo(participant, heatLines).forEach(message::concat);
 
         return message;
     }

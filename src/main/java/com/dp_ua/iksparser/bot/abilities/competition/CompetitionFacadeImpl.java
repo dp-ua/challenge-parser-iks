@@ -380,8 +380,8 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
             participantInfo
                     .append(participantView.info(participant))
                     .append(END_LINE);
-            participantInfo
-                    .append(heatLineView.heatLinesListInfo(participant,participantHeatLines));
+            heatLineView.heatLinesListInfo(participant,participantHeatLines)
+                    .forEach(participantInfo::append);
             participantInfo.append(END_LINE);
             result.add(participantInfo);
         });
