@@ -14,6 +14,7 @@ import com.dp_ua.iksparser.dba.entity.HeatLineEntity;
 import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
 import com.dp_ua.iksparser.dba.service.CoachService;
 import com.dp_ua.iksparser.dba.service.CompetitionService;
+import com.dp_ua.iksparser.dba.service.HeatLineService;
 import com.dp_ua.iksparser.exeption.ParsingException;
 import com.dp_ua.iksparser.service.JsonReader;
 import com.dp_ua.iksparser.service.parser.MainParserService;
@@ -71,6 +72,8 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
     ParticipantView participantView;
     @Autowired
     SearchView searchView;
+    @Autowired
+    HeatLineService heatLineService;
 
     @Override
     public void showCompetitions(String chatId, int pageNumber, Integer editMessageId) {
@@ -312,17 +315,12 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
             return;
         }
 
-        List<HeatLineEntity> heatLines = competition.getDays().stream()
-                .flatMap(day -> day.getEvents().stream())
-                .flatMap(event -> event.getHeats().stream())
-                .flatMap(heap -> heap.getHeatLines().stream())
-                .toList();
-
         Map<CoachEntity, List<HeatLineEntity>> coachHeatLinesMap = new HashMap<>();
         foundCoaches.forEach(coach -> {
-            List<HeatLineEntity> coachHeatLines = heatLines.stream()
-                    .filter(heatLine -> heatLine.getCoaches().contains(coach))
-                    .collect(Collectors.toList());
+            List<HeatLineEntity> coachHeatLines = heatLineService.getHeatLinesInCompetitionWhereCoachIs(
+                    competition.getId(),
+                    coach.getId()
+            );
             coachHeatLinesMap.put(coach, coachHeatLines);
         });
         if (coachHeatLinesMap.isEmpty()) {
@@ -380,7 +378,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
             participantInfo
                     .append(participantView.info(participant))
                     .append(END_LINE);
-            heatLineView.heatLinesListInfo(participant,participantHeatLines)
+            heatLineView.heatLinesListInfo(participant, participantHeatLines)
                     .forEach(participantInfo::append);
             participantInfo.append(END_LINE);
             result.add(participantInfo);

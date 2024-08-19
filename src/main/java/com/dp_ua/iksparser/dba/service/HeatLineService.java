@@ -42,4 +42,8 @@ public class HeatLineService {
     public List<HeatLineDto> convertToDtoList(List<HeatLineEntity> heatLineEntities) {
         return heatLineEntities.stream().map(this::convertToDto).toList();
     }
+
+    public List<HeatLineEntity> getHeatLinesInCompetitionWhereCoachIs(Long competitionId, Long coachId) {
+        return repo.getHeatLinesInCompetitionWhereCoachIs(competitionId, coachId);
+    }
 }
