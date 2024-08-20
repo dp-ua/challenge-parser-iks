@@ -46,4 +46,8 @@ public class HeatLineService {
     public List<HeatLineEntity> getHeatLinesInCompetitionWhereCoachIs(Long competitionId, Long coachId) {
         return repo.getHeatLinesInCompetitionWhereCoachIs(competitionId, coachId);
     }
+
+    public List<HeatLineEntity> getHeatLinesInCompetitionByBib(Long competitionId, String bib) {
+        return repo.getHeatLinesInCompetitionByBib(competitionId, bib);
+    }
 }

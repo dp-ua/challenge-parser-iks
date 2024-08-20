@@ -180,16 +180,13 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
 
         if (isNotValidInputBibConditions(chatId, competition, competitionId, bib)) return;
 
-        List<HeatLineEntity> heatLines = competition.getDays().stream()
-                .flatMap(day -> day.getEvents().stream())
-                .flatMap(event -> event.getHeats().stream())
-                .flatMap(heap -> heap.getHeatLines().stream())
-                .filter(heatLine -> heatLine.getBib().equals(bib))
-                .toList();
+        List<HeatLineEntity> heatLines = heatLineService.getHeatLinesInCompetitionByBib(competition.getId(), bib);
 
         if (heatLines.isEmpty()) {
             publishTextMessage(chatId, "Учасників з номером " + bib + " не знайдено", null);
         }
+        // todo refactor
+        // collect participants and heatLines to hashMap
         Set<ParticipantEntity> participants = heatLines.stream()
                 .map(HeatLineEntity::getParticipant)
                 .collect(Collectors.toSet());
@@ -222,6 +219,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
 
         if (isNotValidInputNameConditions(chatId, competition, competitionId, name)) return;
 
+        // todo refactor
         List<HeatLineEntity> heatLines = competition.getDays().stream()
                 .flatMap(day -> day.getEvents().stream())
                 .flatMap(event -> event.getHeats().stream())

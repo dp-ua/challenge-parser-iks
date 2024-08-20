@@ -27,4 +27,12 @@ public interface HeatLineRepo extends CrudRepository<HeatLineEntity, Long> {
     //JOIN heat_line_entity hl ON hl.heat_id = h.id
     //JOIN heatline_coach hc ON hl.id = hc.heatline_id
     //where competition_id = 23 AND coach_id = 125;
+
+    @Query("SELECT hl FROM DayEntity d " +
+            "JOIN d.events e " +
+            "JOIN e.heats h " +
+            "JOIN h.heatLines hl " +
+            "WHERE d.competition.id = :competitionId AND hl.bib = :bib")
+    List<HeatLineEntity> getHeatLinesInCompetitionByBib(@Param("competitionId") Long competitionId,
+                                                        @Param("bib") String bib);
 }
