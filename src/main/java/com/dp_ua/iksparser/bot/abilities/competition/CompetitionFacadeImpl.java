@@ -14,6 +14,7 @@ import com.dp_ua.iksparser.dba.entity.HeatLineEntity;
 import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
 import com.dp_ua.iksparser.dba.service.CoachService;
 import com.dp_ua.iksparser.dba.service.CompetitionService;
+import com.dp_ua.iksparser.dba.service.HeatLineService;
 import com.dp_ua.iksparser.exeption.ParsingException;
 import com.dp_ua.iksparser.service.JsonReader;
 import com.dp_ua.iksparser.service.parser.MainParserService;
@@ -44,8 +45,12 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
     public static final int COMPETITIONS_PAGE_SIZE = 3;
     public static final int MAX_PARTICIPANTS_SIZE_TO_FIND = 5;
     private static final int MAX_CHUNK_SIZE = 4096;
+    // todo: move to properties or string constants
     public static final String INPUT_SURNAME = "Введіть прізвище";
     public static final String INPUT_BIB = "Введіть номер учасника";
+    public static final String COACH_NAME = "coachName";
+    public static final String NAME = "name";
+    public static final String BIB = "bib";
 
     @Autowired
     SubscribeFacade subscribeFacade;
@@ -71,6 +76,8 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
     ParticipantView participantView;
     @Autowired
     SearchView searchView;
+    @Autowired
+    HeatLineService heatLineService;
 
     @Override
     public void showCompetitions(String chatId, int pageNumber, Integer editMessageId) {
@@ -165,11 +172,12 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
     @Override
     @Transactional(readOnly = true)
     public void searchingByBibNumber(String chatId, String commandArgument, Integer editMessageId) {
-        log.info("searchingByBibNumber. CommandArgument {}, chatId:{} ", commandArgument, chatId);
         sendTypingAction(chatId);
 
-        long competitionId = Long.parseLong(jSonReader.getVal(commandArgument, "id"));
-        String bib = jSonReader.getVal(commandArgument, "bib").trim();
+        long competitionId = parseID(commandArgument);
+        String bib = parseBib(commandArgument);
+
+        log.info("searchingByBibNumber. CompetitionId: {}, bib: {}, chatId: {}", competitionId, bib, chatId);
 
         CompetitionEntity competition = competitionService.findById(competitionId);
 
@@ -177,68 +185,79 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
 
         if (isNotValidInputBibConditions(chatId, competition, competitionId, bib)) return;
 
-        List<HeatLineEntity> heatLines = competition.getDays().stream()
-                .flatMap(day -> day.getEvents().stream())
-                .flatMap(event -> event.getHeats().stream())
-                .flatMap(heap -> heap.getHeatLines().stream())
-                .filter(heatLine -> heatLine.getBib().equals(bib))
-                .toList();
+        List<HeatLineEntity> heatLines = heatLineService.getHeatLinesInCompetitionByBib(competition.getId(), bib);
 
         if (heatLines.isEmpty()) {
             publishTextMessage(chatId, "Учасників з номером " + bib + " не знайдено", null);
         }
-        Set<ParticipantEntity> participants = heatLines.stream()
-                .map(HeatLineEntity::getParticipant)
-                .collect(Collectors.toSet());
-        if (participants.size() > MAX_PARTICIPANTS_SIZE_TO_FIND) {
+
+        Map<ParticipantEntity, List<HeatLineEntity>> separatedParticipantsAndHeatLines = getSeparatedParticipantsAndHeatLines(heatLines);
+
+        if (separatedParticipantsAndHeatLines.size() > MAX_PARTICIPANTS_SIZE_TO_FIND) {
             publishEvent(prepareSendMessageEvent(
                     chatId, editMessageId,
                     "Знайдено забагато спортсменів під цим номером", getBackToCompetitionKeyboard(competitionId)));
             publishFindMore(chatId, competitionId, INPUT_BIB);
             return;
         }
-        participants.forEach(participant -> {
-            String message = searchView.foundParticipantInCompetitionMessage(participant, competition, heatLines);
+
+        separatedParticipantsAndHeatLines.entrySet().forEach(entry -> {
+            ParticipantEntity participant = entry.getKey();
+            List<HeatLineEntity> participantHeatLines = entry.getValue();
+
+            String message = searchView.foundParticipantInCompetitionMessage(participant, competition, participantHeatLines);
             boolean subscribed = subscribeFacade.isSubscribed(chatId, participant);
             publishTextMessage(chatId, message, subscriptionView.button(participant, subscribed));
         });
         publishFindMore(chatId, competitionId, INPUT_BIB);
     }
 
+    // todo move to utils
+    // todo add normalisation and validation
+    private long parseID(String commandArgument) {
+        return Long.parseLong(jSonReader.getVal(commandArgument, "id"));
+    }
+
+    private String parseName(String commandArgument) {
+        return jSonReader.getVal(commandArgument, NAME);
+    }
+
+    private String parseCoachName(String commandArgument) {
+        return jSonReader.getVal(commandArgument, COACH_NAME);
+    }
+
+    private String parseBib(String commandArgument) {
+        return jSonReader.getVal(commandArgument, BIB).trim();
+    }
+
+
     @Override
     @Transactional(readOnly = true)
     public void searchingByName(String chatId, String commandArgument, Integer editMessageId) {
-        log.info("searchingByName. CommandArgument {}, chatId:{} ", commandArgument, chatId);
         sendTypingAction(chatId);
 
-        long competitionId = Long.parseLong(jSonReader.getVal(commandArgument, "id"));
-        String name = jSonReader.getVal(commandArgument, "name");
+        long competitionId = parseID(commandArgument);
+        String name = parseName(commandArgument);
+        log.info("searchingByName. CompetitionId: {}, name: {}, chatId: {}", competitionId, name, chatId);
 
         CompetitionEntity competition = competitionService.findById(competitionId);
         setStateForSearchingByName(chatId, competitionId);
 
         if (isNotValidInputNameConditions(chatId, competition, competitionId, name)) return;
 
-        List<HeatLineEntity> heatLines = competition.getDays().stream()
-                .flatMap(day -> day.getEvents().stream())
-                .flatMap(event -> event.getHeats().stream())
-                .flatMap(heap -> heap.getHeatLines().stream())
-                .filter(heatLine -> heatLine.getParticipant()
-                        .getSurname().toLowerCase()
-                        .contains(name.toLowerCase())
-                )
-                .toList();
-        if (heatLines.isEmpty()) {
+        List<HeatLineEntity> allHeatLines = heatLineService.getHeatLinesInCompetitionByParticipantSurname(
+                competition.getId(),
+                name
+        );
+        if (allHeatLines.isEmpty()) {
             publishTextMessage(chatId, "Учасників не знайдено", null);
             publishFindMore(chatId, competitionId, INPUT_SURNAME);
             return;
         }
 
-        Set<ParticipantEntity> participants = heatLines.stream()
-                .map(HeatLineEntity::getParticipant)
-                .collect(Collectors.toSet());
+        Map<ParticipantEntity, List<HeatLineEntity>> participantHeatLinesMap = getSeparatedParticipantsAndHeatLines(allHeatLines);
 
-        if (participants.size() > MAX_PARTICIPANTS_SIZE_TO_FIND) {
+        if (participantHeatLinesMap.size() > MAX_PARTICIPANTS_SIZE_TO_FIND) {
             publishEvent(prepareSendMessageEvent(
                     chatId, editMessageId,
                     "Знайдено забагато спортсменів. Введіть повніше прізвище", getBackToCompetitionKeyboard(competitionId)));
@@ -246,12 +265,26 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
             return;
         }
 
-        participants.forEach(participant -> {
+        participantHeatLinesMap.entrySet().forEach(entry -> {
+            ParticipantEntity participant = entry.getKey();
+            List<HeatLineEntity> heatLines = entry.getValue();
+
             String message = searchView.foundParticipantInCompetitionMessage(participant, competition, heatLines);
             boolean subscribed = subscribeFacade.isSubscribed(chatId, participant);
             publishTextMessage(chatId, message, subscriptionView.button(participant, subscribed));
         });
         publishFindMore(chatId, competitionId, INPUT_SURNAME);
+    }
+
+    private static Map<ParticipantEntity, List<HeatLineEntity>> getSeparatedParticipantsAndHeatLines(List<HeatLineEntity> heatLines) {
+        Map<ParticipantEntity, List<HeatLineEntity>> participantHeatLinesMap = new HashMap<>();
+        heatLines.forEach(heatLine -> {
+            ParticipantEntity participant = heatLine.getParticipant();
+            List<HeatLineEntity> participantHeatLines =
+                    participantHeatLinesMap.computeIfAbsent(participant, k -> new ArrayList<>());
+            participantHeatLines.add(heatLine);
+        });
+        return participantHeatLinesMap;
     }
 
 
@@ -292,11 +325,12 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
     @Override
     @Transactional(readOnly = true)
     public void searchingByCoachWithName(String chatId, String commandArgument, Integer editMessageId) {
-        log.info("searchingByCoachWithName. CommandArgument {}, chatId:{} ", commandArgument, chatId);
         sendTypingAction(chatId);
 
-        long competitionId = Long.parseLong(jSonReader.getVal(commandArgument, "id"));
-        String coachName = jSonReader.getVal(commandArgument, "coachName");
+        long competitionId = parseID(commandArgument);
+        String coachName = parseCoachName(commandArgument);
+        log.info("searchingByCoachWithName. CompetitionId: {}, coachName: {}, chatId: {}", competitionId, coachName, chatId);
+
         CompetitionEntity competition = competitionService.findById(competitionId);
 
         setStateSearchingByCoach(chatId, competitionId);
@@ -312,17 +346,12 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
             return;
         }
 
-        List<HeatLineEntity> heatLines = competition.getDays().stream()
-                .flatMap(day -> day.getEvents().stream())
-                .flatMap(event -> event.getHeats().stream())
-                .flatMap(heap -> heap.getHeatLines().stream())
-                .toList();
-
         Map<CoachEntity, List<HeatLineEntity>> coachHeatLinesMap = new HashMap<>();
         foundCoaches.forEach(coach -> {
-            List<HeatLineEntity> coachHeatLines = heatLines.stream()
-                    .filter(heatLine -> heatLine.getCoaches().contains(coach))
-                    .collect(Collectors.toList());
+            List<HeatLineEntity> coachHeatLines = heatLineService.getHeatLinesInCompetitionWhereCoachIs(
+                    competition.getId(),
+                    coach.getId()
+            );
             coachHeatLinesMap.put(coach, coachHeatLines);
         });
         if (coachHeatLinesMap.isEmpty()) {
@@ -332,13 +361,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
             return;
         }
         coachHeatLinesMap.forEach((coach, coachHeatLines) -> {
-            Map<ParticipantEntity, List<HeatLineEntity>> participantHeatLinesMap = new HashMap<>();
-            coachHeatLines.forEach(heatLine -> {
-                ParticipantEntity participant = heatLine.getParticipant();
-                List<HeatLineEntity> participantHeatLines =
-                        participantHeatLinesMap.computeIfAbsent(participant, k -> new ArrayList<>());
-                participantHeatLines.add(heatLine);
-            });
+            Map<ParticipantEntity, List<HeatLineEntity>> participantHeatLinesMap = getSeparatedParticipantsAndHeatLines(coachHeatLines);
 
             String header = searchView.foundParticipantHeader(coach, coachHeatLines, competition);
             List<StringBuilder> participantsInfo = getParticipantsInfo(participantHeatLinesMap);
@@ -380,7 +403,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
             participantInfo
                     .append(participantView.info(participant))
                     .append(END_LINE);
-            heatLineView.heatLinesListInfo(participant,participantHeatLines)
+            heatLineView.heatLinesListInfo(participant, participantHeatLines)
                     .forEach(participantInfo::append);
             participantInfo.append(END_LINE);
             result.add(participantInfo);
