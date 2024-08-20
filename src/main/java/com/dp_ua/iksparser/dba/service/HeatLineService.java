@@ -50,4 +50,8 @@ public class HeatLineService {
     public List<HeatLineEntity> getHeatLinesInCompetitionByBib(Long competitionId, String bib) {
         return repo.getHeatLinesInCompetitionByBib(competitionId, bib);
     }
+
+    public List<HeatLineEntity> getHeatLinesInCompetitionByParticipantSurname(Long competitionId, String name) {
+        return repo.getHeatLinesInCompetitionByParticipantSurname(competitionId, name);
+    }
 }

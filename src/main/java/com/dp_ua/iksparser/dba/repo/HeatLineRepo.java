@@ -28,4 +28,12 @@ public interface HeatLineRepo extends CrudRepository<HeatLineEntity, Long> {
             "WHERE d.competition.id = :competitionId AND hl.bib = :bib")
     List<HeatLineEntity> getHeatLinesInCompetitionByBib(@Param("competitionId") Long competitionId,
                                                         @Param("bib") String bib);
+
+    @Query("SELECT hl FROM DayEntity d " +
+            "JOIN d.events e " +
+            "JOIN e.heats h " +
+            "JOIN h.heatLines hl " +
+            "WHERE d.competition.id = :competitionId AND lower(hl.participant.surname) LIKE lower(concat('%', :name, '%'))")
+    List<HeatLineEntity> getHeatLinesInCompetitionByParticipantSurname(@Param("competitionId") Long competitionId,
+                                                                      @Param("name") String name);
 }

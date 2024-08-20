@@ -219,22 +219,17 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
 
         if (isNotValidInputNameConditions(chatId, competition, competitionId, name)) return;
 
-        // todo refactor
-        List<HeatLineEntity> heatLines = competition.getDays().stream()
-                .flatMap(day -> day.getEvents().stream())
-                .flatMap(event -> event.getHeats().stream())
-                .flatMap(heap -> heap.getHeatLines().stream())
-                .filter(heatLine -> heatLine.getParticipant()
-                        .getSurname().toLowerCase()
-                        .contains(name.toLowerCase())
-                )
-                .toList();
+        List<HeatLineEntity> heatLines = heatLineService.getHeatLinesInCompetitionByParticipantSurname(
+                competition.getId(),
+                name
+        );
         if (heatLines.isEmpty()) {
             publishTextMessage(chatId, "Учасників не знайдено", null);
             publishFindMore(chatId, competitionId, INPUT_SURNAME);
             return;
         }
-
+        // todo refactor
+        // collect participants and heatLines to hashMap
         Set<ParticipantEntity> participants = heatLines.stream()
                 .map(HeatLineEntity::getParticipant)
                 .collect(Collectors.toSet());
@@ -247,6 +242,8 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
             return;
         }
 
+        // todo refactor
+        // move to separete method and use in bib search too
         participants.forEach(participant -> {
             String message = searchView.foundParticipantInCompetitionMessage(participant, competition, heatLines);
             boolean subscribed = subscribeFacade.isSubscribed(chatId, participant);
