@@ -1,4 +1,4 @@
-package com.dp_ua.iksparser.bot.command.impl;
+package com.dp_ua.iksparser.bot.command.impl.participants;
 
 import com.dp_ua.iksparser.bot.Icon;
 import com.dp_ua.iksparser.bot.abilities.participant.ParticipantFacade;
