@@ -67,4 +67,19 @@ public class ParticipantView {
                 BOLD +
                 END_LINE;
     }
+
+    public List<InlineKeyboardButton> getParticipantsFindKeyboard() {
+        List<InlineKeyboardButton> row = new ArrayList<>();
+        InlineKeyboardButton button = SERVICE.getKeyboardButton(
+                FIND + " Шукати спортсменів в базі",
+//                "/" + CommandFindParticipants.command  todo
+                "/globalsearchbynameandsurname"
+        );
+        row.add(button);
+        return row;
+    }
+
+    public String getFindInfoText() {
+        return FIND + " Натиснувши кнопку пошуку, ви зможете знайти спортсмена в базі за прізвищем та ім'ям";
+    }
 }

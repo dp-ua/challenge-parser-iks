@@ -1,5 +1,7 @@
 package com.dp_ua.iksparser.service;
 
+import com.dp_ua.iksparser.bot.abilities.response.ResponseContent;
+import com.dp_ua.iksparser.bot.command.impl.CommandMenu;
 import com.dp_ua.iksparser.bot.event.SendMessageEvent;
 import org.telegram.telegrambots.meta.api.methods.ActionType;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
@@ -17,6 +19,7 @@ import java.util.List;
 import java.util.Set;
 
 import static com.dp_ua.iksparser.bot.Icon.BACK;
+import static com.dp_ua.iksparser.bot.Icon.MENU;
 import static com.dp_ua.iksparser.bot.event.SendMessageEvent.MsgType.*;
 
 public enum MessageCreator {
@@ -39,6 +42,16 @@ public enum MessageCreator {
         row.add(button);
         return row;
     }
+
+    public List<InlineKeyboardButton> getMainButton() {
+        List<InlineKeyboardButton> row = new ArrayList<>();
+        InlineKeyboardButton button = SERVICE.getKeyboardButton(
+                MENU + " Повернутись в меню", "/" + CommandMenu.command
+        );
+        row.add(button);
+        return row;
+    }
+
 
     public SendChatAction getChatAction(String chatId) {
         SendChatAction sendChatAction = new SendChatAction();
@@ -76,6 +89,10 @@ public enum MessageCreator {
             SendMessage sendMessage = getSendMessage(chatId, text, keyboard, true);
             return new SendMessageEvent(this, sendMessage, SEND_MESSAGE);
         }
+    }
+
+    public SendMessageEvent getSendMessageEvent(String chatId, Integer editMessageId, ResponseContent content) {
+        return getSendMessageEvent(chatId, content.getMessageText(), content.getKeyboard(), editMessageId);
     }
 
     public SendMessage getSendMessage(String chatId, String text, ReplyKeyboard replyMarkup, boolean enableMarkdown) {
