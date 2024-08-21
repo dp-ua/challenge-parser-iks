@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static com.dp_ua.iksparser.bot.Icon.BACK;
 import static com.dp_ua.iksparser.bot.event.SendMessageEvent.MsgType.*;
 
 public enum MessageCreator {
@@ -29,6 +30,15 @@ public enum MessageCreator {
     public static final String LINK_END = "]";
     public static final String LINK_SEPARATOR = "(";
     public static final String LINK_SEPARATOR_END = ")";
+
+    public List<InlineKeyboardButton> getBackButton(String callbackData) {
+        List<InlineKeyboardButton> row = new ArrayList<>();
+        InlineKeyboardButton button = SERVICE.getKeyboardButton(
+                BACK + " Назад", callbackData
+        );
+        row.add(button);
+        return row;
+    }
 
     public SendChatAction getChatAction(String chatId) {
         SendChatAction sendChatAction = new SendChatAction();

@@ -495,7 +495,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
 
-        List<InlineKeyboardButton> row = getBackButton("/" + CommandCompetitions.command);
+        List<InlineKeyboardButton> row = SERVICE.getBackButton("/" + CommandCompetitions.command);
         rows.add(row);
 
         keyboard.setKeyboard(rows);
@@ -506,7 +506,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
 
-        List<InlineKeyboardButton> row = getBackButton(
+        List<InlineKeyboardButton> row = SERVICE.getBackButton(
                 "/" + CommandCompetition.command + " " + competitionId
         );
         rows.add(row);
@@ -526,7 +526,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
     private InlineKeyboardMarkup getCompetitionDetailsKeyboard(CompetitionEntity competition, boolean competitionFilled) {
         InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
-        rows.add(getBackButton("/competitions"));
+        rows.add(SERVICE.getBackButton("/competitions"));
         if (competitionFilled) {
             rows.add(lookAtBibNumber(competition));
             rows.add(lookAtCompetitionByNameButton(competition));
@@ -567,14 +567,7 @@ public class CompetitionFacadeImpl implements CompetitionFacade {
         return row;
     }
 
-    private static List<InlineKeyboardButton> getBackButton(String callbackData) {
-        List<InlineKeyboardButton> row = new ArrayList<>();
-        InlineKeyboardButton button = SERVICE.getKeyboardButton(
-                BACK + " Назад", callbackData
-        );
-        row.add(button);
-        return row;
-    }
+
 
     private void sendTypingAction(String chatId) {
         log.info("sendTyping for chat: {}", chatId);
