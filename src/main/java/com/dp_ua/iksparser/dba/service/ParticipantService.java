@@ -139,4 +139,8 @@ public class ParticipantService {
     public void delete(ParticipantEntity p) {
         repo.delete(p);
     }
+
+    public long getCount() {
+        return repo.count();
+    }
 }

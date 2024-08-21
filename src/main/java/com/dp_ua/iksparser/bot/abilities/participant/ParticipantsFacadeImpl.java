@@ -43,8 +43,8 @@ public class ParticipantsFacadeImpl implements ParticipantFacade {
 
     @Override
     public String getInfoAboutParticipants() {
-        Iterable<ParticipantEntity> participants = participantService.findAll();
-        return participantView.participantsInfo(participants);
+        long count = participantService.getCount();
+        return participantView.participantsInfo(count);
     }
 
 

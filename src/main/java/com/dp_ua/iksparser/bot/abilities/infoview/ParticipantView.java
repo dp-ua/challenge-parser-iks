@@ -59,11 +59,11 @@ public class ParticipantView {
         return keyboard;
     }
 
-    public String participantsInfo(Iterable<ParticipantEntity> participants) {
+    public String participantsInfo(long participantsCount) {
         return Icon.ATHLETE +
                 "Всього атлетів в базі: " +
                 BOLD +
-                participants.spliterator().getExactSizeIfKnown() +
+                participantsCount +
                 BOLD +
                 END_LINE;
     }
