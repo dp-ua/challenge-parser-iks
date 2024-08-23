@@ -4,6 +4,10 @@ spring:
   jpa:
     open-in-view: false
 
+view:
+  participants:
+    pageSize: 10
+
 telegram:
   bot:
     token: 1234567890:abcdefghijklmnopqrstuvwxyz
