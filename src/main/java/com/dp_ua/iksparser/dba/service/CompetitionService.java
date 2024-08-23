@@ -4,6 +4,7 @@ import com.dp_ua.iksparser.dba.dto.CompetitionDto;
 import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
 import com.dp_ua.iksparser.dba.entity.CompetitionStatus;
 import com.dp_ua.iksparser.dba.entity.DayEntity;
+import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
 import com.dp_ua.iksparser.dba.repo.CompetitionRepo;
 import com.dp_ua.iksparser.service.PageableService;
 import com.dp_ua.iksparser.service.SqlPreprocessorService;
@@ -197,5 +198,9 @@ public class CompetitionService {
 
     public void delete(CompetitionEntity c) {
         repo.delete(c);
+    }
+
+    public Page<CompetitionEntity> findCompetitionsByParticipant(ParticipantEntity participant, int page, int limit) {
+        return repo.findCompetitionsByParticipant(participant.getId(), pageableService.createPageRequest(page, limit));
     }
 }
