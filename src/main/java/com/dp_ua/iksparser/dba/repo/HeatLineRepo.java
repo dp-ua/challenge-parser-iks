@@ -10,8 +10,6 @@ import java.util.List;
 
 @Repository
 public interface HeatLineRepo extends CrudRepository<HeatLineEntity, Long> {
-    // use direct SELECT request to get data from DB
-
     @Query("SELECT hl FROM DayEntity d " +
             "JOIN d.events e " +
             "JOIN e.heats h " +
