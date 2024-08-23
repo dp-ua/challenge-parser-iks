@@ -92,6 +92,18 @@ public enum Icon {
         };
     }
 
+    public static String getIconicNumber(int number) {
+        String stringNumber = String.valueOf(number);
+        StringBuilder sb = new StringBuilder();
+        if (number == 10) {
+            return TEN.toString();
+        }
+        for (int i = 0; i < stringNumber.length(); i++) {
+            sb.append(getIconForNumber(Integer.parseInt(String.valueOf(stringNumber.charAt(i)))));
+        }
+        return sb.toString();
+    }
+
     private final String icon;
 
     Icon(String icon) {

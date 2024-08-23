@@ -127,12 +127,4 @@ public class ParticipantView {
     }
 
 
-    private String getIconicNumber(int number) {
-        String stringNumber = String.valueOf(number);
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < stringNumber.length(); i++) {
-            sb.append(getIconForNumber(Integer.parseInt(String.valueOf(stringNumber.charAt(i)))));
-        }
-        return sb.toString();
-    }
 }
