@@ -28,6 +28,7 @@ public class ResponseShowAllParticipants implements ResponseContent {
     @Autowired
     ParticipantView participantView;
 
+    // todo add STAR to list. Information about subscription to the athlete
     @Override
     public String getMessageText(Object... args) {
         Page<ParticipantEntity> participants = (Page<ParticipantEntity>) getArgumentObject(0, args).get();

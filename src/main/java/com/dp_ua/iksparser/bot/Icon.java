@@ -1,6 +1,7 @@
 package com.dp_ua.iksparser.bot;
 
 public enum Icon {
+    STAR("⭐"),
     MENU("📋"),
     DENIED("🚫"),
     MESSAGE("📩"),
