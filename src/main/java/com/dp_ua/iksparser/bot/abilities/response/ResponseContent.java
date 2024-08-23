@@ -20,12 +20,12 @@ public interface ResponseContent {
 
     default Optional<String> getArgument(int index, Object... args) {
         if (args.length > index) {
-            return Optional.of((String) args[index]);
+            return Optional.of(args[index].toString());
         }
         return Optional.empty();
     }
 
-    default Optional<Object> getArgumentObject(int index, Object... args) {
+    default Optional<?> getArgumentObject(int index, Object... args) {
         if (args.length > index) {
             return Optional.of(args[index]);
         }
