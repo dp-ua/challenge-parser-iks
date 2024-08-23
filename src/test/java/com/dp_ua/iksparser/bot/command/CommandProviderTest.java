@@ -39,7 +39,6 @@ public class CommandProviderTest {
                         deletemessage
                         help
                         menu
-                        participants
                         searchbybibnumber
                         searchbybibnumberwithbib
                         searchbycoach
@@ -50,6 +49,8 @@ public class CommandProviderTest {
                         competition
                         competitionnotloaded
                         competitions
+                        participants
+                        showallparticipants
                         subscribe
                         subscriptions
                         subscriptionslist

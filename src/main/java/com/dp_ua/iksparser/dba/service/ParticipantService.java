@@ -9,7 +9,9 @@ import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.text.Collator;
@@ -55,10 +57,16 @@ public class ParticipantService {
         return participants.get(0);
     }
 
-    public Page<ParticipantEntity> findAllBySurnameAndNameParts(List<String> parts, Pageable pageable) {
+    public Page<ParticipantEntity> findAllBySurnameAndNameParts(List<String> parts, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        List<String> maskedLowerCaseParts = getMaskedLowerCaseParts(parts);
+
+        if (maskedLowerCaseParts.isEmpty()) {
+            return repo.findAll(pageable);
+        }
+
         List<ParticipantEntity> content = findAllBySurnameAndNameParts(parts);
         Collator collator = Collator.getInstance(new Locale("uk", "UA"));
-
         content.sort(Comparator.comparing(ParticipantEntity::getSurname, collator).thenComparing(ParticipantEntity::getName, collator));
         return pageableService.getPage(content, pageable);
     }
@@ -71,7 +79,6 @@ public class ParticipantService {
             return new ArrayList<>(result);
         } else {
             List<String> maskedLowerCaseParts = getMaskedLowerCaseParts(parts);
-            log.info("Masked parts: {}", maskedLowerCaseParts);
 
             for (String part : maskedLowerCaseParts) {
                 result.addAll(repo.findByNameAndSurnameByPart(part));
@@ -83,13 +90,15 @@ public class ParticipantService {
     }
 
     private List<String> getMaskedLowerCaseParts(List<String> parts) {
-        return List.copyOf(parts.stream()
+        List<String> result = List.copyOf(parts.stream()
                 .map(part -> part.split(" "))
                 .flatMap(Arrays::stream)
                 .filter(part -> !part.isBlank())
                 .map(String::toLowerCase)
                 .map(sqlPreprocessorService::escapeSpecialCharacters)
                 .collect(Collectors.toSet()));
+        log.info("Masked parts: {}", result);
+        return result;
     }
 
     private boolean containsParts(ParticipantEntity participant, List<String> parts) {
@@ -142,5 +151,11 @@ public class ParticipantService {
 
     public long getCount() {
         return repo.count();
+    }
+
+    public Page<ParticipantEntity> findAll(int page, int pageSize) {
+        Sort sort = Sort.by(Sort.Order.asc("surname"), Sort.Order.asc("name"));
+        Pageable pageable = pageableService.createPageRequestWithSort(page, pageSize, sort);
+        return repo.findAll(pageable);
     }
 }

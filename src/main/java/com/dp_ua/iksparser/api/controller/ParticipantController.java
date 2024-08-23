@@ -14,8 +14,6 @@ import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -56,8 +54,7 @@ public class ParticipantController {
                 request.getRemoteAddr(),
                 request.getHeader("User-Agent"));
 
-        Pageable pageable = PageRequest.of(page, size);
-        return participantService.findAllBySurnameAndNameParts(nameParts, pageable)
+        return participantService.findAllBySurnameAndNameParts(nameParts, page, size)
                 .map(participantService::convertToDto);
     }
 
