@@ -38,7 +38,10 @@ public class CompetitionView {
                         .mapToObj(i -> {
                             int count = i + 1;
                             StringBuilder sb = new StringBuilder();
-                            sb.append(BOLD).append(Icon.getIconForNumber(count)).append(" ").append(BOLD); // number
+                            sb.append(BOLD)
+                                    .append(Icon.getIconForNumber(count))
+                                    .append(" ")
+                                    .append(BOLD); // number
                             CompetitionEntity competition = competitions.get(i);
                             sb
                                     .append(info(competition))
@@ -50,7 +53,8 @@ public class CompetitionView {
                         .orElse("Список пустий")
         );
 
-        result.append(END_LINE).append(END_LINE);
+        result.append(END_LINE)
+                .append(END_LINE);
         result
                 .append(PAGE_WITH_CURL)
                 .append(" Сторінка ")
@@ -124,7 +128,7 @@ public class CompetitionView {
                 date(competition) +
                 END_LINE +
                 area(competition) +
-                END_LINE +
+                SPACE +
                 link(competition) +
                 END_LINE;
     }
@@ -147,6 +151,8 @@ public class CompetitionView {
         StringBuilder sb = new StringBuilder();
         Icon iconForStatus = icon(competition);
         sb
+                .append(SPACE)
+                .append(SPACE)
                 .append(CALENDAR)
                 .append(ITALIC)
                 .append(" Дата: ")
@@ -166,7 +172,9 @@ public class CompetitionView {
     }
 
     public String area(CompetitionEntity competition) {
-        return AREA +
+        return SPACE +
+                SPACE +
+                AREA +
                 ITALIC +
                 " Місце проведення: " +
                 ITALIC +
@@ -272,28 +280,34 @@ public class CompetitionView {
     }
 
     public String getCompetitionsInfo(List<CompetitionEntity> competitions, List<String> years) {
-        return COMPETITION +
+        long filledCompetitionsCount = competitions.stream().filter(CompetitionEntity::isFilled).count();
+        int competitionsCount = competitions.size();
+        String yearStart = years.get(0);
+        String yearFinish = years.get(years.size() - 1);
+
+        String sb = COMPETITION +
                 "Всього змагань в базі: " +
                 BOLD +
-                competitions.size() +
+                competitionsCount +
                 BOLD +
                 END_LINE +
                 CALENDAR +
                 "Дата : з " +
                 BOLD +
-                years.get(0) +
+                yearStart +
                 BOLD +
                 " по " +
                 BOLD +
-                years.get(years.size() - 1) +
+                yearFinish +
                 BOLD +
                 " роки" +
                 END_LINE +
                 RESULT +
                 "Змагань, по яким заповнена інформація: " +
                 BOLD +
-                competitions.stream().filter(CompetitionEntity::isFilled).count() +
+                filledCompetitionsCount +
                 BOLD +
                 END_LINE;
+        return sb;
     }
 }
