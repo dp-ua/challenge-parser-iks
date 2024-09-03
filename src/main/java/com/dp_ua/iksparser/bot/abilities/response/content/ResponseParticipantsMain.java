@@ -30,9 +30,9 @@ public class ResponseParticipantsMain implements ResponseContent {
     @Override
     public String getMessageText(Object... args) {
         String sb = participantView.participantsInfo(participantService.getCount()) +
-                END_LINE + END_LINE +
+                END_LINE +
+                END_LINE +
                 participantView.getFindInfoText();
-
         return sb;
     }
 
