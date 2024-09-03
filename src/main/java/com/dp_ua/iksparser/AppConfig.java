@@ -19,9 +19,9 @@ import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Configuration
 @Slf4j
@@ -67,17 +67,17 @@ public class AppConfig {
     }
 
     @Bean
-    public Map<ResponseType, ResponseContent> contentMap(List<ResponseContent> responseContents) {
-        Map<ResponseType, ResponseContent> map = new HashMap<>();
-        for (ResponseContent content : responseContents) {
-            ResponseTypeMarker marker = content.getClass().getAnnotation(ResponseTypeMarker.class);
-            if (marker != null) {
-                map.put(marker.value(), content);
-                log.info("ResponseContent: {} -> {}", marker.value(), content.getClass().getSimpleName());
-            } else {
-                log.warn("ResponseContent: {} has no ResponseTypeMarker", content.getClass().getSimpleName());
-            }
-        }
-        return map;
+    public Map<ResponseType, Class<? extends ResponseContent>> contentMap(List<ResponseContent> responseContents) {
+        return responseContents.stream()
+                .filter(content -> content.getClass().isAnnotationPresent(ResponseTypeMarker.class))
+                .collect(Collectors.toMap(
+                        content -> content.getClass().getAnnotation(ResponseTypeMarker.class).value(),
+                        content -> content.getClass(),
+                        (existing, replacement) -> {
+                            log.warn("Duplicate ResponseType: {}. Using the existing implementation: {}",
+                                    existing.getSimpleName(), replacement.getSimpleName());
+                            return existing;
+                        }
+                ));
     }
 }

@@ -8,6 +8,7 @@ import com.dp_ua.iksparser.bot.command.impl.participants.CommandShowFindAllParti
 import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -21,6 +22,7 @@ import static com.dp_ua.iksparser.bot.abilities.response.ResponseType.SHOW_ALL_P
 import static com.dp_ua.iksparser.service.MessageCreator.*;
 
 @Component
+@Scope("prototype")
 @ResponseTypeMarker(SHOW_ALL_PARTICIPANTS)
 public class ResponseShowAllParticipants implements ResponseContent {
     @Autowired
