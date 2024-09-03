@@ -17,8 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.dp_ua.iksparser.bot.Icon.NEXT;
-import static com.dp_ua.iksparser.bot.Icon.PREVIOUS;
 import static com.dp_ua.iksparser.bot.abilities.response.ResponseType.SHOW_ALL_PARTICIPANTS;
 import static com.dp_ua.iksparser.service.MessageCreator.*;
 
@@ -77,15 +75,13 @@ public class ResponseShowAllParticipants implements ResponseContent {
     private List<InlineKeyboardButton> getNavigationButtons(Page<ParticipantEntity> participants, String search) {
         List<InlineKeyboardButton> navigation = new ArrayList<>();
         if (participants.hasPrevious()) {
-            InlineKeyboardButton button = SERVICE.getKeyboardButton(
-                    PREVIOUS + " Попередня сторінка",
+            InlineKeyboardButton button = SERVICE.getNavPreviousPageButton(
                     CommandShowFindAllParticipants.getCallbackCommand(participants.getNumber() - 1, search)
             );
             navigation.add(button);
         }
         if (participants.hasNext()) {
-            InlineKeyboardButton button = SERVICE.getKeyboardButton(
-                    NEXT + " Наступна сторінка",
+            InlineKeyboardButton button = SERVICE.getNavNextPageButton(
                     CommandShowFindAllParticipants.getCallbackCommand(participants.getNumber() + 1, search)
             );
             navigation.add(button);

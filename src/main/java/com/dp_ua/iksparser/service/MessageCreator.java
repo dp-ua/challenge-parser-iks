@@ -18,8 +18,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.dp_ua.iksparser.bot.Icon.BACK;
-import static com.dp_ua.iksparser.bot.Icon.MENU;
+import static com.dp_ua.iksparser.bot.Icon.*;
 import static com.dp_ua.iksparser.bot.event.SendMessageEvent.MsgType.*;
 
 public enum MessageCreator {
@@ -42,6 +41,15 @@ public enum MessageCreator {
         row.add(button);
         return row;
     }
+
+    public InlineKeyboardButton getNavPreviousPageButton(String callBackData) {
+        return getKeyboardButton(PREVIOUS + " Попередня сторінка", callBackData);
+    }
+
+    public InlineKeyboardButton getNavNextPageButton(String callBackData) {
+        return getKeyboardButton(NEXT + " Наступна сторінка", callBackData);
+    }
+
 
     public List<InlineKeyboardButton> getMainButton() {
         List<InlineKeyboardButton> row = new ArrayList<>();
