@@ -72,7 +72,7 @@ public class AppConfig {
                 .filter(content -> content.getClass().isAnnotationPresent(ResponseTypeMarker.class))
                 .collect(Collectors.toMap(
                         content -> content.getClass().getAnnotation(ResponseTypeMarker.class).value(),
-                        content -> content.getClass(),
+                        ResponseContent::getClass,
                         (existing, replacement) -> {
                             log.warn("Duplicate ResponseType: {}. Using the existing implementation: {}",
                                     existing.getSimpleName(), replacement.getSimpleName());
