@@ -1,5 +1,6 @@
 package com.dp_ua.iksparser.bot.command;
 
+import com.dp_ua.iksparser.bot.abilities.action.ActionController;
 import com.dp_ua.iksparser.bot.event.SendMessageEvent;
 import com.dp_ua.iksparser.bot.message.Message;
 import lombok.extern.slf4j.Slf4j;
@@ -10,9 +11,34 @@ import static com.dp_ua.iksparser.service.MessageCreator.SERVICE;
 
 @Slf4j
 public abstract class BaseCommand implements CommandInterface {
+    public static final int DEFAULT_NO_PAGE_ARGUMENT = -1;
+
     @Autowired
     protected ApplicationEventPublisher publisher;
-    public static final int DEFAULT_NO_PAGE_ARGUMENT = -1;
+    @Autowired
+    ActionController actionController;
+
+    protected abstract String getTextForCallBackAnswer(Message message);
+
+    protected abstract void perform(Message message);
+
+    @Override
+    public void execute(Message message) {
+        sendCallbackForMessage(message, getTextForCallBackAnswer(message));
+        performAction(message);
+        perform(message);
+    }
+
+    private void performAction(Message message) {
+        try {
+            String arguments = getCommandArgumentString(message.getMessageText());
+            actionController.getActionType(arguments).ifPresent(actionType -> {
+                actionController.performAction(actionType, message.getChatId(), arguments);
+            });
+        } catch (Exception e) {
+            log.error("Error in performAction: {}", e.getMessage());
+        }
+    }
 
     protected void sendCallbackForMessage(Message message, String text) {
         if (message.hasCallbackQuery()) {
@@ -25,17 +51,7 @@ public abstract class BaseCommand implements CommandInterface {
         }
     }
 
-    @Override
-    public void execute(Message message) {
-        sendCallbackForMessage(message, getTextForCallBackAnswer(message));
-        perform(message);
-    }
-
-    protected abstract String getTextForCallBackAnswer(Message message);
-
-    protected abstract void perform(Message message);
-
-    public int getCommandArgument(String text) {
+    protected int getCommandArgument(String text) {
         if (text.startsWith("/" + command())) {
             String argument = text.substring(command().length() + 1).trim();
             return argument.isEmpty() ? DEFAULT_NO_PAGE_ARGUMENT : Integer.parseInt(argument);
@@ -43,7 +59,7 @@ public abstract class BaseCommand implements CommandInterface {
         return 0;
     }
 
-    public String getCommandArgumentString(String text) {
+    protected String getCommandArgumentString(String text) {
         if (text.startsWith("/" + command())) {
             String argument = text.substring(command().length() + 1).trim();
             return argument.isEmpty() ? "" : argument;
