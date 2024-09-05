@@ -10,4 +10,6 @@ public interface ParticipantFacade {
     void showParticipants(String chatId, long commandArgument, Integer editMessageId);
 
     void showFindAllParticipants(String chatId, String commandArgument, Integer editMessageId);
+
+    void showParticipantDetails(String chatId, String commandArgument, Integer editMessageId);
 }

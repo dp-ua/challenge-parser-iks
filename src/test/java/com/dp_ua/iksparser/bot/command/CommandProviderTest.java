@@ -49,6 +49,7 @@ public class CommandProviderTest {
                         competition
                         competitionnotloaded
                         competitions
+                        showparticipantdetails
                         participants
                         showallparticipants
                         subscribe
