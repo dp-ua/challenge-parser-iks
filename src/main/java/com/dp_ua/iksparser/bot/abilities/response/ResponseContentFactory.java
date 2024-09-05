@@ -18,7 +18,7 @@ public class ResponseContentFactory {
     public ResponseContentFactory(ApplicationContext context, Map<ResponseType, Class<? extends ResponseContent>> contentMap) {
         this.context = context;
         this.contentMap = contentMap;
-        contentMap.forEach((key, value) -> log.info("ResponseContentFactory: key: {}, value: {}", key, value));
+        contentMap.forEach((key, value) -> log.info("key: [{}], class: {}", key, value.getSimpleName()));
     }
 
     public ResponseContent getContentForResponse(ResponseType type) {
