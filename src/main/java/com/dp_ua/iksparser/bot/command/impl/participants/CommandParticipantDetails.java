@@ -9,11 +9,13 @@ import lombok.ToString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import static com.dp_ua.iksparser.bot.abilities.action.ActionController.ACTION;
+
 
 @Component
 @ToString
 public class CommandParticipantDetails extends BaseCommand {
-    public final static String command = "showparticipantdetails";
+    public final static String command = "shpartdet"; // show participant details
     private final boolean isInTextCommand = false;
     @Autowired
     ParticipantFacade participantsFacade;
@@ -40,6 +42,6 @@ public class CommandParticipantDetails extends BaseCommand {
     }
 
     public static String getCallbackCommand(int page, long id, ActionType action) {
-        return "/" + command + " {\"page\":\"" + page + "\",\"id\":\"" + id + "\",\"action\":\"" + action + "\"}";
+        return "/" + command + " {\"page\":\"" + page + "\",\"id\":\"" + id + "\",\"" + ACTION + "\":\"" + action + "\"}";
     }
 }
