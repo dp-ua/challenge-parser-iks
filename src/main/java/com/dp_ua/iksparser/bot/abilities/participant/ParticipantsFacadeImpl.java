@@ -3,7 +3,8 @@ package com.dp_ua.iksparser.bot.abilities.participant;
 import com.dp_ua.iksparser.bot.abilities.FacadeMethods;
 import com.dp_ua.iksparser.bot.abilities.StateService;
 import com.dp_ua.iksparser.bot.abilities.infoview.ParticipantView;
-import com.dp_ua.iksparser.bot.abilities.response.ResponseContent;
+import com.dp_ua.iksparser.bot.abilities.response.ResponseContainer;
+import com.dp_ua.iksparser.bot.abilities.response.ResponseContentGenerator;
 import com.dp_ua.iksparser.bot.abilities.subscribe.SubscribeFacade;
 import com.dp_ua.iksparser.bot.command.impl.participants.CommandParticipants;
 import com.dp_ua.iksparser.bot.command.impl.participants.CommandShowFindAllParticipants;
@@ -15,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 import java.util.List;
@@ -80,7 +80,7 @@ public class ParticipantsFacadeImpl extends FacadeMethods implements Participant
     public void showFindAllParticipants(String chatId, String commandArgument, Integer editMessageId) {
         log.info("SHOW FIND ALL PARTICIPANTS chatId: {}, commandArgument: {}", chatId, commandArgument);
 
-        ResponseContent content = contentFactory.getContentForResponse(SHOW_ALL_PARTICIPANTS);
+        ResponseContentGenerator content = contentFactory.getContentForResponse(SHOW_ALL_PARTICIPANTS);
         validate(content, "ResponseContent for SHOW_ALL_PARTICIPANTS not found");
 
         String pageString = jSonReader.getVal(commandArgument, "page");
@@ -90,16 +90,15 @@ public class ParticipantsFacadeImpl extends FacadeMethods implements Participant
         String search = jSonReader.getVal(commandArgument, "search");
         validate(search, "Search not found");
 
-        Page<ParticipantEntity> participants = participantService.findAllBySurnameAndNameParts(List.of(search), page, pageSize);
-
-        String text = content.getMessageText(participants, search);
-        InlineKeyboardMarkup keyboard = content.getKeyboard(participants, search);
+        Page<ParticipantEntity> participants = participantService.findAllBySurnameAndNameParts(List.of(search), page, PARTICIPANTS_PAGE_SIZE);
+        ResponseContainer container = content.getContainer(participants, search);
 
         List<InlineKeyboardButton> backButton = SERVICE.getBackButton("/" + CommandParticipants.command);
-        keyboard.getKeyboard().add(backButton);
+        container.getKeyboard().getKeyboard().add(backButton);
 
         setStateShowFindAll(chatId, page);
-        SendMessageEvent event = SERVICE.getSendMessageEvent(chatId, text, keyboard, editMessageId);
+        SendMessageEvent event = SERVICE.getSendMessageEvent(chatId, editMessageId, container);
+
         publisher.publishEvent(event);
     }
 

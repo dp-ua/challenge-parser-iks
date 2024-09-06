@@ -1,6 +1,6 @@
 package com.dp_ua.iksparser.service;
 
-import com.dp_ua.iksparser.bot.abilities.response.ResponseContent;
+import com.dp_ua.iksparser.bot.abilities.response.ResponseContainer;
 import com.dp_ua.iksparser.bot.command.impl.CommandMenu;
 import com.dp_ua.iksparser.bot.event.SendMessageEvent;
 import org.telegram.telegrambots.meta.api.methods.ActionType;
@@ -99,7 +99,7 @@ public enum MessageCreator {
         }
     }
 
-    public SendMessageEvent getSendMessageEvent(String chatId, Integer editMessageId, ResponseContent content) {
+    public SendMessageEvent getSendMessageEvent(String chatId, Integer editMessageId, ResponseContainer content) {
         return getSendMessageEvent(chatId, content.getMessageText(), content.getKeyboard(), editMessageId);
     }
 

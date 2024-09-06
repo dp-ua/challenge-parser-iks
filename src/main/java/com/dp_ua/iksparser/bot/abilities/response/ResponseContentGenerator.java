@@ -7,10 +7,14 @@ import java.util.Optional;
 
 import static com.dp_ua.iksparser.service.MessageCreator.BOLD;
 
-public interface ResponseContent {
-    String getMessageText(Object... args);
+public interface ResponseContentGenerator {
+    default ResponseContainer getContainer(Object... args) {
+        return new ResponseContainer(messageText(args), keyboard(args));
+    }
 
-    InlineKeyboardMarkup getKeyboard(Object... args);
+    String messageText(Object... args);
+
+    InlineKeyboardMarkup keyboard(Object... args);
 
     default void validate(Object object, String message) {
         if (object == null) {

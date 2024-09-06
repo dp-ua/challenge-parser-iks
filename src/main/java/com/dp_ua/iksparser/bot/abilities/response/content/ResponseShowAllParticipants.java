@@ -2,7 +2,7 @@ package com.dp_ua.iksparser.bot.abilities.response.content;
 
 import com.dp_ua.iksparser.bot.Icon;
 import com.dp_ua.iksparser.bot.abilities.infoview.ParticipantView;
-import com.dp_ua.iksparser.bot.abilities.response.ResponseContent;
+import com.dp_ua.iksparser.bot.abilities.response.ResponseContentGenerator;
 import com.dp_ua.iksparser.bot.abilities.response.ResponseTypeMarker;
 import com.dp_ua.iksparser.bot.command.impl.participants.CommandShowFindAllParticipants;
 import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
@@ -24,13 +24,13 @@ import static com.dp_ua.iksparser.service.MessageCreator.*;
 @Component
 @Scope("prototype")
 @ResponseTypeMarker(SHOW_ALL_PARTICIPANTS)
-public class ResponseShowAllParticipants implements ResponseContent {
+public class ResponseShowAllParticipants implements ResponseContentGenerator {
     @Autowired
     ParticipantView participantView;
 
     // todo add STAR to list. Information about subscription to the athlete
     @Override
-    public String getMessageText(Object... args) {
+    public String messageText(Object... args) {
         Page<ParticipantEntity> participants = (Page<ParticipantEntity>) getArgumentObject(0, args).get();
         validate(participants, "Participants not found");
         StringBuilder sb = new StringBuilder();
@@ -61,7 +61,7 @@ public class ResponseShowAllParticipants implements ResponseContent {
     }
 
     @Override
-    public InlineKeyboardMarkup getKeyboard(Object... args) {
+    public InlineKeyboardMarkup keyboard(Object... args) {
         Page<ParticipantEntity> participants = (Page<ParticipantEntity>) getArgumentObject(0, args).get();
         validate(participants, "Participants not found");
 

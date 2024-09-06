@@ -12,25 +12,25 @@ import java.util.Map;
 public class ResponseContentFactory {
 
     private final ApplicationContext context;
-    private final Map<ResponseType, Class<? extends ResponseContent>> contentMap;
+    private final Map<ResponseType, Class<? extends ResponseContentGenerator>> contentMap;
 
     @Autowired
-    public ResponseContentFactory(ApplicationContext context, Map<ResponseType, Class<? extends ResponseContent>> contentMap) {
+    public ResponseContentFactory(ApplicationContext context, Map<ResponseType, Class<? extends ResponseContentGenerator>> contentMap) {
         this.context = context;
         this.contentMap = contentMap;
         contentMap.forEach((key, value) -> log.info("key: [{}], class: {}", key, value.getSimpleName()));
     }
 
-    public ResponseContent getContentForResponse(ResponseType type) {
-        Class<? extends ResponseContent> responseContentClass = contentMap.get(type);
+    public ResponseContentGenerator getContentForResponse(ResponseType type) {
+        Class<? extends ResponseContentGenerator> responseContentClass = contentMap.get(type);
 
         if (responseContentClass == null) {
             log.error("ResponseContentFactory: No ResponseContent class found for type: {}", type);
             throw new IllegalArgumentException("ResponseContentFactory: No ResponseContent class found for type: %s".formatted(type));
         }
 
-        ResponseContent responseContent = context.getBean(responseContentClass);
-        log.debug("ResponseContentFactory: type: {}, responseContent: {}", type, responseContent);
-        return responseContent;
+        ResponseContentGenerator contentGenerator = context.getBean(responseContentClass);
+        log.debug("ResponseContentFactory: type: {}, responseContent: {}", type, contentGenerator);
+        return contentGenerator;
     }
 }

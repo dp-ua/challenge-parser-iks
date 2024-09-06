@@ -1,7 +1,7 @@
 package com.dp_ua.iksparser;
 
 import com.dp_ua.iksparser.bot.Bot;
-import com.dp_ua.iksparser.bot.abilities.response.ResponseContent;
+import com.dp_ua.iksparser.bot.abilities.response.ResponseContentGenerator;
 import com.dp_ua.iksparser.bot.abilities.response.ResponseType;
 import com.dp_ua.iksparser.bot.abilities.response.ResponseTypeMarker;
 import jakarta.persistence.EntityManagerFactory;
@@ -67,12 +67,12 @@ public class AppConfig {
     }
 
     @Bean
-    public Map<ResponseType, Class<? extends ResponseContent>> contentMap(List<ResponseContent> responseContents) {
-        return responseContents.stream()
+    public Map<ResponseType, Class<? extends ResponseContentGenerator>> contentMap(List<ResponseContentGenerator> contentGenerators) {
+        return contentGenerators.stream()
                 .filter(content -> content.getClass().isAnnotationPresent(ResponseTypeMarker.class))
                 .collect(Collectors.toMap(
                         content -> content.getClass().getAnnotation(ResponseTypeMarker.class).value(),
-                        ResponseContent::getClass,
+                        ResponseContentGenerator::getClass,
                         (existing, replacement) -> {
                             log.warn("Duplicate ResponseType: {}. Using the existing implementation: {}",
                                     existing.getSimpleName(), replacement.getSimpleName());
