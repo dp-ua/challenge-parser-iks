@@ -14,6 +14,7 @@ import java.util.Optional;
 @Component
 @Slf4j
 public class ActionController {
+    public static final String ACTION = "ac";
     @Autowired
     JsonReader jsonReader;
     @Autowired
@@ -26,10 +27,10 @@ public class ActionController {
         long participantId = getParticipantId(text);
         ParticipantEntity participant = participantService.findById(participantId).orElseThrow(() -> new IllegalArgumentException("Participant not found by id: " + participantId));
         switch (action) { // todo make personal perfomers for actions, use Annotation, remove switch
-            case SUBSCRIBE:
+            case SUB:
                 subscriptions.subscribe(userId, participant);
                 break;
-            case UNSUBSCRIBE:
+            case UNSUB:
                 subscriptions.unsubscribe(userId, participant);
                 break;
             default:
@@ -43,7 +44,7 @@ public class ActionController {
 
     public Optional<ActionType> getActionType(String text) {
         try {
-            String action = jsonReader.getVal(text, "action");
+            String action = jsonReader.getVal(text, ACTION);
             log.debug("ActionController: action: {}, text: {}", action, text);
             return Optional.of(ActionType.valueOf(action));
         } catch (JSONException e) {
