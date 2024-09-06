@@ -41,4 +41,8 @@ public class CommandMenu extends BaseCommand {
     public String command() {
         return command;
     }
+
+    public static String getCallBackCommand() {
+        return "/" + command;
+    }
 }
