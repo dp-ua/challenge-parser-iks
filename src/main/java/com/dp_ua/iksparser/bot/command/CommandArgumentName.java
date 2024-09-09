@@ -4,8 +4,8 @@ public enum CommandArgumentName {
     PARTICIPANT_ID("pid"),
     COMPETITION_ID("cid"),
     PAGE("pg"),
-    ID("id"),
-    ACTION("act")
+    ACTION("act"),
+    SEARCH("search"),
     ;
     private final String value;
 

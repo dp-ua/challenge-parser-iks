@@ -8,6 +8,9 @@ import lombok.ToString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import static com.dp_ua.iksparser.bot.command.CommandArgumentName.PAGE;
+import static com.dp_ua.iksparser.bot.command.CommandArgumentName.SEARCH;
+
 
 @Component
 @ToString
@@ -36,11 +39,11 @@ public class CommandShowFindAllParticipants extends BaseCommand {
     }
 
     public static String getCallbackCommand(int page, String search) {
-        return "/" + command + " {\"page\":\"" + page + "\",\"search\":\"" + search + "\"}";
+        return "/" + command + " {\"" + PAGE.getValue() + "\":\"" + page + "\",\"" + SEARCH.getValue() + "\":\"" + search + "\"}";
     }
 
     public static String getStateText(int page) {
-        return "/" + command + " {\"page\":\"" + page + "\",\"search\":\"{}\"}";
+        return "/" + command + " {\"" + PAGE.getValue() + "\":\"" + page + "\",\"" + SEARCH.getValue() + "\":\"{}\"}";
     }
 
 }

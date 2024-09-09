@@ -21,8 +21,8 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import java.util.List;
 import java.util.Optional;
 
-import static com.dp_ua.iksparser.bot.abilities.response.ResponseType.PARTICIPANTS_VIEW_MAIN;
-import static com.dp_ua.iksparser.bot.abilities.response.ResponseType.SHOW_ALL_PARTICIPANTS;
+import static com.dp_ua.iksparser.bot.abilities.response.ResponseType.*;
+import static com.dp_ua.iksparser.bot.command.CommandArgumentName.*;
 import static com.dp_ua.iksparser.service.MessageCreator.SERVICE;
 
 @Component
@@ -83,11 +83,11 @@ public class ParticipantsFacadeImpl extends FacadeMethods implements Participant
         ResponseContentGenerator content = contentFactory.getContentForResponse(SHOW_ALL_PARTICIPANTS);
         validate(content, "ResponseContent for SHOW_ALL_PARTICIPANTS not found");
 
-        String pageString = jSonReader.getVal(commandArgument, "page");
+        String pageString = jSonReader.getVal(commandArgument, PAGE.getValue());
         validate(pageString, "Page not found");
         int page = normalizeArgument(Integer.parseInt(pageString));
 
-        String search = jSonReader.getVal(commandArgument, "search");
+        String search = jSonReader.getVal(commandArgument, SEARCH.getValue());
         validate(search, "Search not found");
 
         Page<ParticipantEntity> participants = participantService.findAllBySurnameAndNameParts(List.of(search), page, PARTICIPANTS_PAGE_SIZE);

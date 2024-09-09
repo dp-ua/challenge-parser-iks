@@ -9,7 +9,7 @@ import lombok.ToString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import static com.dp_ua.iksparser.bot.abilities.action.ActionController.ACTION;
+import static com.dp_ua.iksparser.bot.command.CommandArgumentName.*;
 
 
 @Component
@@ -38,10 +38,14 @@ public class CommandParticipantDetails extends BaseCommand {
     }
 
     public static String getCallbackCommand(int page, long id) {
-        return "/" + command + " {\"page\":\"" + page + "\",\"id\":\"" + id + "\"}";
+        return "/" + command + " {\"" + PAGE.getValue() + "\":\"" + page + "\",\"" + PARTICIPANT_ID.getValue() + "\":\"" + id + "\"}";
     }
 
     public static String getCallbackCommand(int page, long id, ActionType action) {
-        return "/" + command + " {\"page\":\"" + page + "\",\"id\":\"" + id + "\",\"" + ACTION + "\":\"" + action + "\"}";
+        return "/" + command
+                + " {\"" + PAGE.getValue() + "\":\"" + page
+                + "\",\"" + PARTICIPANT_ID.getValue() + "\":\"" + id
+                + "\",\"" + ACTION.getValue() + "\":\"" + action
+                + "\"}";
     }
 }

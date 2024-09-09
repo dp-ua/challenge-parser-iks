@@ -11,10 +11,12 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+import static com.dp_ua.iksparser.bot.command.CommandArgumentName.ACTION;
+import static com.dp_ua.iksparser.bot.command.CommandArgumentName.PARTICIPANT_ID;
+
 @Component
 @Slf4j
 public class ActionController {
-    public static final String ACTION = "ac";
     @Autowired
     JsonReader jsonReader;
     @Autowired
@@ -39,12 +41,12 @@ public class ActionController {
     }
 
     private long getParticipantId(String text) {
-        return Long.parseLong(jsonReader.getVal(text, "id"));
+        return Long.parseLong(jsonReader.getVal(text, PARTICIPANT_ID.getValue()));
     }
 
     public Optional<ActionType> getActionType(String text) {
         try {
-            String action = jsonReader.getVal(text, ACTION);
+            String action = jsonReader.getVal(text, ACTION.getValue());
             log.debug("ActionController: action: {}, text: {}", action, text);
             return Optional.of(ActionType.valueOf(action));
         } catch (JSONException e) {
