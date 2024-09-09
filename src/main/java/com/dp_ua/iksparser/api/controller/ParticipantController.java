@@ -101,7 +101,7 @@ public class ParticipantController {
 
     @Operation(summary = "Get competitions for participant",
             description = "Get competitions for participant")
-    @GetMapping("PARTICIPANT_URI+ /{id}/competitions")
+    @GetMapping(PARTICIPANT_URI+ "/{id}/competitions")
     @Transactional
     public ResponseEntity<CompetitionDto> getCompetitionsForParticipant(
             HttpServletRequest request,
