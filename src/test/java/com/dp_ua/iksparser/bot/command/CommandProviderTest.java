@@ -49,6 +49,7 @@ public class CommandProviderTest {
                         competition
                         competitionnotloaded
                         competitions
+                        parcompdet
                         shpartdet
                         participants
                         showallparticipants
