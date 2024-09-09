@@ -200,7 +200,7 @@ public class CompetitionView {
         return sb.toString();
     }
 
-    private Icon icon(CompetitionEntity competition) {
+    public Icon icon(CompetitionEntity competition) {
         CompetitionStatus status = CompetitionStatus.getByName(competition.getStatus());
         if (status == null) return null;
         return switch (status) {
