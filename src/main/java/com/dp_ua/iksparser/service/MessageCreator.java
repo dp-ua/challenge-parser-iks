@@ -125,7 +125,7 @@ public enum MessageCreator {
     }
 
     public String cleanMarkdown(String input) {
-        return input.replaceAll("[*_`\\[\\]\\\\/]", "");
+         return input.replaceAll("`", "’").replaceAll("[*_`\\[\\]\\\\/]", "");
     }
 
     public InlineKeyboardButton getKeyboardButton(String text, String callbackData) {
