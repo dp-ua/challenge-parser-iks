@@ -21,6 +21,8 @@ import static com.dp_ua.iksparser.service.MessageCreator.*;
 public class SubscriptionView {
     public static final String STATUS_NEW_ENROLL = "Нова заявка в івентах";
     public static final String STATUS_HAS_RESULT = "Є результати змагання";
+    public static final String BUTTON_TEXT_UNSUBSCRIBE = UNSUBSCRIBE + " Відписатись";
+    public static final String BUTTON_TEXT_SUBSCRIBE = SUBSCRIBE + " Підписатись";
     @Autowired
     CompetitionView competitionView;
     @Autowired
@@ -81,6 +83,21 @@ public class SubscriptionView {
         return text;
     }
 
+    private InlineKeyboardButton button(boolean subscribed, String callbackData) {
+        return subscribed ?
+                SERVICE.getKeyboardButton(BUTTON_TEXT_UNSUBSCRIBE, callbackData) :
+                SERVICE.getKeyboardButton(BUTTON_TEXT_SUBSCRIBE, callbackData);
+    }
+
+    public InlineKeyboardButton buttonSubscribe(String callbackData) {
+        return button(false, callbackData);
+    }
+
+    public InlineKeyboardButton buttonUnsubscribe(String callbackData) {
+        return button(true, callbackData);
+    }
+
+    // todo remove. use buttonSubscribe and buttonUnsubscribe instead
     public InlineKeyboardMarkup button(ParticipantEntity participant, boolean subscribed) {
         InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
@@ -89,12 +106,12 @@ public class SubscriptionView {
         InlineKeyboardButton button;
         if (subscribed) {
             button = SERVICE.getKeyboardButton(
-                    UNSUBSCRIBE + " Відписатись",
+                    BUTTON_TEXT_UNSUBSCRIBE,
                     "/" + CommandUnsubscribe.command + " " + participant.getId()
             );
         } else {
             button = SERVICE.getKeyboardButton(
-                    SUBSCRIBE + " Підписатись ",
+                    BUTTON_TEXT_SUBSCRIBE,
                     "/" + CommandSubscribe.command + " " + participant.getId()
             );
         }
