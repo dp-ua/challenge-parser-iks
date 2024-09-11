@@ -101,7 +101,7 @@ public class ParticipantsFacadeImpl extends FacadeMethods implements Participant
         Page<ParticipantEntity> participants = participantService.findAllBySurnameAndNameParts(List.of(search), page, PARTICIPANTS_PAGE_SIZE);
         ResponseContainer container = content.getContainer(participants, search);
 
-        List<InlineKeyboardButton> backButton = SERVICE.getBackButton("/" + CommandParticipants.command);
+        List<InlineKeyboardButton> backButton = SERVICE.getBackButton(CommandParticipants.getCallbackCommand());
         container.getKeyboard().getKeyboard().add(backButton);
 
         setStateShowFindAll(chatId, page);

@@ -65,7 +65,7 @@ public class ParticipantView {
         List<InlineKeyboardButton> row = new ArrayList<>();
         InlineKeyboardButton button = SERVICE.getKeyboardButton(
                 ATHLETE + " Переглянути спортсменів",
-                "/" + CommandParticipants.command
+                CommandParticipants.getCallbackCommand()
         );
         row.add(button);
         rows.add(row);

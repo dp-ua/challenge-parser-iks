@@ -33,4 +33,8 @@ public class CommandParticipants extends BaseCommand {
         long commandArgument = getCommandArgument(message.getMessageText());
         participantsFacade.showParticipants(chatId, commandArgument, message.getEditMessageId());
     }
+
+    public static String getCallbackCommand() {
+        return "/" + command;
+    }
 }
