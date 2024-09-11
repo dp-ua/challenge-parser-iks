@@ -25,9 +25,9 @@ public class ParticipantView {
         StringBuilder sb = new StringBuilder();
         sb
                 .append(ATHLETE)
-                .append(participant.getSurname())
+                .append(getSurname(participant))
                 .append(" ")
-                .append(participant.getName());
+                .append(getName(participant));
         if (!participant.getUrl().isEmpty()) {
             sb
                     .insert(0, LINK);
@@ -46,10 +46,17 @@ public class ParticipantView {
                 .append(END_LINE)
                 .append(SPACE).append(SPACE).append(SPACE)
                 .append(AREA)
-                .append(participant.getRegion())
+                .append(getRegion(participant))
                 .append(", ")
-                .append(participant.getTeam());
+                .append(getTeam(participant));
         return sb.toString();
+    }
+
+    public String subscribedNoticeLine() {
+        return STAR +
+                SPACE +
+                "Ви підписані на цього спортсмена" +
+                END_LINE;
     }
 
     public InlineKeyboardMarkup getShowParticipantsKeyboard() {
@@ -86,7 +93,17 @@ public class ParticipantView {
     }
 
     public String getFindInfoText() {
-        return FIND + " Натиснувши кнопку пошуку, ви зможете знайти спортсмена в базі за прізвищем та ім'ям";
+        String sb = FIND +
+                SPACE +
+                "Натиснувши кнопку пошуку, ви зможете знайти спортсмена в базі за прізвищем та ім'ям" +
+                END_LINE +
+                END_LINE +
+                ITALIC +
+                INFO +
+                SPACE +
+                " Або введіть частину прізвища або імені в поле чату та відправте повідомлення" +
+                ITALIC;
+        return sb;
     }
 
     public String getParticipantsInfoList(Page<ParticipantEntity> participants) {
@@ -117,8 +134,8 @@ public class ParticipantView {
             List<InlineKeyboardButton> row = rows.get(rows.size() - 1);
             ParticipantEntity participant = content.get(i);
             InlineKeyboardButton button = SERVICE.getKeyboardButton(
-                    getIconicNumber(i + 1) + " " + participant.getSurname() + " " + participant.getName(),
-                    "/" + CommandParticipantDetails.command + " " + participant.getId()
+                    getIconicNumber(i + 1) + " " + getSurname(participant) + " " + getName(participant),
+                    CommandParticipantDetails.getCallbackCommand(0, participant.getId())
             );
             row.add(button);
         }
@@ -126,5 +143,19 @@ public class ParticipantView {
         return keyboard;
     }
 
+    private String getSurname(ParticipantEntity participant) {
+        return SERVICE.cleanMarkdown(participant.getSurname());
+    }
 
+    private String getName(ParticipantEntity participant) {
+        return SERVICE.cleanMarkdown(participant.getName());
+    }
+
+    private String getTeam(ParticipantEntity participant) {
+        return SERVICE.cleanMarkdown(participant.getTeam());
+    }
+
+    private String getRegion(ParticipantEntity participant) {
+        return SERVICE.cleanMarkdown(participant.getRegion());
+    }
 }
