@@ -1,12 +1,17 @@
 package com.dp_ua.iksparser.bot.command;
 
 import com.dp_ua.iksparser.bot.abilities.action.ActionController;
+import com.dp_ua.iksparser.bot.abilities.response.ResponseContainer;
+import com.dp_ua.iksparser.bot.abilities.response.ResponseContentFactory;
+import com.dp_ua.iksparser.bot.abilities.response.ResponseContentGenerator;
 import com.dp_ua.iksparser.bot.event.SendMessageEvent;
 import com.dp_ua.iksparser.bot.message.Message;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 
+import static com.dp_ua.iksparser.bot.abilities.response.ResponseType.NOT_IMPLEMENTED;
 import static com.dp_ua.iksparser.service.MessageCreator.SERVICE;
 
 @Slf4j
@@ -17,6 +22,8 @@ public abstract class BaseCommand implements CommandInterface {
     protected ApplicationEventPublisher publisher;
     @Autowired
     ActionController actionController;
+    @Autowired
+    ResponseContentFactory responseContentFactory;
 
     protected abstract String getTextForCallBackAnswer(Message message);
 
@@ -24,9 +31,25 @@ public abstract class BaseCommand implements CommandInterface {
 
     @Override
     public void execute(Message message) {
-        sendCallbackForMessage(message, getTextForCallBackAnswer(message));
-        performAction(message);
-        perform(message);
+        try {
+            sendCallbackForMessage(message, getTextForCallBackAnswer(message));
+            performAction(message);
+            perform(message);
+        } catch (NotImplementedException e) {
+            log.error("Not implemented yet: {}", e.getMessage());
+            informUserAboutNotImplemented(message);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void informUserAboutNotImplemented(Message message) {
+        String chatId = message.getChatId();
+        ResponseContentGenerator generator = responseContentFactory.getContentForResponse(NOT_IMPLEMENTED);
+        ResponseContainer container = generator.getContainer();
+
+        SendMessageEvent sendMessageEvent = SERVICE.getSendMessageEvent(chatId, null, container);
+        publisher.publishEvent(sendMessageEvent);
     }
 
     private void performAction(Message message) {

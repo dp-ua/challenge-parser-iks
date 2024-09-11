@@ -140,20 +140,6 @@ public class CompetitionFacadeImpl extends FacadeMethods implements CompetitionF
         });
     }
 
-    private InlineKeyboardMarkup getEnoughKeyboard() {
-        InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
-        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
-        List<InlineKeyboardButton> row = new ArrayList<>();
-        InlineKeyboardButton button = SERVICE.getKeyboardButton(
-                " Досить " + ENOUGH,
-                "/" + CommandDeleteMessage.command
-        );
-        row.add(button);
-        rows.add(row);
-        keyboard.setKeyboard(rows);
-        return keyboard;
-    }
-
     private void setStateForSearchingByBibNumber(String chatId, long competitionId) {
         stateService.setState(chatId, CommandSearchByBibNumberWithBib.getTextForState(competitionId));
     }

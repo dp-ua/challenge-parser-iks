@@ -1,6 +1,7 @@
 package com.dp_ua.iksparser.service;
 
 import com.dp_ua.iksparser.bot.abilities.response.ResponseContainer;
+import com.dp_ua.iksparser.bot.command.impl.CommandDeleteMessage;
 import com.dp_ua.iksparser.bot.command.impl.CommandMenu;
 import com.dp_ua.iksparser.bot.event.SendMessageEvent;
 import org.telegram.telegrambots.meta.api.methods.ActionType;
@@ -50,6 +51,19 @@ public enum MessageCreator {
         return getKeyboardButton(NEXT + " Наступна сторінка", callBackData);
     }
 
+    public InlineKeyboardMarkup getHideMessageKeyboard(String text) {
+        InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
+        List<InlineKeyboardButton> row = new ArrayList<>();
+        InlineKeyboardButton button = getKeyboardButton(
+                text + ENOUGH,
+                "/" + CommandDeleteMessage.command
+        );
+        row.add(button);
+        rows.add(row);
+        keyboard.setKeyboard(rows);
+        return keyboard;
+    }
 
     public List<InlineKeyboardButton> getMainButton() {
         List<InlineKeyboardButton> row = new ArrayList<>();
