@@ -15,7 +15,7 @@ import static com.dp_ua.iksparser.bot.command.CommandArgumentName.SEARCH;
 @Component
 @ToString
 public class CommandShowFindAllParticipants extends BaseCommand {
-    public final static String command = "showallparticipants";
+    public final static String command = "salps"; // show all participants
     private final boolean isInTextCommand = false;
     @Autowired
     ParticipantFacade participantsFacade;

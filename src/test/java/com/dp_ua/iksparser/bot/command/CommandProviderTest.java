@@ -52,7 +52,7 @@ public class CommandProviderTest {
                         parcompdet
                         shpartdet
                         participants
-                        showallparticipants
+                        salps
                         subscribe
                         subscriptions
                         subscriptionslist

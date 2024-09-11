@@ -18,7 +18,7 @@ class CommandShowFindAllParticipantsTest {
         // given
         int page = 1;
         String search = "search";
-        String expected = "/showallparticipants {\"pg\":\"1\",\"search\":\"search\"}";
+        String expected = "/salps {\"pg\":\"1\",\"sh\":\"search\"}";
         // when
         String actual = CommandShowFindAllParticipants.getCallbackCommand(page, search);
         // then
@@ -29,7 +29,7 @@ class CommandShowFindAllParticipantsTest {
     void shouldGenerateStateText() {
         // given
         int page = 1;
-        String expected = "/showallparticipants {\"pg\":\"1\",\"search\":\"{}\"}";
+        String expected = "/salps {\"pg\":\"1\",\"sh\":\"{}\"}";
         // when
         String actual = CommandShowFindAllParticipants.getStateText(page);
         // then

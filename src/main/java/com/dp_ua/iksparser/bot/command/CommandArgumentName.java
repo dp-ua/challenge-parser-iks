@@ -5,7 +5,7 @@ public enum CommandArgumentName {
     COMPETITION_ID("cid"),
     PAGE("pg"),
     ACTION("act"),
-    SEARCH("search"),
+    SEARCH("sh"),
     ;
     private final String value;
 
