@@ -117,11 +117,11 @@ public class CompetitionFacadeImpl extends FacadeMethods implements CompetitionF
     }
 
     @Override
-    public void startSearchByBibNumber(String chatId, long commandArgument, Integer editMessageId) {
-        log.info("startSearchByBibNumber. CommandArgument {}, chatId:{} ", commandArgument, chatId);
+    public void startSearchByBibNumber(String chatId, long bibNumber, Integer editMessageId) {
+        log.info("startSearchByBibNumber. CommandArgument {}, chatId:{} ", bibNumber, chatId);
         sendTypingAction(chatId);
 
-        handleCompetition(chatId, commandArgument, editMessageId, competition -> {
+        handleCompetition(chatId, bibNumber, editMessageId, competition -> {
             long competitionId = competition.getId();
             setStateForSearchingByBibNumber(chatId, competitionId);
             publishTextMessage(chatId, searchView.findByBibNumber(competition), getBackToCompetitionKeyboard(competitionId));
@@ -517,7 +517,7 @@ public class CompetitionFacadeImpl extends FacadeMethods implements CompetitionF
         List<InlineKeyboardButton> row = new ArrayList<>();
         InlineKeyboardButton button = SERVICE.getKeyboardButton(
                 FIND + " Пошук спортсмена по номеру " + NUMBER,
-                "/" + CommandSearchByBibNumber.command + " " + competition.getId()
+                CommandSearchByBibNumber.getCallbackCommand(competition.getId())
         );
         row.add(button);
         return row;

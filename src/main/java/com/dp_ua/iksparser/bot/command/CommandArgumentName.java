@@ -6,6 +6,7 @@ public enum CommandArgumentName {
     PAGE("pg"),
     ACTION("act"),
     SEARCH("sh"),
+    BIB_NUMBER("bn"),
     ;
     private final String value;
 
