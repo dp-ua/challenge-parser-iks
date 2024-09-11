@@ -32,11 +32,11 @@ public class CommandCompetition extends BaseCommand {
     @Override
     protected void perform(Message message) {
         String chatId = message.getChatId();
-        long commandArgument = getCommandArgument(message.getMessageText());
-        competitionFacade.showCompetition(chatId, commandArgument, message.getEditMessageId());
+        long competitionId = Long.parseLong(parseArgument(message.getMessageText(), COMPETITION_ID.getValue()));
+        competitionFacade.showCompetition(chatId, competitionId, message.getEditMessageId());
     }
 
-    public String getCallbackCommand(long competitionId) {
+    public static String getCallbackCommand(long competitionId) {
         return "/" + command + " {\"" + COMPETITION_ID.getValue() + "\":\"" + competitionId + "\"}";
     }
 }

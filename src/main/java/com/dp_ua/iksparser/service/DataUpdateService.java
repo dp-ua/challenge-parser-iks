@@ -166,7 +166,7 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
     private SelfMessage getUpdateMessage(long competitionId, UpdateStatusEntity updateStatusEntity) {
         SelfMessage selfMessage = new SelfMessage();
         selfMessage.setChatId(updateStatusEntity.getChatId());
-        selfMessage.setMessageText("/" + CommandCompetition.command + " " + competitionId);
+        selfMessage.setMessageText(CommandCompetition.getCallbackCommand(competitionId));
         return selfMessage;
     }
 

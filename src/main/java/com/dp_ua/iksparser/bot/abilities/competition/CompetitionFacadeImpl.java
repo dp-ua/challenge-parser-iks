@@ -89,11 +89,11 @@ public class CompetitionFacadeImpl extends FacadeMethods implements CompetitionF
 
     @Override
     @Transactional
-    public void showCompetition(String chatId, long commandArgument, Integer editMessageId) {
-        log.info("showCompetition. CommandArgument {}, chatId:{} ", commandArgument, chatId);
+    public void showCompetition(String chatId, long competitionId, Integer editMessageId) {
+        log.info("showCompetition. CommandArgument {}, chatId:{} ", competitionId, chatId);
         sendTypingAction(chatId);
 
-        handleCompetition(chatId, commandArgument, editMessageId, competition -> {
+        handleCompetition(chatId, competitionId, editMessageId, competition -> {
             StringBuilder sb = new StringBuilder();
             boolean competitionFilled = competition.isFilled();
             sb.append(competitionView.info(competition));
@@ -484,7 +484,7 @@ public class CompetitionFacadeImpl extends FacadeMethods implements CompetitionF
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
 
         List<InlineKeyboardButton> row = SERVICE.getBackButton(
-                "/" + CommandCompetition.command + " " + competitionId
+                CommandCompetition.getCallbackCommand(competitionId)
         );
         rows.add(row);
 

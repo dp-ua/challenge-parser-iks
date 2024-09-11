@@ -104,7 +104,7 @@ public class CompetitionView {
             int count = i + 1;
             InlineKeyboardButton button = SERVICE.getKeyboardButton(
                     Icon.getIconForNumber(count).toString(),
-                    "/" + CommandCompetition.command + " " + competition.getId()
+                    CommandCompetition.getCallbackCommand(competition.getId())
             );
             row.add(button);
         });
