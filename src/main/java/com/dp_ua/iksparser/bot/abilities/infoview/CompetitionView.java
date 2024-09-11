@@ -77,6 +77,20 @@ public class CompetitionView {
         return result.toString();
     }
 
+    public String listWithNumbers(List<CompetitionEntity> competitions) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < competitions.size(); i++) {
+            CompetitionEntity competition = competitions.get(i);
+            sb
+                    .append(Icon.getIconicNumber(i + 1)).append(SPACE)
+                    .append(info(competition));
+            if (i < competitions.size() - 1) {
+                sb.append(END_LINE);
+            }
+        }
+        return sb.toString();
+    }
+
     public InlineKeyboardMarkup getKeyboardForCompetitionsPage(Page<CompetitionEntity> page) {
         List<CompetitionEntity> competitions = page.getContent();
         InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
