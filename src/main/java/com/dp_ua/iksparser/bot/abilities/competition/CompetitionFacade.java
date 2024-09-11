@@ -7,7 +7,7 @@ import com.dp_ua.iksparser.exeption.ParsingException;
 import java.util.List;
 
 public interface CompetitionFacade {
-    void showCompetitions(String chatId, int page, Integer editMessageId) throws ParsingException;
+    void showCompetitions(String chatId, int page, Integer editMessageId);
 
     void showCompetition(String chatId, long commandArgument, Integer editMessageId);
 

@@ -122,14 +122,14 @@ public class CompetitionView {
         if (number > 0) {
             InlineKeyboardButton leftPage = SERVICE.getKeyboardButton(
                     PREVIOUS + " Свіжіші",
-                    "/" + CommandCompetitions.command + " " + (number - 1)
+                    CommandCompetitions.getCallbackCommand(number - 1)
             );
             row.add(leftPage);
         }
         if (number < totalPages - 1) {
             InlineKeyboardButton rightPage = SERVICE.getKeyboardButton(
                     "Старіші " + NEXT,
-                    "/" + CommandCompetitions.command + " " + (number + 1)
+                    CommandCompetitions.getCallbackCommand(number + 1)
             );
             row.add(rightPage);
         }
@@ -287,7 +287,7 @@ public class CompetitionView {
 
         InlineKeyboardButton button = SERVICE.getKeyboardButton(
                 COMPETITION + " Переглянути змагання",
-                "/" + CommandCompetitions.command);
+                CommandCompetitions.getCallbackCommand(0));
         row.add(button);
         rows.add(row);
         return rows;

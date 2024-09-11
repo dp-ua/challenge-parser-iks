@@ -6,6 +6,7 @@ import com.dp_ua.iksparser.bot.abilities.response.ResponseContentFactory;
 import com.dp_ua.iksparser.bot.abilities.response.ResponseContentGenerator;
 import com.dp_ua.iksparser.bot.event.SendMessageEvent;
 import com.dp_ua.iksparser.bot.message.Message;
+import com.dp_ua.iksparser.service.JsonReader;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,8 @@ public abstract class BaseCommand implements CommandInterface {
     ActionController actionController;
     @Autowired
     ResponseContentFactory responseContentFactory;
+    @Autowired
+    JsonReader jSonReader;
 
     protected abstract String getTextForCallBackAnswer(Message message);
 
@@ -80,6 +83,13 @@ public abstract class BaseCommand implements CommandInterface {
             return argument.isEmpty() ? DEFAULT_NO_PAGE_ARGUMENT : Integer.parseInt(argument);
         }
         return 0;
+    }
+
+    protected String parseArgument(String text, String argumentName) {
+        if (text.startsWith("{")) {
+            return jSonReader.getVal(text, argumentName);
+        }
+        throw new RuntimeException("Argument not found");
     }
 
     protected String getCommandArgumentString(String text) {

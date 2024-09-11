@@ -8,6 +8,8 @@ import lombok.ToString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import static com.dp_ua.iksparser.bot.command.CommandArgumentName.COMPETITION_ID;
+
 
 @Component
 @ToString
@@ -32,5 +34,9 @@ public class CommandCompetition extends BaseCommand {
         String chatId = message.getChatId();
         long commandArgument = getCommandArgument(message.getMessageText());
         competitionFacade.showCompetition(chatId, commandArgument, message.getEditMessageId());
+    }
+
+    public String getCallbackCommand(long competitionId) {
+        return "/" + command + " {\"" + COMPETITION_ID.getValue() + "\":\"" + competitionId + "\"}";
     }
 }

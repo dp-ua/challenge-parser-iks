@@ -472,7 +472,7 @@ public class CompetitionFacadeImpl extends FacadeMethods implements CompetitionF
         InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
 
-        List<InlineKeyboardButton> row = SERVICE.getBackButton("/" + CommandCompetitions.command);
+        List<InlineKeyboardButton> row = SERVICE.getBackButton(CommandCompetitions.getCallbackCommand());
         rows.add(row);
 
         keyboard.setKeyboard(rows);
