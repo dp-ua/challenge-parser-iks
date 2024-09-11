@@ -86,7 +86,8 @@ public abstract class BaseCommand implements CommandInterface {
     }
 
     protected String parseArgument(String text, String argumentName) {
-        if (text.startsWith("{")) {
+        String arguments = getCommandArgumentString(text);
+        if (arguments.startsWith("{")) {
             return jSonReader.getVal(text, argumentName);
         }
         throw new RuntimeException("Argument not found");
