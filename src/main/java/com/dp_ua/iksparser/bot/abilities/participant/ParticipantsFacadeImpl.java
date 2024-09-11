@@ -9,7 +9,9 @@ import com.dp_ua.iksparser.bot.abilities.subscribe.SubscribeFacade;
 import com.dp_ua.iksparser.bot.command.impl.participants.CommandParticipants;
 import com.dp_ua.iksparser.bot.command.impl.participants.CommandShowFindAllParticipants;
 import com.dp_ua.iksparser.bot.event.SendMessageEvent;
+import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
 import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
+import com.dp_ua.iksparser.dba.service.CompetitionService;
 import com.dp_ua.iksparser.dba.service.ParticipantService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +31,9 @@ import static com.dp_ua.iksparser.service.MessageCreator.SERVICE;
 @Slf4j
 public class ParticipantsFacadeImpl extends FacadeMethods implements ParticipantFacade {
     @Value("${view.participants.pageSize}")
-    private int pageSize;
+    private int PARTICIPANTS_PAGE_SIZE;
+    @Value("${view.competitions.detailed.pageSize}")
+    private int COMPETITION_PAGE_SIZE;
     @Autowired
     private ParticipantService participantService;
     @Autowired
@@ -38,6 +42,8 @@ public class ParticipantsFacadeImpl extends FacadeMethods implements Participant
     ParticipantView participantView;
     @Autowired
     StateService stateService;
+    @Autowired
+    CompetitionService competitionService;
 
     @Override
     public void subscribe(String chatId, long commandArgument, Integer editMessageId) {
@@ -69,9 +75,11 @@ public class ParticipantsFacadeImpl extends FacadeMethods implements Participant
     public void showParticipants(String chatId, long commandArgument, Integer editMessageId) {
         log.info("SHOW PARTICIPANTS chatId: {}, commandArgument: {}", chatId, commandArgument);
 
-        ResponseContent content = contentFactory.getContentForResponse(PARTICIPANTS_VIEW_MAIN);
-        validate(content, "ResponseContent for PARTICIPANTS_VIEW_MAIN not found");
+        ResponseContentGenerator contentGenerator = contentFactory.getContentForResponse(PARTICIPANTS_VIEW_MAIN);
+        validate(contentGenerator, "ResponseContent for PARTICIPANTS_VIEW_MAIN not found");
+        ResponseContainer content = contentGenerator.getContainer();
 
+        setStateShowFindAll(chatId, 0);
         SendMessageEvent event = SERVICE.getSendMessageEvent(chatId, editMessageId, content);
         publisher.publishEvent(event);
     }
@@ -100,6 +108,26 @@ public class ParticipantsFacadeImpl extends FacadeMethods implements Participant
         SendMessageEvent event = SERVICE.getSendMessageEvent(chatId, editMessageId, container);
 
         publisher.publishEvent(event);
+    }
+
+    @Override
+    public void showParticipantDetails(String chatId, String commandArgument, Integer editMessageId) {
+        log.info("SHOW PARTICIPANT DETAILS chatId: {}, commandArgument: {}", chatId, commandArgument);
+
+        long id = Long.parseLong(jSonReader.getVal(commandArgument, PARTICIPANT_ID.getValue()));
+        int page = Integer.parseInt(jSonReader.getVal(commandArgument, PAGE.getValue()));
+
+        participantService.findById(id).ifPresent(participant -> {
+            boolean subscribed = subscribeFacade.isSubscribed(chatId, participant);
+            Page<CompetitionEntity> competitions = competitionService.findCompetitionsByParticipant(participant, page, COMPETITION_PAGE_SIZE);
+
+            ResponseContentGenerator content = contentFactory.getContentForResponse(PARTICIPANT_DETAILS);
+            validate(content, "ResponseContent for PARTICIPANTS_VIEW_MAIN not found");
+            ResponseContainer container = content.getContainer(participant, competitions, subscribed);
+
+            SendMessageEvent event = SERVICE.getSendMessageEvent(chatId, editMessageId, container);
+            publisher.publishEvent(event);
+        });
     }
 
     private void setStateShowFindAll(String chatId, int page) {
