@@ -44,7 +44,9 @@ public class ParticipantView {
                 .append(BIRTHDAY);
         sb
                 .append(END_LINE)
-                .append(SPACE).append(SPACE).append(SPACE)
+                .append(SPACE)
+                .append(SPACE)
+                .append(SPACE)
                 .append(AREA)
                 .append(getRegion(participant))
                 .append(", ")
@@ -93,17 +95,19 @@ public class ParticipantView {
     }
 
     public String getFindInfoText() {
-        String sb = FIND +
-                SPACE +
-                "Натиснувши кнопку пошуку, ви зможете знайти спортсмена в базі за прізвищем та ім'ям" +
-                END_LINE +
-                END_LINE +
-                ITALIC +
-                INFO +
-                SPACE +
-                " Або введіть частину прізвища або імені в поле чату та відправте повідомлення" +
-                ITALIC;
-        return sb;
+        StringBuilder sb = new StringBuilder();
+        sb
+                .append(FIND)
+                .append(SPACE)
+                .append("Натиснувши кнопку пошуку, ви зможете знайти спортсмена в базі за прізвищем та ім'ям")
+                .append(END_LINE)
+                .append(END_LINE)
+                .append(ITALIC)
+                .append(INFO)
+                .append(SPACE)
+                .append(" Або введіть частину прізвища або імені в поле чату та відправте повідомлення")
+                .append(ITALIC);
+        return sb.toString();
     }
 
     public String getParticipantsInfoList(Page<ParticipantEntity> participants) {
@@ -124,7 +128,7 @@ public class ParticipantView {
         keyboard.setKeyboard(rows);
 
         List<ParticipantEntity> content = participants.getContent();
-        if (content.size() == 0) {
+        if (content.isEmpty()) {
             return keyboard;
         }
         for (int i = 0; i < content.size(); i++) {

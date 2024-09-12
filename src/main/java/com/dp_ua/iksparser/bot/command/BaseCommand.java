@@ -58,9 +58,9 @@ public abstract class BaseCommand implements CommandInterface {
     private void performAction(Message message) {
         try {
             String arguments = getCommandArgumentString(message.getMessageText());
-            actionController.getActionType(arguments).ifPresent(actionType -> {
-                actionController.performAction(actionType, message.getChatId(), arguments);
-            });
+            actionController.getActionType(arguments).ifPresent(actionType ->
+                    actionController.performAction(actionType, message.getChatId(), arguments)
+            );
         } catch (Exception e) {
             log.error("Error in performAction: {}", e.getMessage());
         }

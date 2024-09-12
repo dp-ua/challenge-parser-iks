@@ -37,13 +37,16 @@ public class SubscriptionView {
                 .append(END_LINE)
                 .append(END_LINE)
                 .append(participantView.info(participant))
-                .append(END_LINE).append("Приймає участь у змаганнях: ")
+                .append(END_LINE)
+                .append("Приймає участь у змаганнях: ")
                 .append(competitionView.info(competition))
                 .append(END_LINE);
 
         separateHeatLinesByStatuses(heatLines).forEach((status, lines) -> {
             if (!lines.isEmpty()) {
-                sb.append(status).append(":").append(END_LINE);
+                sb.append(status)
+                        .append(":")
+                        .append(END_LINE);
                 lines.forEach(heatLine -> sb.append(heatLineView.info(heatLine)));
                 sb.append(END_LINE);
             }
@@ -123,46 +126,50 @@ public class SubscriptionView {
     }
 
     public String subscriptions(List<SubscriberEntity> subscriptions) {
-        String sb = whatIsSubscriptions() +
+        return whatIsSubscriptions() +
                 END_LINE +
                 subscriptionsDetails(subscriptions);
-        return sb;
     }
 
     public String whatIsSubscriptions() {
-        String sb = SUBSCRIBE +
-                BOLD +
-                " Підписка" +
-                BOLD +
-                END_LINE +
-                END_LINE +
-                "Дозволяє отримувати" +
-                SPACE +
-                MESSAGE +
-                ITALIC +
-                SPACE +
-                "сповіщення" +
-                ITALIC +
-                END_LINE +
-                "про нові заявки в івентах, в яких бере участь обраний спортсмен." +
-                END_LINE;
-        return sb;
+        StringBuilder sb = new StringBuilder();
+        sb
+                .append(SUBSCRIBE)
+                .append(SPACE)
+                .append(BOLD)
+                .append("Підписка")
+                .append(BOLD)
+                .append(END_LINE)
+                .append(END_LINE)
+                .append("Дозволяє отримувати")
+                .append(SPACE)
+                .append(MESSAGE)
+                .append(ITALIC)
+                .append(SPACE)
+                .append("сповіщення")
+                .append(ITALIC)
+                .append(END_LINE)
+                .append("про нові заявки в івентах, в яких бере участь обраний спортсмен.")
+                .append(END_LINE);
+        return sb.toString();
     }
 
     public String subscriptionsDetails(List<SubscriberEntity> subscriptions) {
         int size = subscriptions.size();
-        String sb = SUBSCRIBE +
-                " Ви підписані на " +
-                BOLD +
-                size +
-                BOLD +
-                SPACE +
-                ITALIC +
-                (size == 1 ? "атлета" : "атлетів") +
-                ITALIC +
-                ATHLETE +
-                END_LINE;
-        return sb;
+        StringBuilder sb = new StringBuilder();
+        sb
+                .append(SUBSCRIBE)
+                .append(" Ви підписані на ")
+                .append(BOLD)
+                .append(size)
+                .append(BOLD)
+                .append(SPACE)
+                .append(ITALIC)
+                .append(size == 1 ? "атлета" : "атлетів")
+                .append(ITALIC)
+                .append(ATHLETE)
+                .append(END_LINE);
+        return sb.toString();
     }
 
     public InlineKeyboardMarkup getSubscriptionsKeyboard() {

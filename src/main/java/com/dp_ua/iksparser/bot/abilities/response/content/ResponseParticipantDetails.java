@@ -54,14 +54,17 @@ public class ResponseParticipantDetails implements ResponseContentGenerator {
         boolean subscribed = getSubscribed(args);
         Page<CompetitionEntity> competitionsPage = getCompetitions(args);
 
-        String sb = subscribedNoticeLine(subscribed) +
-                END_LINE +
-                participantsInfo(participant) +
-                END_LINE + END_LINE +
-                competitionsInfo(competitionsPage) +
-                END_LINE +
-                getPageInfoNavigation(competitionsPage);
-        return sb;
+        StringBuilder sb = new StringBuilder();
+        sb
+                .append(subscribedNoticeLine(subscribed))
+                .append(END_LINE)
+                .append(participantsInfo(participant))
+                .append(END_LINE)
+                .append(END_LINE)
+                .append(competitionsInfo(competitionsPage))
+                .append(END_LINE)
+                .append(getPageInfoNavigation(competitionsPage));
+        return sb.toString();
     }
 
     @Override
@@ -89,10 +92,11 @@ public class ResponseParticipantDetails implements ResponseContentGenerator {
     private String competitionsInfo(Page<CompetitionEntity> competitionsPage) {
         StringBuilder sb = new StringBuilder();
         List<CompetitionEntity> competitions = competitionsPage.getContent();
-        if (competitions.size() > 0) {
+        if (!competitions.isEmpty()) {
             sb
                     .append(TEXT_TOOK_PART_IN_COMPETITIONS)
-                    .append(END_LINE).append(END_LINE)
+                    .append(END_LINE)
+                    .append(END_LINE)
                     .append(competitionView.listWithNumbers(competitions))
             ;
         } else {
@@ -114,7 +118,7 @@ public class ResponseParticipantDetails implements ResponseContentGenerator {
     }
 
     private List<InlineKeyboardButton> getCompetitionsNavButtons(List<CompetitionEntity> competitions, ParticipantEntity participant) {
-        if (competitions.size() == 0) {
+        if (competitions.isEmpty()) {
             return new ArrayList<>();
         }
         List<InlineKeyboardButton> row = new ArrayList<>();
@@ -194,14 +198,14 @@ public class ResponseParticipantDetails implements ResponseContentGenerator {
     }
 
     private Page<CompetitionEntity> getCompetitions(Object[] args) {
-        return (Page<CompetitionEntity>) getArgumentObject(ARGS_COMPETITIONS_INDEX, args).get();
+        return (Page<CompetitionEntity>) getArgumentObject(ARGS_COMPETITIONS_INDEX, args).orElseThrow();
     }
 
     private boolean getSubscribed(Object[] args) {
-        return Boolean.parseBoolean(getArgument(ARGS_SUBSCRIBED_INDEX, args).get());
+        return Boolean.parseBoolean(getArgument(ARGS_SUBSCRIBED_INDEX, args).orElseThrow());
     }
 
     private ParticipantEntity getParticipant(Object[] args) {
-        return (ParticipantEntity) getArgumentObject(ARGS_PARTICIPANT_INDEX, args).get();
+        return (ParticipantEntity) getArgumentObject(ARGS_PARTICIPANT_INDEX, args).orElseThrow();
     }
 }

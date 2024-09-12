@@ -137,22 +137,28 @@ public class CompetitionView {
     }
 
     public String info(CompetitionEntity competition) {
-        return name(competition) +
-                END_LINE +
-                date(competition) +
-                END_LINE +
-                area(competition) +
-                SPACE +
-                link(competition) +
-                END_LINE;
+        return new StringBuilder()
+                .append(name(competition))
+                .append(END_LINE)
+                .append(date(competition))
+                .append(END_LINE)
+                .append(area(competition))
+                .append(SPACE)
+                .append(link(competition))
+                .append(END_LINE)
+                .toString();
     }
 
     public String notFilledInfo() {
-        return WARNING +
-                END_LINE +
-                " Детальна інформація про змагання відсутня " +
-                WARNING +
-                END_LINE;
+        return new StringBuilder()
+                .append(WARNING)
+                .append(SPACE)
+                .append(END_LINE)
+                .append("Детальна інформація про змагання відсутня")
+                .append(SPACE)
+                .append(WARNING)
+                .append(END_LINE)
+                .toString();
     }
 
     public String name(CompetitionEntity competition) {
@@ -299,29 +305,31 @@ public class CompetitionView {
         String yearStart = years.get(0);
         String yearFinish = years.get(years.size() - 1);
 
-        String sb = COMPETITION +
-                "Всього змагань в базі: " +
-                BOLD +
-                competitionsCount +
-                BOLD +
-                END_LINE +
-                CALENDAR +
-                "Дата : з " +
-                BOLD +
-                yearStart +
-                BOLD +
-                " по " +
-                BOLD +
-                yearFinish +
-                BOLD +
-                " роки" +
-                END_LINE +
-                RESULT +
-                "Змагань, по яким заповнена інформація: " +
-                BOLD +
-                filledCompetitionsCount +
-                BOLD +
-                END_LINE;
-        return sb;
+        StringBuilder sb = new StringBuilder();
+        sb
+                .append(COMPETITION)
+                .append("Всього змагань в базі: ")
+                .append(BOLD)
+                .append(competitionsCount)
+                .append(BOLD)
+                .append(END_LINE)
+                .append(CALENDAR)
+                .append("Дата : з ")
+                .append(BOLD)
+                .append(yearStart)
+                .append(BOLD)
+                .append(" по ")
+                .append(BOLD)
+                .append(yearFinish)
+                .append(BOLD)
+                .append(" роки")
+                .append(END_LINE)
+                .append(RESULT)
+                .append("Змагань, по яким заповнена інформація: ")
+                .append(BOLD)
+                .append(filledCompetitionsCount)
+                .append(BOLD)
+                .append(END_LINE);
+        return sb.toString();
     }
 }

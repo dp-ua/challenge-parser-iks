@@ -71,8 +71,10 @@ public class CommandStart implements CommandInterface {
                 .append(COACH)
                 .append(END_LINE)
                 .append(END_LINE)
-                .append("Для початку роботи введи команду " + CommandCompetitions.getCallbackCommand())
-                .append(" або " + CommandMenu.getCallBackCommand())
+                .append("Для початку роботи введи команду ")
+                .append(CommandCompetitions.getCallbackCommand())
+                .append(" або ")
+                .append(CommandMenu.getCallBackCommand())
                 .append(END_LINE)
                 .append("Або скористайся кнопкою в меню");
         return sb;

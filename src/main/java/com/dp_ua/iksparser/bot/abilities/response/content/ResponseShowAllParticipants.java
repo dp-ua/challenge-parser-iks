@@ -31,7 +31,7 @@ public class ResponseShowAllParticipants implements ResponseContentGenerator {
     // todo add STAR to list. Information about subscription to the athlete
     @Override
     public String messageText(Object... args) {
-        Page<ParticipantEntity> participants = (Page<ParticipantEntity>) getArgumentObject(0, args).get();
+        Page<ParticipantEntity> participants = (Page<ParticipantEntity>) getArgumentObject(0, args).orElseThrow();
         validate(participants, "Participants not found");
         StringBuilder sb = new StringBuilder();
 
@@ -44,7 +44,8 @@ public class ResponseShowAllParticipants implements ResponseContentGenerator {
                 .append(BOLD)
                 .append(searchString)
                 .append(BOLD)
-                .append(END_LINE).append(END_LINE)
+                .append(END_LINE)
+                .append(END_LINE)
                 .append(participantsInfo)
                 .append(END_LINE);
         if (Strings.isEmpty(searchString)) {
@@ -52,7 +53,8 @@ public class ResponseShowAllParticipants implements ResponseContentGenerator {
                     .append(ITALIC)
                     .append("Для пошуку по імені або прізвищу введіть їх(або частину) у поле чату та відправте повідомлення")
                     .append(ITALIC)
-                    .append(END_LINE).append(END_LINE);
+                    .append(END_LINE)
+                    .append(END_LINE);
         }
         sb
                 .append(getPageInfoNavigation(participants));
@@ -62,7 +64,7 @@ public class ResponseShowAllParticipants implements ResponseContentGenerator {
 
     @Override
     public InlineKeyboardMarkup keyboard(Object... args) {
-        Page<ParticipantEntity> participants = (Page<ParticipantEntity>) getArgumentObject(0, args).get();
+        Page<ParticipantEntity> participants = (Page<ParticipantEntity>) getArgumentObject(0, args).orElseThrow();
         validate(participants, "Participants not found");
 
         Optional<String> searchString = getArgument(1, args);

@@ -260,17 +260,13 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
         List<DayEntity> updatedDays = competitionParser.getUnsavedUnfilledDays(document);
         List<DayEntity> oldDays = competition.getDays();
         if (oldDays.isEmpty()) {
-            updatedDays.forEach(day -> {
-                saveDayAndSetRelationToCompetition(competition, day);
-            });
+            updatedDays.forEach(day -> saveDayAndSetRelationToCompetition(competition, day));
         } else {
             updatedDays.forEach(newDay -> oldDays.stream()
                     .filter(newDay::isTheSame)
                     .findFirst()
                     .ifPresentOrElse(oldDay -> dayService.save(oldDay),
-                            () -> {
-                                saveDayAndSetRelationToCompetition(competition, newDay);
-                            }
+                            () -> saveDayAndSetRelationToCompetition(competition, newDay)
                     ));
         }
     }
