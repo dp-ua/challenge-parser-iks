@@ -13,7 +13,7 @@ public class CommandSend extends AdminAccessCommand {
     @Autowired
     BotController bot;
 
-    public static final String command = "send";
+    private static final String command = "send";
 
     @Override
     protected String getTextForCallBackAnswer(Message message) {
