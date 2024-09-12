@@ -48,7 +48,7 @@ public class ResponseParticipantDetails implements ResponseContentGenerator {
 
     @Override
     public String messageText(Object... args) {
-        validateArgs(args, ARGS_SIZE);
+        validateArgs(args);
 
         ParticipantEntity participant = getParticipant(args);
         boolean subscribed = getSubscribed(args);
@@ -66,7 +66,7 @@ public class ResponseParticipantDetails implements ResponseContentGenerator {
 
     @Override
     public InlineKeyboardMarkup keyboard(Object... args) {
-        validateArgs(args, ARGS_SIZE);
+        validateArgs(args);
 
         ParticipantEntity participant = getParticipant(args);
         boolean subscribed = getSubscribed(args);
@@ -175,9 +175,9 @@ public class ResponseParticipantDetails implements ResponseContentGenerator {
         return subscriptionView.buttonUnsubscribe(CommandParticipantDetails.getCallbackCommand(page, participant.getId(), ActionType.UNSUB));
     }
 
-    private void validateArgs(Object[] args, int argsSize) {
-        if (args.length != argsSize) {
-            throw new IllegalArgumentException("Invalid args size: " + args.length + ", expected: " + argsSize);
+    private void validateArgs(Object[] args) {
+        if (args.length != ARGS_SIZE) {
+            throw new IllegalArgumentException("Invalid args size: " + args.length + ", expected: " + ARGS_SIZE);
         }
         Optional<?> argumentObject = getArgumentObject(ARGS_PARTICIPANT_INDEX, args);
         if (argumentObject.isEmpty() || !(argumentObject.get() instanceof ParticipantEntity)) {
