@@ -14,7 +14,7 @@ import static com.dp_ua.iksparser.bot.command.CommandArgumentName.COMPETITION_ID
 @Component
 @ToString
 public class CommandCompetition extends BaseCommand {
-    public final static String command = "competition";
+    private final static String command = "competition";
     private final boolean isInTextCommand = false;
     @Autowired
     private CompetitionFacade competitionFacade;

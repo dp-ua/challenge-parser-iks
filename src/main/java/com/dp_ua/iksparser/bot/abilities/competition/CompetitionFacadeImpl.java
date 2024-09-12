@@ -391,11 +391,11 @@ public class CompetitionFacadeImpl extends FacadeMethods implements CompetitionF
     }
 
     @Override
-    public void showNotLoadedInfo(String chatId, long commandArgument, Integer editMessageId) {
-        log.info("showNotLoadedInfo. CommandArgument {}, chatId:{} ", commandArgument, chatId);
+    public void showNotLoadedInfo(String chatId, long competitionId, Integer editMessageId) {
+        log.info("showNotLoadedInfo. CommandArgument {}, chatId:{} ", competitionId, chatId);
         sendTypingAction(chatId);
 
-        handleCompetition(chatId, commandArgument, editMessageId, competition -> {
+        handleCompetition(chatId, competitionId, editMessageId, competition -> {
             String sb = competitionView.info(competition) +
                     END_LINE +
                     competitionView.notFilledInfo();

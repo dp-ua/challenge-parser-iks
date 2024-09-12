@@ -173,7 +173,7 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
     private SelfMessage getErrorMessage(long competitionId, UpdateStatusEntity updateStatusEntity) {
         SelfMessage selfMessage = new SelfMessage();
         selfMessage.setChatId(updateStatusEntity.getChatId());
-        selfMessage.setMessageText("/" + CommandCompetitionNotLoaded.command + " " + competitionId);
+        selfMessage.setMessageText(CommandCompetitionNotLoaded.getCallBackCommand(competitionId));
         return selfMessage;
     }
 
