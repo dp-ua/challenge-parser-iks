@@ -33,7 +33,7 @@ public class CommandCompetitionNotLoaded extends BaseCommand {
     protected void perform(Message message) {
         String chatId = message.getChatId();
         String text = message.getMessageText();
-        long competitionId = Long.parseLong(parseArgument(text, COMPETITION_ID.getValue()));
+        long competitionId = Long.parseLong(parseArgument(text, COMPETITION_ID));
         competitionFacade.showNotLoadedInfo(chatId, competitionId, message.getEditMessageId());
     }
 

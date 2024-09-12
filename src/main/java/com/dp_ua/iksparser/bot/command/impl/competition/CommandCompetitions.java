@@ -49,7 +49,7 @@ public class CommandCompetitions extends BaseCommand {
 
     private int getPage(Message message) {
         try {
-            return Integer.parseInt(parseArgument(message.getMessageText(), PAGE.getValue()));
+            return Integer.parseInt(parseArgument(message.getMessageText(), PAGE));
         } catch (Exception e) {
             return DEFAULT_NO_PAGE_ARGUMENT;
         }
