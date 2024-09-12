@@ -1,14 +1,14 @@
 package com.dp_ua.iksparser.bot.command.impl.participants;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class CommandShowFindAllParticipantsTest {
     CommandShowFindAllParticipants command;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         command = new CommandShowFindAllParticipants();
     }
