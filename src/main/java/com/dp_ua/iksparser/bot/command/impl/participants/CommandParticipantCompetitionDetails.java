@@ -13,7 +13,7 @@ import static com.dp_ua.iksparser.bot.command.CommandArgumentName.PARTICIPANT_ID
 @Component
 @ToString
 public class CommandParticipantCompetitionDetails extends BaseCommand {
-    public final static String command = "parcompdet"; // show participant competition details
+    private final static String command = "parcompdet"; // show participant competition details
 
     @Override
     protected String getTextForCallBackAnswer(Message message) {

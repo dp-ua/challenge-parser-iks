@@ -15,7 +15,7 @@ import static com.dp_ua.iksparser.bot.command.CommandArgumentName.*;
 @Component
 @ToString
 public class CommandParticipantDetails extends BaseCommand {
-    public final static String command = "shpartdet"; // show participant details
+    private final static String command = "shpartdet"; // show participant details
     private final boolean isInTextCommand = false;
     @Autowired
     ParticipantFacade participantsFacade;

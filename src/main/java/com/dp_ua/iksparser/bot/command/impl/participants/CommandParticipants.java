@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 @ToString
 public class CommandParticipants extends BaseCommand {
-    public final static String command = "participants";
+    private final static String command = "participants";
     private final boolean isInTextCommand = false;
     @Autowired
     ParticipantFacade participantsFacade;
