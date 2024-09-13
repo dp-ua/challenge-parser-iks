@@ -185,15 +185,15 @@ public class ResponseParticipantDetails implements ResponseContentGenerator {
         }
         Optional<?> argumentObject = getArgumentObject(ARGS_PARTICIPANT_INDEX, args);
         if (argumentObject.isEmpty() || !(argumentObject.get() instanceof ParticipantEntity)) {
-            throw new IllegalArgumentException("Invalid argument type: " + argumentObject.getClass().getName());
+            throw new IllegalArgumentException("Invalid argument type: " + argumentObject.get().getClass().getName());
         }
         argumentObject = getArgumentObject(ARGS_COMPETITIONS_INDEX, args);
         if (argumentObject.isEmpty() || !(argumentObject.get() instanceof Page<?>)) {
-            throw new IllegalArgumentException("Invalid argument type: " + argumentObject.getClass().getName());
+            throw new IllegalArgumentException("Invalid argument type: " + argumentObject.get().getClass().getName());
         }
         Optional<String> argument = getArgument(ARGS_SUBSCRIBED_INDEX, args);
         if (argument.isEmpty() || !argument.get().matches("true|false")) {
-            throw new IllegalArgumentException("Invalid argument type: " + argument.getClass().getName());
+            throw new IllegalArgumentException("Invalid argument type: " + argument.get().getClass().getName());
         }
     }
 
