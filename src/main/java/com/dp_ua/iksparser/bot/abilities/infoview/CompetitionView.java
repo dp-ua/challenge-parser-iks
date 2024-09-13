@@ -82,7 +82,8 @@ public class CompetitionView {
         for (int i = 0; i < competitions.size(); i++) {
             CompetitionEntity competition = competitions.get(i);
             sb
-                    .append(Icon.getIconicNumber(i + 1)).append(SPACE)
+                    .append(Icon.getIconicNumber(i + 1))
+                    .append(SPACE)
                     .append(info(competition));
             if (i < competitions.size() - 1) {
                 sb.append(END_LINE);
@@ -331,5 +332,18 @@ public class CompetitionView {
                 .append(BOLD)
                 .append(END_LINE);
         return sb.toString();
+    }
+
+    public InlineKeyboardMarkup getBackToCompetitionKeyboard(CompetitionEntity competition) {
+        InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
+
+        List<InlineKeyboardButton> row = SERVICE.getBackButton(
+                CommandCompetition.getCallbackCommand(competition.getId())
+        );
+        rows.add(row);
+
+        keyboard.setKeyboard(rows);
+        return keyboard;
     }
 }

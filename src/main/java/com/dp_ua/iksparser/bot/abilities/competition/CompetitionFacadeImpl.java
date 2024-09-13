@@ -2,9 +2,10 @@ package com.dp_ua.iksparser.bot.abilities.competition;
 
 import com.dp_ua.iksparser.bot.abilities.FacadeMethods;
 import com.dp_ua.iksparser.bot.abilities.infoview.*;
+import com.dp_ua.iksparser.bot.abilities.response.ResponseContainer;
+import com.dp_ua.iksparser.bot.abilities.response.ResponseContentGenerator;
 import com.dp_ua.iksparser.bot.abilities.subscribe.SubscribeFacade;
 import com.dp_ua.iksparser.bot.command.impl.*;
-import com.dp_ua.iksparser.bot.command.impl.competition.CommandCompetition;
 import com.dp_ua.iksparser.bot.command.impl.competition.CommandCompetitions;
 import com.dp_ua.iksparser.bot.event.SendMessageEvent;
 import com.dp_ua.iksparser.dba.dto.CompetitionDto;
@@ -35,6 +36,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static com.dp_ua.iksparser.bot.Icon.*;
+import static com.dp_ua.iksparser.bot.abilities.response.ResponseType.SEARCH_BY_BIB_NUMBER;
 import static com.dp_ua.iksparser.service.MessageCreator.END_LINE;
 import static com.dp_ua.iksparser.service.MessageCreator.SERVICE;
 
@@ -121,10 +123,13 @@ public class CompetitionFacadeImpl extends FacadeMethods implements CompetitionF
         log.info("startSearchByBibNumber. CommandArgument {}, chatId:{} ", bibNumber, chatId);
         sendTypingAction(chatId);
 
+        ResponseContentGenerator contentGenerator = contentFactory.getContentForResponse(SEARCH_BY_BIB_NUMBER);
+
         handleCompetition(chatId, bibNumber, editMessageId, competition -> {
+            ResponseContainer content = contentGenerator.getContainer(competition);
             long competitionId = competition.getId();
             setStateForSearchingByBibNumber(chatId, competitionId);
-            publishTextMessage(chatId, searchView.findByBibNumber(competition), getBackToCompetitionKeyboard(competitionId));
+            publishTextMessage(chatId, content.getMessageText(), content.getKeyboard());
         });
     }
 
@@ -136,7 +141,7 @@ public class CompetitionFacadeImpl extends FacadeMethods implements CompetitionF
         handleCompetition(chatId, commandArgument, editMessageId, competition -> {
             long competitionId = competition.getId();
             setStateForSearchingByName(chatId, competitionId);
-            publishTextMessage(chatId, searchView.findByName(competition), getBackToCompetitionKeyboard(competitionId));
+            publishTextMessage(chatId, searchView.findByName(competition), competitionView.getBackToCompetitionKeyboard(competition));
         });
     }
 
@@ -175,20 +180,20 @@ public class CompetitionFacadeImpl extends FacadeMethods implements CompetitionF
         if (separatedParticipantsAndHeatLines.size() > MAX_PARTICIPANTS_SIZE_TO_FIND) {
             publishEvent(prepareSendMessageEvent(
                     chatId, editMessageId,
-                    "Знайдено забагато спортсменів під цим номером", getBackToCompetitionKeyboard(competitionId)));
-            publishFindMore(chatId, competitionId, INPUT_BIB);
+                    "Знайдено забагато спортсменів під цим номером",
+                    competitionView.getBackToCompetitionKeyboard(competition))
+            );
+            publishFindMore(chatId, competition, INPUT_BIB);
             return;
         }
 
-        separatedParticipantsAndHeatLines.entrySet().forEach(entry -> {
-            ParticipantEntity participant = entry.getKey();
-            List<HeatLineEntity> participantHeatLines = entry.getValue();
+        separatedParticipantsAndHeatLines.forEach((participant, participantHeatLines) -> {
 
             String message = searchView.foundParticipantInCompetitionMessage(participant, competition, participantHeatLines);
             boolean subscribed = subscribeFacade.isSubscribed(chatId, participant);
             publishTextMessage(chatId, message, subscriptionView.button(participant, subscribed));
         });
-        publishFindMore(chatId, competitionId, INPUT_BIB);
+        publishFindMore(chatId, competition, INPUT_BIB);
     }
 
     // todo move to utils
@@ -230,7 +235,7 @@ public class CompetitionFacadeImpl extends FacadeMethods implements CompetitionF
         );
         if (allHeatLines.isEmpty()) {
             publishTextMessage(chatId, "Учасників не знайдено", null);
-            publishFindMore(chatId, competitionId, INPUT_SURNAME);
+            publishFindMore(chatId, competition, INPUT_SURNAME);
             return;
         }
 
@@ -239,20 +244,20 @@ public class CompetitionFacadeImpl extends FacadeMethods implements CompetitionF
         if (participantHeatLinesMap.size() > MAX_PARTICIPANTS_SIZE_TO_FIND) {
             publishEvent(prepareSendMessageEvent(
                     chatId, editMessageId,
-                    "Знайдено забагато спортсменів. Введіть повніше прізвище", getBackToCompetitionKeyboard(competitionId)));
-            publishFindMore(chatId, competitionId, INPUT_SURNAME);
+                    "Знайдено забагато спортсменів. Введіть повніше прізвище",
+                    competitionView.getBackToCompetitionKeyboard(competition))
+            );
+            publishFindMore(chatId, competition, INPUT_SURNAME);
             return;
         }
 
-        participantHeatLinesMap.entrySet().forEach(entry -> {
-            ParticipantEntity participant = entry.getKey();
-            List<HeatLineEntity> heatLines = entry.getValue();
+        participantHeatLinesMap.forEach((participant, heatLines) -> {
 
             String message = searchView.foundParticipantInCompetitionMessage(participant, competition, heatLines);
             boolean subscribed = subscribeFacade.isSubscribed(chatId, participant);
             publishTextMessage(chatId, message, subscriptionView.button(participant, subscribed));
         });
-        publishFindMore(chatId, competitionId, INPUT_SURNAME);
+        publishFindMore(chatId, competition, INPUT_SURNAME);
     }
 
     private static Map<ParticipantEntity, List<HeatLineEntity>> getSeparatedParticipantsAndHeatLines(List<HeatLineEntity> heatLines) {
@@ -267,13 +272,13 @@ public class CompetitionFacadeImpl extends FacadeMethods implements CompetitionF
     }
 
 
-    private void publishFindMore(String chatId, long competitionId, String text) {
+    private void publishFindMore(String chatId, CompetitionEntity competition, String text) {
         try {
             Thread.sleep(100);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        InlineKeyboardMarkup keyboard = getBackToCompetitionKeyboard(competitionId);
+        InlineKeyboardMarkup keyboard = competitionView.getBackToCompetitionKeyboard(competition);
         publishEvent(prepareSendMessageEvent(
                 chatId,
                 null,
@@ -292,7 +297,11 @@ public class CompetitionFacadeImpl extends FacadeMethods implements CompetitionF
         handleCompetition(chatId, commandArgument, editMessageId, competition -> {
             long competitionId = competition.getId();
             setStateSearchingByCoach(chatId, competitionId);
-            publishTextMessage(chatId, searchView.findByCoach(competition), getBackToCompetitionKeyboard(competitionId));
+            publishTextMessage(
+                    chatId,
+                    searchView.findByCoach(competition),
+                    competitionView.getBackToCompetitionKeyboard(competition)
+            );
         });
     }
 
@@ -321,7 +330,7 @@ public class CompetitionFacadeImpl extends FacadeMethods implements CompetitionF
             publishEvent(prepareSendMessageEvent(
                     chatId, editMessageId,
                     "Тренера не знайдено.", null));
-            publishFindMore(chatId, competitionId, INPUT_SURNAME);
+            publishFindMore(chatId, competition, INPUT_SURNAME);
             return;
         }
 
@@ -336,7 +345,7 @@ public class CompetitionFacadeImpl extends FacadeMethods implements CompetitionF
         if (coachHeatLinesMap.isEmpty()) {
             log.warn("No participants found");
             publishTextMessage(chatId, "Учасників не знайдено", null);
-            publishFindMore(chatId, competitionId, INPUT_SURNAME);
+            publishFindMore(chatId, competition, INPUT_SURNAME);
             return;
         }
         coachHeatLinesMap.forEach((coach, coachHeatLines) -> {
@@ -347,7 +356,7 @@ public class CompetitionFacadeImpl extends FacadeMethods implements CompetitionF
 
             sendChunkedMessages(chatId, header, participantsInfo);
         });
-        publishFindMore(chatId, competitionId, INPUT_SURNAME);
+        publishFindMore(chatId, competition, INPUT_SURNAME);
     }
 
 
@@ -424,13 +433,13 @@ public class CompetitionFacadeImpl extends FacadeMethods implements CompetitionF
         if (bib.isEmpty()) {
             log.warn("Bib is empty");
             publishTextMessage(chatId, "Ви не вказали біб-номер", null);
-            publishFindMore(chatId, id, INPUT_BIB);
+            publishFindMore(chatId, competition, INPUT_BIB);
             return true;
         }
         if (!bib.matches("[0-9]+")) {
             log.warn("Bib contains invalid symbols: {}", bib);
             publishTextMessage(chatId, "Ви вказали некоректний біб-номер", null);
-            publishFindMore(chatId, id, INPUT_BIB);
+            publishFindMore(chatId, competition, INPUT_BIB);
             return true;
         }
         return false;
@@ -450,19 +459,19 @@ public class CompetitionFacadeImpl extends FacadeMethods implements CompetitionF
         if (name.isEmpty()) {
             log.warn("Name is empty");
             publishTextMessage(chatId, "Ви не вказали прізвище", null);
-            publishFindMore(chatId, id, INPUT_SURNAME);
+            publishFindMore(chatId, competition, INPUT_SURNAME);
             return true;
         }
         if (name.length() < 3) {
             log.warn("Name is too short");
             publishTextMessage(chatId, "Ви вказали занадто коротке прізвище", null);
-            publishFindMore(chatId, id, INPUT_SURNAME);
+            publishFindMore(chatId, competition, INPUT_SURNAME);
             return true;
         }
         if (!name.matches("[а-яА-Яa-zA-Z-ґҐєЄіІїЇ']+")) {
             log.warn("Name contains invalid symbols: {}", name);
             publishTextMessage(chatId, "Ви вказали некоректне прізвище", null);
-            publishFindMore(chatId, id, INPUT_SURNAME);
+            publishFindMore(chatId, competition, INPUT_SURNAME);
             return true;
         }
         return false;
@@ -479,18 +488,6 @@ public class CompetitionFacadeImpl extends FacadeMethods implements CompetitionF
         return keyboard;
     }
 
-    private InlineKeyboardMarkup getBackToCompetitionKeyboard(long competitionId) {
-        InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
-        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
-
-        List<InlineKeyboardButton> row = SERVICE.getBackButton(
-                CommandCompetition.getCallbackCommand(competitionId)
-        );
-        rows.add(row);
-
-        keyboard.setKeyboard(rows);
-        return keyboard;
-    }
 
     private void publishEvent(SendMessageEvent messageEvent) {
         publisher.publishEvent(messageEvent);
