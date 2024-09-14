@@ -1,6 +1,7 @@
 package com.dp_ua.iksparser.bot.command;
 
 import com.dp_ua.iksparser.bot.abilities.action.ActionController;
+import com.dp_ua.iksparser.bot.abilities.action.ActionType;
 import com.dp_ua.iksparser.bot.abilities.response.ResponseContainer;
 import com.dp_ua.iksparser.bot.abilities.response.ResponseContentFactory;
 import com.dp_ua.iksparser.bot.abilities.response.ResponseContentGenerator;
@@ -13,11 +14,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 
 import static com.dp_ua.iksparser.bot.abilities.response.ResponseType.NOT_IMPLEMENTED;
+import static com.dp_ua.iksparser.bot.command.CommandArgumentName.*;
 import static com.dp_ua.iksparser.service.MessageCreator.SERVICE;
 
 @Slf4j
 public abstract class BaseCommand implements CommandInterface {
     public static final int DEFAULT_NO_PAGE_ARGUMENT = -1;
+    protected static final String PARAM_DELIMITER = ",";
+    protected static final String BRACKET_OPEN = " {";
+    protected static final String BRACKET_CLOSE = "}";
+    protected static final String SLASH = "/";
+
 
     @Autowired
     protected ApplicationEventPublisher publisher;
@@ -99,5 +106,21 @@ public abstract class BaseCommand implements CommandInterface {
             return argument.isEmpty() ? "" : argument;
         }
         return "";
+    }
+
+    protected static String paramParticipant(long participantId) {
+        return paramObject(PARTICIPANT_ID, String.valueOf(participantId));
+    }
+
+    protected static String paramCompetition(long competitionId) {
+        return paramObject(COMPETITION_ID, String.valueOf(competitionId));
+    }
+
+    protected static String paramAction(ActionType action) {
+        return paramObject(ACTION, action.toString());
+    }
+
+    protected static String paramObject(CommandArgumentName name, String value) {
+        return "\"" + name.getValue() + "\":\"" + value + "\"";
     }
 }
