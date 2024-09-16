@@ -32,7 +32,7 @@ public class CommandSearchByBibNumber extends BaseCommand {
     protected void perform(Message message) {
         String chatId = message.getChatId();
         String text = message.getMessageText();
-        long competitionId = Long.parseLong(parseArgument(text, COMPETITION_ID));
+        long competitionId = Long.parseLong(parseArgumentFromFullText(text, COMPETITION_ID));
         competitionFacade.startSearchByBibNumber(chatId, competitionId, message.getEditMessageId());
     }
 
