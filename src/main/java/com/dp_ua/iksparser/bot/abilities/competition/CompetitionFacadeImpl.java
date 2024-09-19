@@ -1,7 +1,10 @@
 package com.dp_ua.iksparser.bot.abilities.competition;
 
 import com.dp_ua.iksparser.bot.abilities.FacadeMethods;
-import com.dp_ua.iksparser.bot.abilities.infoview.*;
+import com.dp_ua.iksparser.bot.abilities.infoview.CompetitionView;
+import com.dp_ua.iksparser.bot.abilities.infoview.HeatLineView;
+import com.dp_ua.iksparser.bot.abilities.infoview.ParticipantView;
+import com.dp_ua.iksparser.bot.abilities.infoview.SearchView;
 import com.dp_ua.iksparser.bot.abilities.response.ResponseContainer;
 import com.dp_ua.iksparser.bot.abilities.response.ResponseContentGenerator;
 import com.dp_ua.iksparser.bot.abilities.subscribe.SubscribeFacade;
@@ -16,6 +19,7 @@ import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
 import com.dp_ua.iksparser.dba.service.CoachService;
 import com.dp_ua.iksparser.dba.service.CompetitionService;
 import com.dp_ua.iksparser.dba.service.HeatLineService;
+import com.dp_ua.iksparser.dba.service.ParticipantService;
 import com.dp_ua.iksparser.exeption.ParsingException;
 import com.dp_ua.iksparser.service.parser.MainParserService;
 import lombok.extern.slf4j.Slf4j;
@@ -28,14 +32,12 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static com.dp_ua.iksparser.bot.Icon.*;
+import static com.dp_ua.iksparser.bot.abilities.response.ResponseType.FIND_PARTICIPANT_IN_COMPETITION;
 import static com.dp_ua.iksparser.bot.abilities.response.ResponseType.SEARCH_BY_BIB_NUMBER;
 import static com.dp_ua.iksparser.service.MessageCreator.END_LINE;
 import static com.dp_ua.iksparser.service.MessageCreator.SERVICE;
@@ -62,7 +64,7 @@ public class CompetitionFacadeImpl extends FacadeMethods implements CompetitionF
     @Autowired
     CoachService coachService;
     @Autowired
-    SubscriptionView subscriptionView;
+    ParticipantService participantService;
     @Autowired
     CompetitionView competitionView;
     @Autowired
@@ -187,13 +189,39 @@ public class CompetitionFacadeImpl extends FacadeMethods implements CompetitionF
             return;
         }
 
-        separatedParticipantsAndHeatLines.forEach((participant, participantHeatLines) -> {
-
-            String message = searchView.foundParticipantInCompetitionMessage(participant, competition, participantHeatLines);
-            boolean subscribed = subscribeFacade.isSubscribed(chatId, participant);
-            publishTextMessage(chatId, message, subscriptionView.button(participant, subscribed));
-        });
+        separatedParticipantsAndHeatLines.forEach((participant, heatlines) ->
+                showAthleteCompetitionParticipationDetails(chatId, null, participant, heatlines, competition));
         publishFindMore(chatId, competition, INPUT_BIB);
+    }
+
+    private void showAthleteCompetitionParticipationDetails(String chatId, Integer editMessageId,
+                                                            ParticipantEntity participant,
+                                                            List<HeatLineEntity> participantHeatLines,
+                                                            CompetitionEntity competition) {
+        boolean subscribed = subscribeFacade.isSubscribed(chatId, participant);
+
+        ResponseContainer container = contentFactory.getContentForResponse(FIND_PARTICIPANT_IN_COMPETITION)
+                .getContainer(participant, competition, participantHeatLines, subscribed);
+
+        SendMessageEvent sendMessageEvent = prepareSendMessageEvent(chatId, editMessageId, container);
+
+        publishEvent(sendMessageEvent);
+    }
+
+    @Override
+    public void showAthleteCompetitionParticipationDetails(String chatId, Integer editMessageId,
+                                                           long participantId, long competitionId) {
+        log.info("showAthleteCompetitionParticipationDetails. ParticipantId: {}, competitionId: {}, chatId: {}", participantId, competitionId, chatId);
+
+        Optional<ParticipantEntity> participant = participantService.findById(participantId);
+        CompetitionEntity competition = competitionService.findById(competitionId);
+        if (participant.isEmpty() || competition == null) {
+            throw new RuntimeException("Participant:%s or competition:%s not found"
+                    .formatted(participantId, competitionId));
+        }
+        List<HeatLineEntity> heatlines = heatLineService.getHeatLinesInCompetitionByParticipantId(competitionId, participantId);
+
+        showAthleteCompetitionParticipationDetails(chatId, editMessageId, participant.get(), heatlines, competition);
     }
 
     // todo move to utils
@@ -251,12 +279,8 @@ public class CompetitionFacadeImpl extends FacadeMethods implements CompetitionF
             return;
         }
 
-        participantHeatLinesMap.forEach((participant, heatLines) -> {
-
-            String message = searchView.foundParticipantInCompetitionMessage(participant, competition, heatLines);
-            boolean subscribed = subscribeFacade.isSubscribed(chatId, participant);
-            publishTextMessage(chatId, message, subscriptionView.button(participant, subscribed));
-        });
+        participantHeatLinesMap.forEach((participant, heatLines) ->
+                showAthleteCompetitionParticipationDetails(chatId, null, participant, heatLines, competition));
         publishFindMore(chatId, competition, INPUT_SURNAME);
     }
 
@@ -491,6 +515,10 @@ public class CompetitionFacadeImpl extends FacadeMethods implements CompetitionF
 
     private void publishEvent(SendMessageEvent messageEvent) {
         publisher.publishEvent(messageEvent);
+    }
+
+    private SendMessageEvent prepareSendMessageEvent(String chatId, Integer editMessageId, ResponseContainer content) {
+        return prepareSendMessageEvent(chatId, editMessageId, content.getMessageText(), content.getKeyboard());
     }
 
     private SendMessageEvent prepareSendMessageEvent(String chatId, Integer editMessageId, String text, InlineKeyboardMarkup keyboard) {
