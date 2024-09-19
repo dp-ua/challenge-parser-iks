@@ -1,7 +1,7 @@
 package com.dp_ua.iksparser.dba.service;
 
-import com.dp_ua.iksparser.dba.entity.HeatLineEntity;
 import com.dp_ua.iksparser.dba.dto.HeatLineDto;
+import com.dp_ua.iksparser.dba.entity.HeatLineEntity;
 import com.dp_ua.iksparser.dba.repo.HeatLineRepo;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,5 +53,9 @@ public class HeatLineService {
 
     public List<HeatLineEntity> getHeatLinesInCompetitionByParticipantSurname(Long competitionId, String name) {
         return repo.getHeatLinesInCompetitionByParticipantSurname(competitionId, name);
+    }
+
+    public List<HeatLineEntity> getHeatLinesInCompetitionByParticipantId(Long competitionId, Long participantId) {
+        return repo.getHeatLinesInCompetitionByParticipantId(competitionId, participantId);
     }
 }
