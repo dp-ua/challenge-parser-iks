@@ -25,7 +25,6 @@ public abstract class BaseCommand implements CommandInterface {
     protected static final String BRACKET_CLOSE = "}";
     protected static final String SLASH = "/";
 
-
     @Autowired
     protected ApplicationEventPublisher publisher;
     @Autowired
@@ -85,11 +84,8 @@ public abstract class BaseCommand implements CommandInterface {
     }
 
     protected int getCommandArgument(String text) {
-        if (text.startsWith("/" + command())) {
-            String argument = text.substring(command().length() + 1).trim();
-            return argument.isEmpty() ? DEFAULT_NO_PAGE_ARGUMENT : Integer.parseInt(argument);
-        }
-        return 0;
+        String argument = getCommandArgumentString(text);
+        return argument.isEmpty() ? DEFAULT_NO_PAGE_ARGUMENT : Integer.parseInt(argument);
     }
 
     protected String parseArgumentFromFullText(String text, CommandArgumentName argumentName) {
@@ -101,8 +97,9 @@ public abstract class BaseCommand implements CommandInterface {
     }
 
     protected String getCommandArgumentString(String text) {
-        if (text.startsWith("/" + command())) {
-            String argument = text.substring(command().length() + 1).trim();
+        String commandPattern = "/" + command() + "(?:@[\\w_]+)?"; // Команда может заканчиваться суффиксом @Bot_name
+        if (text.matches(commandPattern + "(\\s|\\n).*")) { // Учитываем пробел или символ новой строки как разделитель
+            String argument = text.replaceFirst(commandPattern, "").trim(); // Убираем команду и ее суффикс, если есть
             return argument.isEmpty() ? "" : argument;
         }
         return "";
