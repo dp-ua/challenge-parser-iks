@@ -1,6 +1,7 @@
 package com.dp_ua.iksparser.dba.service;
 
 import com.dp_ua.iksparser.dba.dto.HeatLineDto;
+import com.dp_ua.iksparser.dba.entity.CoachEntity;
 import com.dp_ua.iksparser.dba.entity.HeatLineEntity;
 import com.dp_ua.iksparser.dba.repo.HeatLineRepo;
 import jakarta.transaction.Transactional;
@@ -35,12 +36,8 @@ public class HeatLineService {
         dto.setLane(heatLineEntity.getLane());
         dto.setBib(heatLineEntity.getBib());
         dto.setParticipant(heatLineEntity.getParticipant());
-        dto.setCoaches(heatLineEntity.getCoaches().stream().map(coach -> coach.getId()).toList());
+        dto.setCoaches(heatLineEntity.getCoaches().stream().map(CoachEntity::getId).toList());
         return dto;
-    }
-
-    public List<HeatLineDto> convertToDtoList(List<HeatLineEntity> heatLineEntities) {
-        return heatLineEntities.stream().map(this::convertToDto).toList();
     }
 
     public List<HeatLineEntity> getHeatLinesInCompetitionWhereCoachIs(Long competitionId, Long coachId) {
