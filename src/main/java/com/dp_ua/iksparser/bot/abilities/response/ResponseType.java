@@ -7,5 +7,6 @@ public enum ResponseType {
     PARTICIPANT_DETAILS,
 
     SEARCH_BY_BIB_NUMBER,
+    FIND_PARTICIPANT_IN_COMPETITION
 
 }
