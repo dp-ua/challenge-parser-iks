@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -45,5 +46,18 @@ public class ParticipantEntity extends DomainElement {
 
     public void addHeatLine(HeatLineEntity heatLine) {
         heatLines.add(heatLine);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ParticipantEntity that = (ParticipantEntity) o;
+        return Objects.equals(surname, that.surname) && Objects.equals(name, that.name) && Objects.equals(team, that.team) && Objects.equals(region, that.region) && Objects.equals(born, that.born) && Objects.equals(url, that.url);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(surname, name, team, region, born, url);
     }
 }
