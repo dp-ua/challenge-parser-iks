@@ -81,8 +81,8 @@ public class CompetitionService {
                 .findFirst();
     }
 
-    public CompetitionEntity findById(long commandArgument) {
-        return repo.findById(commandArgument).orElse(null);
+    public CompetitionEntity findById(long id) {
+        return repo.findById(id).orElse(null);
     }
 
     public CompetitionEntity save(CompetitionEntity competition) {
