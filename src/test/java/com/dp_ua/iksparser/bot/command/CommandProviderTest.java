@@ -53,6 +53,7 @@ public class CommandProviderTest {
                         shpartdet
                         participants
                         salps
+                        showhtlincomfpart
                         subscribe
                         subscriptions
                         subscriptionslist

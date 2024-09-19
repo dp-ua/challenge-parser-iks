@@ -30,4 +30,6 @@ public interface CompetitionFacade {
     void startSearchByBibNumber(String chatId, long commandArgument, Integer editMessageId);
 
     void searchingByBibNumber(String chatId, String commandArgument, Integer editMessageId);
+
+    void showAthleteCompetitionParticipationDetails(String chatId, Integer editMessageId, long participantId, long competitionId);
 }
