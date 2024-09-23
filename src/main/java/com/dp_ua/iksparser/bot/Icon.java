@@ -1,6 +1,8 @@
 package com.dp_ua.iksparser.bot;
 
 public enum Icon {
+    STAR("⭐"),
+    MENU("📋"),
     DENIED("🚫"),
     MESSAGE("📩"),
     SUBSCRIBE("🔔"),
@@ -89,6 +91,18 @@ public enum Icon {
             case 9 -> NINE;
             default -> NUMBER;
         };
+    }
+
+    public static String getIconicNumber(int number) {
+        String stringNumber = String.valueOf(number);
+        StringBuilder sb = new StringBuilder();
+        if (number == 10) {
+            return TEN.toString();
+        }
+        for (int i = 0; i < stringNumber.length(); i++) {
+            sb.append(getIconForNumber(Integer.parseInt(String.valueOf(stringNumber.charAt(i)))));
+        }
+        return sb.toString();
     }
 
     private final String icon;

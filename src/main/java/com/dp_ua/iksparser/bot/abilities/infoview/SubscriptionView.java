@@ -21,6 +21,8 @@ import static com.dp_ua.iksparser.service.MessageCreator.*;
 public class SubscriptionView {
     public static final String STATUS_NEW_ENROLL = "Нова заявка в івентах";
     public static final String STATUS_HAS_RESULT = "Є результати змагання";
+    public static final String BUTTON_TEXT_UNSUBSCRIBE = UNSUBSCRIBE + " Відписатись";
+    public static final String BUTTON_TEXT_SUBSCRIBE = SUBSCRIBE + " Підписатись";
     @Autowired
     CompetitionView competitionView;
     @Autowired
@@ -35,13 +37,16 @@ public class SubscriptionView {
                 .append(END_LINE)
                 .append(END_LINE)
                 .append(participantView.info(participant))
-                .append(END_LINE).append("Приймає участь у змаганнях: ")
+                .append(END_LINE)
+                .append("Приймає участь у змаганнях: ")
                 .append(competitionView.info(competition))
                 .append(END_LINE);
 
         separateHeatLinesByStatuses(heatLines).forEach((status, lines) -> {
             if (!lines.isEmpty()) {
-                sb.append(status).append(":").append(END_LINE);
+                sb.append(status)
+                        .append(":")
+                        .append(END_LINE);
                 lines.forEach(heatLine -> sb.append(heatLineView.info(heatLine)));
                 sb.append(END_LINE);
             }
@@ -81,6 +86,21 @@ public class SubscriptionView {
         return text;
     }
 
+    private InlineKeyboardButton button(boolean subscribed, String callbackData) {
+        return subscribed ?
+                SERVICE.getKeyboardButton(BUTTON_TEXT_UNSUBSCRIBE, callbackData) :
+                SERVICE.getKeyboardButton(BUTTON_TEXT_SUBSCRIBE, callbackData);
+    }
+
+    public InlineKeyboardButton buttonSubscribe(String callbackData) {
+        return button(false, callbackData);
+    }
+
+    public InlineKeyboardButton buttonUnsubscribe(String callbackData) {
+        return button(true, callbackData);
+    }
+
+    // todo remove. use buttonSubscribe and buttonUnsubscribe instead
     public InlineKeyboardMarkup button(ParticipantEntity participant, boolean subscribed) {
         InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
@@ -89,12 +109,12 @@ public class SubscriptionView {
         InlineKeyboardButton button;
         if (subscribed) {
             button = SERVICE.getKeyboardButton(
-                    UNSUBSCRIBE + " Відписатись",
+                    BUTTON_TEXT_UNSUBSCRIBE,
                     "/" + CommandUnsubscribe.command + " " + participant.getId()
             );
         } else {
             button = SERVICE.getKeyboardButton(
-                    SUBSCRIBE + " Підписатись ",
+                    BUTTON_TEXT_SUBSCRIBE,
                     "/" + CommandSubscribe.command + " " + participant.getId()
             );
         }
@@ -106,46 +126,50 @@ public class SubscriptionView {
     }
 
     public String subscriptions(List<SubscriberEntity> subscriptions) {
-        String sb = whatIsSubscriptions() +
+        return whatIsSubscriptions() +
                 END_LINE +
                 subscriptionsDetails(subscriptions);
-        return sb;
     }
 
     public String whatIsSubscriptions() {
-        String sb = SUBSCRIBE +
-                BOLD +
-                " Підписка" +
-                BOLD +
-                END_LINE +
-                END_LINE +
-                "Дозволяє отримувати" +
-                SPACE +
-                MESSAGE +
-                ITALIC +
-                SPACE +
-                "сповіщення" +
-                ITALIC +
-                END_LINE +
-                "про нові заявки в івентах, в яких бере участь обраний спортсмен." +
-                END_LINE;
-        return sb;
+        StringBuilder sb = new StringBuilder();
+        sb
+                .append(SUBSCRIBE)
+                .append(SPACE)
+                .append(BOLD)
+                .append("Підписка")
+                .append(BOLD)
+                .append(END_LINE)
+                .append(END_LINE)
+                .append("Дозволяє отримувати")
+                .append(SPACE)
+                .append(MESSAGE)
+                .append(ITALIC)
+                .append(SPACE)
+                .append("сповіщення")
+                .append(ITALIC)
+                .append(END_LINE)
+                .append("про нові заявки в івентах, в яких бере участь обраний спортсмен.")
+                .append(END_LINE);
+        return sb.toString();
     }
 
     public String subscriptionsDetails(List<SubscriberEntity> subscriptions) {
         int size = subscriptions.size();
-        String sb = SUBSCRIBE +
-                " Ви підписані на " +
-                BOLD +
-                size +
-                BOLD +
-                SPACE +
-                ITALIC +
-                (size == 1 ? "атлета" : "атлетів") +
-                ITALIC +
-                ATHLETE +
-                END_LINE;
-        return sb;
+        StringBuilder sb = new StringBuilder();
+        sb
+                .append(SUBSCRIBE)
+                .append(" Ви підписані на ")
+                .append(BOLD)
+                .append(size)
+                .append(BOLD)
+                .append(SPACE)
+                .append(ITALIC)
+                .append(size == 1 ? "атлета" : "атлетів")
+                .append(ITALIC)
+                .append(ATHLETE)
+                .append(END_LINE);
+        return sb.toString();
     }
 
     public InlineKeyboardMarkup getSubscriptionsKeyboard() {

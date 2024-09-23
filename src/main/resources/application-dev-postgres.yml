@@ -1,0 +1,55 @@
+#For local test in IDE
+server:
+  port: 8181
+    #  servlet:
+    #    context-path: /iksparser
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+view:
+  participants:
+    pageSize: 10
+  competitions:
+    general:
+      pageSize: 5
+    detailed:
+      pageSize: 3
+
+spring:
+  config:
+    activate:
+      on-profile: dev-postgres
+  datasource:
+    url: jdbc:postgresql://172.25.70.57/iks_db
+    driver-class-name: org.postgresql.Driver
+    username: ${TEST_DB_USERNAME}
+    password: ${TEST_DB_PASSWORD}
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+  output:
+    ansi:
+      enabled: DETECT
+
+telegram:
+  bot:
+    token: ${TEST_TELEGRAM_BOT_TOKEN}
+    name: ${TEST_TELEGRAM_BOT_NAME}
+    reconnectTimeout: 10000
+    adminId: ${TEST_TELEGRAM_ADMIN_ID}
+
+logging:
+  level:
+    root: INFO
+    com.dp_ua: DEBUG
+    com.dp_ua.iksparser.dba: INFO
+
+  file:
+    name: ./logs/file.log
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

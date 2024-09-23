@@ -9,6 +9,15 @@ management:
       exposure:
         include: health
 
+view:
+  participants:
+    pageSize: 10
+  competitions:
+    general:
+      pageSize: 5
+    detailed:
+      pageSize: 3
+
 spring:
   config:
     activate:

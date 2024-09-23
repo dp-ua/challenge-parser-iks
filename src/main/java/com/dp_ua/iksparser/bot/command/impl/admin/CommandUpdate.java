@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class CommandUpdate extends AdminAccessCommand {
-    public static final String command = "update";
+    private static final String command = "update";
     @Autowired
     CompetitionFacade competitionFacade;
     @Autowired

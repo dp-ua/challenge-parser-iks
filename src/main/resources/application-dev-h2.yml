@@ -9,6 +9,10 @@ management:
       exposure:
         include: health
 
+view:
+  participants:
+    pageSize: 10
+
 spring:
   config:
     activate:

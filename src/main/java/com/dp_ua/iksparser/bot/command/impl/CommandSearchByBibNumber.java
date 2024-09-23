@@ -8,10 +8,12 @@ import lombok.ToString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import static com.dp_ua.iksparser.bot.command.CommandArgumentName.COMPETITION_ID;
+
 @Component
 @ToString
 public class CommandSearchByBibNumber extends BaseCommand {
-    public static final String command = "searchbybibnumber";
+    private static final String command = "searchbybibnumber"; //search by bib number in competition
     private final boolean isInTextCommand = false;
     @Autowired
     private CompetitionFacade competitionFacade;
@@ -29,7 +31,12 @@ public class CommandSearchByBibNumber extends BaseCommand {
     @Override
     protected void perform(Message message) {
         String chatId = message.getChatId();
-        long commandArgument = getCommandArgument(message.getMessageText());
-        competitionFacade.startSearchByBibNumber(chatId, commandArgument, message.getEditMessageId());
+        String text = message.getMessageText();
+        long competitionId = Long.parseLong(parseArgumentFromFullText(text, COMPETITION_ID));
+        competitionFacade.startSearchByBibNumber(chatId, competitionId, message.getEditMessageId());
+    }
+
+    public static String getCallbackCommand(long id) {
+        return "/" + command + " {\"" + COMPETITION_ID.getValue() + "\":\"" + id + "\"}";
     }
 }

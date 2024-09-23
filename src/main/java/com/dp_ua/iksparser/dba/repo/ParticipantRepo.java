@@ -17,6 +17,7 @@ public interface ParticipantRepo extends CrudRepository<ParticipantEntity, Long>
     @Query("SELECT p FROM ParticipantEntity p WHERE lower(p.name) LIKE lower(concat('%', :word, '%')) OR lower(p.surname) LIKE lower(concat('%', :word,'%'))")
     List<ParticipantEntity> findByNameAndSurnameByPart(@Param("word") String word);
 
+    @Query(value = "SELECT * FROM participant_entity p ORDER BY p.surname COLLATE \"uk-UA-x-icu\" ASC, p.name COLLATE \"uk-UA-x-icu\" ASC", nativeQuery = true)
     Page<ParticipantEntity> findAll(Pageable pageable);
 
     @Query("SELECT p FROM ParticipantEntity p WHERE (p.surname, p.name, p.born) IN (SELECT p.surname, p.name, p.born FROM ParticipantEntity p GROUP BY p.surname, p.name, p.born HAVING COUNT(p) > 1)")

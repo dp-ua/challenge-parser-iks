@@ -1,5 +1,8 @@
 package com.dp_ua.iksparser.service;
 
+import com.dp_ua.iksparser.bot.abilities.response.ResponseContainer;
+import com.dp_ua.iksparser.bot.command.impl.CommandDeleteMessage;
+import com.dp_ua.iksparser.bot.command.impl.CommandMenu;
 import com.dp_ua.iksparser.bot.event.SendMessageEvent;
 import org.telegram.telegrambots.meta.api.methods.ActionType;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
@@ -16,6 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static com.dp_ua.iksparser.bot.Icon.*;
 import static com.dp_ua.iksparser.bot.event.SendMessageEvent.MsgType.*;
 
 public enum MessageCreator {
@@ -29,6 +33,47 @@ public enum MessageCreator {
     public static final String LINK_END = "]";
     public static final String LINK_SEPARATOR = "(";
     public static final String LINK_SEPARATOR_END = ")";
+
+    public List<InlineKeyboardButton> getBackButton(String callbackData) {
+        List<InlineKeyboardButton> row = new ArrayList<>();
+        InlineKeyboardButton button = SERVICE.getKeyboardButton(
+                BACK + " Назад", callbackData
+        );
+        row.add(button);
+        return row;
+    }
+
+    public InlineKeyboardButton getNavPreviousPageButton(String callBackData) {
+        return getKeyboardButton(PREVIOUS + " Попередня сторінка", callBackData);
+    }
+
+    public InlineKeyboardButton getNavNextPageButton(String callBackData) {
+        return getKeyboardButton(NEXT + " Наступна сторінка", callBackData);
+    }
+
+    public InlineKeyboardMarkup getHideMessageKeyboard(String text) {
+        InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
+        List<InlineKeyboardButton> row = new ArrayList<>();
+        InlineKeyboardButton button = getKeyboardButton(
+                text + ENOUGH,
+                "/" + CommandDeleteMessage.command
+        );
+        row.add(button);
+        rows.add(row);
+        keyboard.setKeyboard(rows);
+        return keyboard;
+    }
+
+    public List<InlineKeyboardButton> getMainButton() {
+        List<InlineKeyboardButton> row = new ArrayList<>();
+        InlineKeyboardButton button = SERVICE.getKeyboardButton(
+                MENU + " Повернутись в меню", "/" + CommandMenu.command
+        );
+        row.add(button);
+        return row;
+    }
+
 
     public SendChatAction getChatAction(String chatId) {
         SendChatAction sendChatAction = new SendChatAction();
@@ -68,6 +113,10 @@ public enum MessageCreator {
         }
     }
 
+    public SendMessageEvent getSendMessageEvent(String chatId, Integer editMessageId, ResponseContainer content) {
+        return getSendMessageEvent(chatId, content.getMessageText(), content.getKeyboard(), editMessageId);
+    }
+
     public SendMessage getSendMessage(String chatId, String text, ReplyKeyboard replyMarkup, boolean enableMarkdown) {
         SendMessage.SendMessageBuilder builder = SendMessage.builder();
         String cleanText = maskApostrof(text);
@@ -90,7 +139,7 @@ public enum MessageCreator {
     }
 
     public String cleanMarkdown(String input) {
-        return input.replaceAll("[*_`\\[\\]]", "");
+         return input.replaceAll("`", "’").replaceAll("[*_`\\[\\]\\\\/]", "");
     }
 
     public InlineKeyboardButton getKeyboardButton(String text, String callbackData) {

@@ -4,17 +4,18 @@ import com.dp_ua.iksparser.bot.Icon;
 import com.dp_ua.iksparser.bot.abilities.competition.CompetitionFacade;
 import com.dp_ua.iksparser.bot.command.BaseCommand;
 import com.dp_ua.iksparser.bot.message.Message;
-import com.dp_ua.iksparser.exeption.ParsingException;
 import lombok.ToString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import static com.dp_ua.iksparser.bot.command.CommandArgumentName.PAGE;
 
 
 @Component
 @ToString
 public class CommandCompetitions extends BaseCommand {
-    public static final String command = "competitions";
-    public static final String description = "Список змагань";
+    private static final String command = "competitions";
+    private static final String description = "Список змагань";
     private final boolean isInTextCommand = false;
     @Autowired
     private CompetitionFacade competitionFacade;
@@ -42,11 +43,23 @@ public class CommandCompetitions extends BaseCommand {
     @Override
     protected void perform(Message message) {
         String chatId = message.getChatId();
-        int commandArgument = getCommandArgument(message.getMessageText());
+        int page = getPage(message);
+        competitionFacade.showCompetitions(chatId, page, message.getEditMessageId());
+    }
+
+    private int getPage(Message message) {
         try {
-            competitionFacade.showCompetitions(chatId, commandArgument, message.getEditMessageId());
-        } catch (ParsingException e) {
-            throw new RuntimeException(e);
+            return Integer.parseInt(parseArgumentFromFullText(message.getMessageText(), PAGE));
+        } catch (Exception e) {
+            return DEFAULT_NO_PAGE_ARGUMENT;
         }
+    }
+
+    public static String getCallbackCommand(long page) {
+        return "/" + command + " {\"" + PAGE.getValue() + "\":\"" + page + "\"}";
+    }
+
+    public static String getCallbackCommand() {
+        return "/" + command;
     }
 }

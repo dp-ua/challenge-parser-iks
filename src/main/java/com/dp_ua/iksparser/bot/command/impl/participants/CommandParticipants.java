@@ -1,4 +1,4 @@
-package com.dp_ua.iksparser.bot.command.impl;
+package com.dp_ua.iksparser.bot.command.impl.participants;
 
 import com.dp_ua.iksparser.bot.Icon;
 import com.dp_ua.iksparser.bot.abilities.participant.ParticipantFacade;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 @ToString
 public class CommandParticipants extends BaseCommand {
-    public final static String command = "participants";
+    private final static String command = "participants";
     private final boolean isInTextCommand = false;
     @Autowired
     ParticipantFacade participantsFacade;
@@ -32,5 +32,9 @@ public class CommandParticipants extends BaseCommand {
         String chatId = message.getChatId();
         long commandArgument = getCommandArgument(message.getMessageText());
         participantsFacade.showParticipants(chatId, commandArgument, message.getEditMessageId());
+    }
+
+    public static String getCallbackCommand() {
+        return "/" + command;
     }
 }

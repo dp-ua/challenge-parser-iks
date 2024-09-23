@@ -7,12 +7,16 @@ import com.dp_ua.iksparser.bot.event.GetMessageEvent;
 import com.dp_ua.iksparser.bot.message.Message;
 import com.dp_ua.iksparser.bot.message.SelfMessage;
 import com.dp_ua.iksparser.exeption.NotForMeException;
+import com.dp_ua.iksparser.service.MessageCreator;
+import com.dp_ua.iksparser.service.SqlPreprocessorService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+
+import static com.dp_ua.iksparser.service.MessageCreator.SERVICE;
 
 @Component
 @Slf4j
@@ -21,6 +25,8 @@ public class GetMessagePerformer implements ApplicationListener<GetMessageEvent>
     TextCommandDetectorService commandDetector;
     @Autowired
     StateService stateService;
+    @Autowired
+    SqlPreprocessorService sqlPreprocessorService;
 
     @Override
     public void onApplicationEvent(GetMessageEvent event) {
@@ -44,7 +50,7 @@ public class GetMessagePerformer implements ApplicationListener<GetMessageEvent>
         } catch (NotForMeException e) {
             log.info("NotForMeException: {}", e.getMessage());
         } catch (IllegalArgumentException e) {
-            log.info("IllegalArgumentException: {}", e.getMessage());
+            log.error("IllegalArgumentException: {}", e);
         } catch (Exception e) {
             log.error("Exception: {}", e.getMessage());
             throw new RuntimeException(e);
@@ -52,7 +58,8 @@ public class GetMessagePerformer implements ApplicationListener<GetMessageEvent>
     }
 
     private GetMessageEvent getGetMessageEvent(String state, Message message) {
-        String textCommand = StateService.formatArgs(state, message.getMessageText());
+        String text = SERVICE.cleanMarkdown(message.getMessageText());
+        String textCommand = StateService.formatArgs(state, text);
         SelfMessage selfMessage = new SelfMessage();
         selfMessage.setChatId(message.getChatId());
         selfMessage.setMessageText(textCommand);

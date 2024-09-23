@@ -38,7 +38,10 @@ public class CompetitionView {
                         .mapToObj(i -> {
                             int count = i + 1;
                             StringBuilder sb = new StringBuilder();
-                            sb.append(BOLD).append(Icon.getIconForNumber(count)).append(" ").append(BOLD); // number
+                            sb.append(BOLD)
+                                    .append(Icon.getIconForNumber(count))
+                                    .append(" ")
+                                    .append(BOLD); // number
                             CompetitionEntity competition = competitions.get(i);
                             sb
                                     .append(info(competition))
@@ -50,7 +53,8 @@ public class CompetitionView {
                         .orElse("Список пустий")
         );
 
-        result.append(END_LINE).append(END_LINE);
+        result.append(END_LINE)
+                .append(END_LINE);
         result
                 .append(PAGE_WITH_CURL)
                 .append(" Сторінка ")
@@ -73,6 +77,21 @@ public class CompetitionView {
         return result.toString();
     }
 
+    public String listWithNumbers(List<CompetitionEntity> competitions) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < competitions.size(); i++) {
+            CompetitionEntity competition = competitions.get(i);
+            sb
+                    .append(Icon.getIconicNumber(i + 1))
+                    .append(SPACE)
+                    .append(info(competition));
+            if (i < competitions.size() - 1) {
+                sb.append(END_LINE);
+            }
+        }
+        return sb.toString();
+    }
+
     public InlineKeyboardMarkup getKeyboardForCompetitionsPage(Page<CompetitionEntity> page) {
         List<CompetitionEntity> competitions = page.getContent();
         InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
@@ -86,7 +105,7 @@ public class CompetitionView {
             int count = i + 1;
             InlineKeyboardButton button = SERVICE.getKeyboardButton(
                     Icon.getIconForNumber(count).toString(),
-                    "/" + CommandCompetition.command + " " + competition.getId()
+                    CommandCompetition.getCallbackCommand(competition.getId())
             );
             row.add(button);
         });
@@ -104,14 +123,14 @@ public class CompetitionView {
         if (number > 0) {
             InlineKeyboardButton leftPage = SERVICE.getKeyboardButton(
                     PREVIOUS + " Свіжіші",
-                    "/" + CommandCompetitions.command + " " + (number - 1)
+                    CommandCompetitions.getCallbackCommand(number - 1)
             );
             row.add(leftPage);
         }
         if (number < totalPages - 1) {
             InlineKeyboardButton rightPage = SERVICE.getKeyboardButton(
                     "Старіші " + NEXT,
-                    "/" + CommandCompetitions.command + " " + (number + 1)
+                    CommandCompetitions.getCallbackCommand(number + 1)
             );
             row.add(rightPage);
         }
@@ -119,22 +138,28 @@ public class CompetitionView {
     }
 
     public String info(CompetitionEntity competition) {
-        return name(competition) +
-                END_LINE +
-                date(competition) +
-                END_LINE +
-                area(competition) +
-                END_LINE +
-                link(competition) +
-                END_LINE;
+        return new StringBuilder()
+                .append(name(competition))
+                .append(END_LINE)
+                .append(date(competition))
+                .append(END_LINE)
+                .append(area(competition))
+                .append(SPACE)
+                .append(link(competition))
+                .append(END_LINE)
+                .toString();
     }
 
     public String notFilledInfo() {
-        return WARNING +
-                END_LINE +
-                " Детальна інформація про змагання відсутня " +
-                WARNING +
-                END_LINE;
+        return new StringBuilder()
+                .append(WARNING)
+                .append(SPACE)
+                .append(END_LINE)
+                .append("Детальна інформація про змагання відсутня")
+                .append(SPACE)
+                .append(WARNING)
+                .append(END_LINE)
+                .toString();
     }
 
     public String name(CompetitionEntity competition) {
@@ -147,6 +172,8 @@ public class CompetitionView {
         StringBuilder sb = new StringBuilder();
         Icon iconForStatus = icon(competition);
         sb
+                .append(SPACE)
+                .append(SPACE)
                 .append(CALENDAR)
                 .append(ITALIC)
                 .append(" Дата: ")
@@ -166,7 +193,9 @@ public class CompetitionView {
     }
 
     public String area(CompetitionEntity competition) {
-        return AREA +
+        return SPACE +
+                SPACE +
+                AREA +
                 ITALIC +
                 " Місце проведення: " +
                 ITALIC +
@@ -192,7 +221,7 @@ public class CompetitionView {
         return sb.toString();
     }
 
-    private Icon icon(CompetitionEntity competition) {
+    public Icon icon(CompetitionEntity competition) {
         CompetitionStatus status = CompetitionStatus.getByName(competition.getStatus());
         if (status == null) return null;
         return switch (status) {
@@ -265,35 +294,56 @@ public class CompetitionView {
 
         InlineKeyboardButton button = SERVICE.getKeyboardButton(
                 COMPETITION + " Переглянути змагання",
-                "/" + CommandCompetitions.command);
+                CommandCompetitions.getCallbackCommand(0));
         row.add(button);
         rows.add(row);
         return rows;
     }
 
     public String getCompetitionsInfo(List<CompetitionEntity> competitions, List<String> years) {
-        return COMPETITION +
-                "Всього змагань в базі: " +
-                BOLD +
-                competitions.size() +
-                BOLD +
-                END_LINE +
-                CALENDAR +
-                "Дата : з " +
-                BOLD +
-                years.get(0) +
-                BOLD +
-                " по " +
-                BOLD +
-                years.get(years.size() - 1) +
-                BOLD +
-                " роки" +
-                END_LINE +
-                RESULT +
-                "Змагань, по яким заповнена інформація: " +
-                BOLD +
-                competitions.stream().filter(CompetitionEntity::isFilled).count() +
-                BOLD +
-                END_LINE;
+        long filledCompetitionsCount = competitions.stream().filter(CompetitionEntity::isFilled).count();
+        int competitionsCount = competitions.size();
+        String yearStart = years.get(0);
+        String yearFinish = years.get(years.size() - 1);
+
+        StringBuilder sb = new StringBuilder();
+        sb
+                .append(COMPETITION)
+                .append("Всього змагань в базі: ")
+                .append(BOLD)
+                .append(competitionsCount)
+                .append(BOLD)
+                .append(END_LINE)
+                .append(CALENDAR)
+                .append("Дата : з ")
+                .append(BOLD)
+                .append(yearStart)
+                .append(BOLD)
+                .append(" по ")
+                .append(BOLD)
+                .append(yearFinish)
+                .append(BOLD)
+                .append(" роки")
+                .append(END_LINE)
+                .append(RESULT)
+                .append("Змагань, по яким заповнена інформація: ")
+                .append(BOLD)
+                .append(filledCompetitionsCount)
+                .append(BOLD)
+                .append(END_LINE);
+        return sb.toString();
+    }
+
+    public InlineKeyboardMarkup getBackToCompetitionKeyboard(CompetitionEntity competition) {
+        InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
+
+        List<InlineKeyboardButton> row = SERVICE.getBackButton(
+                CommandCompetition.getCallbackCommand(competition.getId())
+        );
+        rows.add(row);
+
+        keyboard.setKeyboard(rows);
+        return keyboard;
     }
 }

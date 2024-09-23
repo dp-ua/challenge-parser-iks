@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CommandDuplicates extends AdminAccessCommand {
-    public static final String command = "duplicates";
+    private static final String command = "duplicates";
     @Autowired
     DbServiceOperation dbServiceOperation;
 

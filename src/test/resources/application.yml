@@ -4,6 +4,15 @@ spring:
   jpa:
     open-in-view: false
 
+view:
+  participants:
+    pageSize: 10
+  competitions:
+    general:
+      pageSize: 5
+    detailed:
+      pageSize: 3
+
 telegram:
   bot:
     token: 1234567890:abcdefghijklmnopqrstuvwxyz

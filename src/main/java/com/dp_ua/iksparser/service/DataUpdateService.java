@@ -166,14 +166,14 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
     private SelfMessage getUpdateMessage(long competitionId, UpdateStatusEntity updateStatusEntity) {
         SelfMessage selfMessage = new SelfMessage();
         selfMessage.setChatId(updateStatusEntity.getChatId());
-        selfMessage.setMessageText("/" + CommandCompetition.command + " " + competitionId);
+        selfMessage.setMessageText(CommandCompetition.getCallbackCommand(competitionId));
         return selfMessage;
     }
 
     private SelfMessage getErrorMessage(long competitionId, UpdateStatusEntity updateStatusEntity) {
         SelfMessage selfMessage = new SelfMessage();
         selfMessage.setChatId(updateStatusEntity.getChatId());
-        selfMessage.setMessageText("/" + CommandCompetitionNotLoaded.command + " " + competitionId);
+        selfMessage.setMessageText(CommandCompetitionNotLoaded.getCallBackCommand(competitionId));
         return selfMessage;
     }
 
@@ -213,7 +213,13 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
     private List<EventEntity> operateAndGetNewEventsForDays(CompetitionEntity competition, Document document) {
         List<EventEntity> newEventResults = new ArrayList<>();
         competition.getDays().forEach(day -> {
-            List<EventEntity> updatedEvents = competitionParser.getUnsavedEvents(document, day);
+            List<EventEntity> updatedEvents = new ArrayList<>();
+            try {
+                updatedEvents = competitionParser.getUnsavedEvents(document, day);
+            } catch (Exception e) {
+                log.warn("Error parsing events for competition[{}], day[{}]: {}",
+                        competition.getId(), day.getDateId(), e.getMessage());
+            }
             List<EventEntity> oldEvents = day.getEvents();
 
             if (oldEvents.isEmpty()) {
@@ -260,17 +266,13 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
         List<DayEntity> updatedDays = competitionParser.getUnsavedUnfilledDays(document);
         List<DayEntity> oldDays = competition.getDays();
         if (oldDays.isEmpty()) {
-            updatedDays.forEach(day -> {
-                saveDayAndSetRelationToCompetition(competition, day);
-            });
+            updatedDays.forEach(day -> saveDayAndSetRelationToCompetition(competition, day));
         } else {
             updatedDays.forEach(newDay -> oldDays.stream()
                     .filter(newDay::isTheSame)
                     .findFirst()
                     .ifPresentOrElse(oldDay -> dayService.save(oldDay),
-                            () -> {
-                                saveDayAndSetRelationToCompetition(competition, newDay);
-                            }
+                            () -> saveDayAndSetRelationToCompetition(competition, newDay)
                     ));
         }
     }

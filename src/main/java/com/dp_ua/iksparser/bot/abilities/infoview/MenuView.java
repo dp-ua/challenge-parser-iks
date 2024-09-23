@@ -50,7 +50,7 @@ public class MenuView {
         List<List<InlineKeyboardButton>> resultKeyboard = new ArrayList<>();
 
         InlineKeyboardMarkup competitionsKeyboard = competitionView.getCompetitionsKeyboard();
-        InlineKeyboardMarkup participantsKeyboard = participantView.getParticipantsKeyboard();
+        InlineKeyboardMarkup participantsKeyboard = participantView.getShowParticipantsKeyboard();
         InlineKeyboardMarkup subscriptionsKeyboard = subscriptionView.getSubscriptionsKeyboard();
 
         resultKeyboard.addAll(competitionsKeyboard.getKeyboard());
