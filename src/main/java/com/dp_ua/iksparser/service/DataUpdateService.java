@@ -213,7 +213,13 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
     private List<EventEntity> operateAndGetNewEventsForDays(CompetitionEntity competition, Document document) {
         List<EventEntity> newEventResults = new ArrayList<>();
         competition.getDays().forEach(day -> {
-            List<EventEntity> updatedEvents = competitionParser.getUnsavedEvents(document, day);
+            List<EventEntity> updatedEvents = new ArrayList<>();
+            try {
+                updatedEvents = competitionParser.getUnsavedEvents(document, day);
+            } catch (Exception e) {
+                log.warn("Error parsing events for competition[{}], day[{}]: {}",
+                        competition.getId(), day.getDateId(), e.getMessage());
+            }
             List<EventEntity> oldEvents = day.getEvents();
 
             if (oldEvents.isEmpty()) {
