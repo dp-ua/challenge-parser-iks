@@ -8,6 +8,7 @@ import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
 import com.dp_ua.iksparser.dba.entity.SubscriberEntity;
 import com.dp_ua.iksparser.dba.service.SubscriberService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
@@ -84,7 +85,7 @@ public class SubscribeFacadeImpl implements SubscribeFacade {
         List<SubscriberEntity> subscriptions = getSubscriptions(chatId);
         log.info("Subscriptions list: {}", subscriptions);
         // TODO:
-        throw new UnsupportedOperationException("Not implemented yet");
+        throw new NotImplementedException("Not implemented yet");
     }
 
     @Override
