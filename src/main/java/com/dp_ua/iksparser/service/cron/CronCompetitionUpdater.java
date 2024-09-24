@@ -41,11 +41,11 @@ public class CronCompetitionUpdater implements ApplicationListener<ContextRefres
     ApplicationEventPublisher publisher;
     private final Set<String> finishedOrCanceledStatuses = new HashSet<>(Arrays.asList(C_FINISHED.getName(), C_CANCELED.getName()));
 
-
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        List<CompetitionEntity> competitions = competitionService.findAllOrderByUpdated();
-        if (competitions.isEmpty()) {
+        // First start application. Check if competitions in DB and update if not
+        long count = competitionService.count();
+        if (count == 0) {
             log.info("No competitions in DB");
             update(LocalDate.now().getYear());
         }
@@ -116,7 +116,7 @@ public class CronCompetitionUpdater implements ApplicationListener<ContextRefres
 
     private void runEventToUpdateCompetition(CompetitionEntity competition) {
         if (competition.isURLEmpty()) {
-            log.warn("Can't update. Competition URL is empty, id: {}", competition.getId());
+            log.debug("Can't update. Competition URL is empty, id: {}", competition.getId());
             return;
         }
         if (competition.isUrlNotValid()) {

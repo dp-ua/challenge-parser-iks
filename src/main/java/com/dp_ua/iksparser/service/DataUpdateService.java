@@ -116,24 +116,25 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
     }
 
     private boolean isNeedToInformSubscribers(CompetitionEntity competition) {
-        LocalDate date = competitionService.getParsedDate(competition.getEndDate());
         LocalDate now = LocalDate.now();
-        if (
-                date.isEqual(now) ||                                    // today
-                        date.isEqual(now.minusDays(1)) || // yesterday
-                        date.isEqual(now.minusDays(2))    // day before yesterday
-        ) {
-            return true;
-        }
-
+        LocalDate date = competitionService.getParsedDate(competition.getEndDate());
         String status = competition.getStatus();
+        return isDateForUpdate(date, now) || isStatusForUpdate(status);
+    }
+
+    private static boolean isStatusForUpdate(String status) {
         return C_IN_PROGRESS.getName().equals(status) ||
                 C_NOT_STARTED.getName().equals(status) ||
                 C_PLANED.getName().equals(status);
     }
 
-    private void sendMessages(long competitionId, UpdateStatus status) {
+    private static boolean isDateForUpdate(LocalDate date, LocalDate now) {
+        return date.isEqual(now) ||                                    // today
+                date.isEqual(now.minusDays(1)) || // yesterday
+                date.isEqual(now.minusDays(2)); // day before yesterday
+    }
 
+    private void sendMessages(long competitionId, UpdateStatus status) {
         List<UpdateStatusEntity> statuses = service.findAllByCompetitionIdAndStatus(competitionId, status.name());
 
         statuses.stream()
