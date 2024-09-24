@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Entity
@@ -26,6 +27,19 @@ public class CompetitionEntity extends DomainElement {
     private String url;
     @OneToMany(mappedBy = "competition", cascade = CascadeType.ALL)
     private List<DayEntity> days;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CompetitionEntity that = (CompetitionEntity) o;
+        return Objects.equals(getName(), that.getName()) && Objects.equals(getStatus(), that.getStatus()) && Objects.equals(getBeginDate(), that.getBeginDate()) && Objects.equals(getEndDate(), that.getEndDate()) && Objects.equals(getCountry(), that.getCountry()) && Objects.equals(getCity(), that.getCity()) && Objects.equals(getUrl(), that.getUrl());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getName(), getStatus(), getBeginDate(), getEndDate(), getCountry(), getCity(), getUrl());
+    }
 
     public String getUrl() {
         return codeURL(url);
@@ -49,19 +63,16 @@ public class CompetitionEntity extends DomainElement {
         days.add(day);
     }
 
-    public boolean isNeedToUpdate() {
-        if (days.isEmpty()) {
-            return true;
-        }
-        return days.stream().anyMatch(DayEntity::isNeedToUpdate);
-    }
-
     public boolean isFilled() {
         return !getDays().isEmpty();
     }
 
     public boolean isURLEmpty() {
         return getUrl() == null || getUrl().isEmpty();
+    }
+
+    public boolean isCanBeUpdated() {
+        return !isURLEmpty() || !isUrlNotValid();
     }
 
     public boolean isUrlNotValid() {

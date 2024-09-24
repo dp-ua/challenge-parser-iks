@@ -106,8 +106,8 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
         operateDaysAndAddItToCompetition(competition, document);
         List<EventEntity> newEvents = operateAndGetNewEventsForDays(competition, document);
         Map<ParticipantEntity, List<HeatLineEntity>> participations = operateEventsToParseHeats(newEvents);
-        competitionService.save(competition); // save all cascade
-        if (isNeedToInformSubscribers(competition)) {
+        competitionService.save(competition); // save all cascades
+        if (participations.size() > 0 && isNeedToInformSubscribers(competition)) {
             log.info("Informing subscribers about new participants: [{}]", participations.size());
             publisher.publishEvent(new SubscribeEvent(this, participations));
         } else {
