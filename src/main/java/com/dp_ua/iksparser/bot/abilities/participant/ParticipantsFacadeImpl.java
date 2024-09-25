@@ -85,17 +85,17 @@ public class ParticipantsFacadeImpl extends FacadeMethods implements Participant
     }
 
     @Override
-    public void showFindAllParticipants(String chatId, String commandArgument, Integer editMessageId) {
-        log.info("SHOW FIND ALL PARTICIPANTS chatId: {}, commandArgument: {}", chatId, commandArgument);
+    public void showFindAllParticipants(String chatId, String jsonArguments, Integer editMessageId) {
+        log.info("SHOW FIND ALL PARTICIPANTS chatId: {}, commandArgument: {}", chatId, jsonArguments);
 
         ResponseContentGenerator content = contentFactory.getContentForResponse(SHOW_ALL_PARTICIPANTS);
         validate(content, "ResponseContent for SHOW_ALL_PARTICIPANTS not found");
 
-        String pageString = jSonReader.getVal(commandArgument, PAGE.getValue());
+        String pageString = jSonReader.getVal(jsonArguments, PAGE.getValue());
         validate(pageString, "Page not found");
         int page = normalizeArgument(Integer.parseInt(pageString));
 
-        String search = jSonReader.getVal(commandArgument, SEARCH.getValue());
+        String search = jSonReader.getVal(jsonArguments, SEARCH.getValue());
         validate(search, "Search not found");
 
         Page<ParticipantEntity> participants = participantService.findAllBySurnameAndNameParts(List.of(search), page, PARTICIPANTS_PAGE_SIZE);
@@ -111,11 +111,11 @@ public class ParticipantsFacadeImpl extends FacadeMethods implements Participant
     }
 
     @Override
-    public void showParticipantDetails(String chatId, String commandArgument, Integer editMessageId) {
-        log.info("SHOW PARTICIPANT DETAILS chatId: {}, commandArgument: {}", chatId, commandArgument);
+    public void showParticipantDetails(String chatId, String jsonArguments, Integer editMessageId) {
+        log.info("SHOW PARTICIPANT DETAILS chatId: {}, commandArgument: {}", chatId, jsonArguments);
 
-        long id = Long.parseLong(jSonReader.getVal(commandArgument, PARTICIPANT_ID.getValue()));
-        int page = Integer.parseInt(jSonReader.getVal(commandArgument, PAGE.getValue()));
+        long id = Long.parseLong(jSonReader.getVal(jsonArguments, PARTICIPANT_ID.getValue()));
+        int page = Integer.parseInt(jSonReader.getVal(jsonArguments, PAGE.getValue()));
 
         participantService.findById(id).ifPresent(participant -> {
             boolean subscribed = subscribeFacade.isSubscribed(chatId, participant);

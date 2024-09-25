@@ -41,11 +41,11 @@ public class CronCompetitionUpdater implements ApplicationListener<ContextRefres
     ApplicationEventPublisher publisher;
     private final Set<String> finishedOrCanceledStatuses = new HashSet<>(Arrays.asList(C_FINISHED.getName(), C_CANCELED.getName()));
 
-
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        List<CompetitionEntity> competitions = competitionService.findAllOrderByUpdated();
-        if (competitions.isEmpty()) {
+        // First start application. Check if competitions in DB and update if not
+        long count = competitionService.count();
+        if (count == 0) {
             log.info("No competitions in DB");
             update(LocalDate.now().getYear());
         }
@@ -68,43 +68,48 @@ public class CronCompetitionUpdater implements ApplicationListener<ContextRefres
         }
     }
 
+    private void updateCompetitions(List<CompetitionEntity> competitions) {
+        log.info("Going to update competitions. Found {} ", competitions.size());
+        competitions.stream()
+                .filter(CompetitionEntity::isCanBeUpdated)
+                .forEach(competition -> {
+                    log.info("Update competition with id: {} begin date: {}", competition.getId(), competition.getBeginDate());
+                    runEventToUpdateCompetition(competition);
+                });
+    }
+
     @Scheduled(cron = "0 0/9 10-23 * * *") // every 9 minutes check not filled events from 10 to 23
     public void checkNotFilledEvents() {
-        Set<CompetitionEntity> needToUpdateCompetitionIds = new HashSet<>();
-        eventService.findAll().stream()
+        List<CompetitionEntity> competitions = eventService.findAll().stream()
                 .filter(EventEntity::isNotFilled)
-                .forEach(event -> needToUpdateCompetitionIds.add(event.getDay().getCompetition()));
-        needToUpdateCompetitionIds.forEach(competition -> {
-            log.info("[CNFE] Need to update competition with id: {} begin date: {}", competition.getId(), competition.getBeginDate());
-            runEventToUpdateCompetition(competition);
-        });
+                .map(eventEntity -> eventEntity.getDay().getCompetition())
+                .distinct()
+                .toList();
+        log.info("Update competitions with not filled events. Found {} ", competitions.size());
+        updateCompetitions(competitions.stream().toList());
     }
 
     @Scheduled(cron = "0 15 6 * * *") // every day at 6:15 update all competition
     @Transactional
     public void updateAllCompetitionsDetails() {
-        List<CompetitionEntity> competitions = competitionService.findAllOrderByUpdated();
-        log.info("Found {} competitions", competitions.size());
-        competitions.stream()
-                .filter(CompetitionEntity::isNeedToUpdate)
-                .forEach(competition -> {
-                    log.info("[UACD] Need to update competition with id: {}, begin date: {}", competition.getId(), competition.getBeginDate());
-                    runEventToUpdateCompetition(competition);
-                });
+        List<CompetitionEntity> competitions = competitionService.findAllOrderByUpdated()
+                .stream()
+                .filter(CompetitionEntity::isCanBeUpdated)
+                .toList();
+        log.info("Update All competitions. Found {} ", competitions.size());
+        updateCompetitions(competitions);
     }
 
     @Scheduled(cron = "0 0/20 10-23 * * *") // every 20 minutes check closest competitions
     public void updateClosestCompetitionDetails() {
-        log.info("Start update closest competitions");
-        List<CompetitionEntity> competitions = competitionService.findAllOrderByBeginDateDesc();
         LocalDate date = LocalDate.now();
-        competitions.stream()
+        List<CompetitionEntity> competitions = competitionService.findAllOrderByBeginDateDesc()
+                .stream()
                 .filter(competition ->
                         !finishedOrCanceledStatuses.contains(competition.getStatus()) && isWithinOneWeekFromBeginDate(competition, date))
-                .forEach(competition -> {
-                    log.info("[UCCD]Need to update competition with id: {}, begin date: {}", competition.getId(), competition.getBeginDate());
-                    runEventToUpdateCompetition(competition);
-                });
+                .toList();
+        log.info("Update closest competitions. Found {} ", competitions.size());
+        updateCompetitions(competitions);
     }
 
     private boolean isWithinOneWeekFromBeginDate(CompetitionEntity competition, LocalDate date) {
@@ -116,7 +121,7 @@ public class CronCompetitionUpdater implements ApplicationListener<ContextRefres
 
     private void runEventToUpdateCompetition(CompetitionEntity competition) {
         if (competition.isURLEmpty()) {
-            log.warn("Can't update. Competition URL is empty, id: {}", competition.getId());
+            log.debug("Can't update. Competition URL is empty, id: {}", competition.getId());
             return;
         }
         if (competition.isUrlNotValid()) {
