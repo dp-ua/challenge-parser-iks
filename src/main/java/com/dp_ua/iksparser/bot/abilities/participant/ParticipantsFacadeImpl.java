@@ -79,7 +79,7 @@ public class ParticipantsFacadeImpl extends FacadeMethods implements Participant
         validate(contentGenerator, "ResponseContent for PARTICIPANTS_VIEW_MAIN not found");
         ResponseContainer content = contentGenerator.getContainer();
 
-        setStateShowFindAll(chatId, 0);
+        setStateShowFindAll(chatId);
         SendMessageEvent event = SERVICE.getSendMessageEvent(chatId, editMessageId, content);
         publisher.publishEvent(event);
     }
@@ -104,7 +104,7 @@ public class ParticipantsFacadeImpl extends FacadeMethods implements Participant
         List<InlineKeyboardButton> backButton = SERVICE.getBackButton(CommandParticipants.getCallbackCommand());
         container.getKeyboard().getKeyboard().add(backButton);
 
-        setStateShowFindAll(chatId, 0);
+        setStateShowFindAll(chatId);
         SendMessageEvent event = SERVICE.getSendMessageEvent(chatId, editMessageId, container);
 
         publisher.publishEvent(event);
@@ -130,8 +130,8 @@ public class ParticipantsFacadeImpl extends FacadeMethods implements Participant
         });
     }
 
-    private void setStateShowFindAll(String chatId, int page) {
-        stateService.setState(chatId, CommandShowFindAllParticipants.getStateText(page));
+    private void setStateShowFindAll(String chatId) {
+        stateService.setState(chatId, CommandShowFindAllParticipants.getStateText(0));
     }
 
     private static int normalizeArgument(long commandArgument) {
