@@ -104,7 +104,7 @@ public class ParticipantsFacadeImpl extends FacadeMethods implements Participant
         List<InlineKeyboardButton> backButton = SERVICE.getBackButton(CommandParticipants.getCallbackCommand());
         container.getKeyboard().getKeyboard().add(backButton);
 
-        setStateShowFindAll(chatId, page);
+        setStateShowFindAll(chatId, 0);
         SendMessageEvent event = SERVICE.getSendMessageEvent(chatId, editMessageId, container);
 
         publisher.publishEvent(event);
