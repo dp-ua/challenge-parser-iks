@@ -25,7 +25,7 @@ public class TextCommandDetectorImpl implements TextCommandDetectorService {
 
     @Override
     public List<CommandInterface> getParsedCommands(String text) throws NotForMeException {
-        log.debug("getParsedCommands: {}", text);
+        log.debug("Try to parse command: {}", text);
         if (isCanBeCommand(text)) {
             List<CommandInterface> simpleCommands = getParsedSimpleCommands(text);
             if (simpleCommands != null) return simpleCommands;
