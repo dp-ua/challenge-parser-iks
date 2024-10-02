@@ -13,9 +13,20 @@ import org.springframework.stereotype.Component;
 @ToString
 public class CommandParticipants extends BaseCommand {
     private final static String command = "participants";
+    protected static final String description = Icon.ATHLETE + "Список атлетів";
     private final boolean isInTextCommand = false;
     @Autowired
     ParticipantFacade participantsFacade;
+
+    @Override
+    public boolean isNeedToAddToMenu() {
+        return true;
+    }
+
+    @Override
+    public String description() {
+        return description;
+    }
 
     @Override
     public String command() {

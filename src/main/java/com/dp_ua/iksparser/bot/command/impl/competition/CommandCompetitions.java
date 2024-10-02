@@ -15,7 +15,7 @@ import static com.dp_ua.iksparser.bot.command.CommandArgumentName.PAGE;
 @ToString
 public class CommandCompetitions extends BaseCommand {
     private static final String command = "competitions";
-    private static final String description = "Список змагань";
+    private static final String description = Icon.COMPETITION + " Список змагань";
     private final boolean isInTextCommand = false;
     @Autowired
     private CompetitionFacade competitionFacade;
