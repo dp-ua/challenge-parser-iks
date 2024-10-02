@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class CommandMenu extends BaseCommand {
     public static final String command = "menu";
-    public static final String description = "головне меню";
+    public static final String description = "Меню";
     @Autowired
     MainFacade mainFacade;
 
