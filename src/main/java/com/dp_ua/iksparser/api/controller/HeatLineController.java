@@ -1,6 +1,7 @@
 package com.dp_ua.iksparser.api.controller;
 
 import com.dp_ua.iksparser.dba.dto.HeatLineDto;
+import com.dp_ua.iksparser.dba.entity.HeatLineEntity;
 import com.dp_ua.iksparser.dba.service.HeatLineService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.dp_ua.iksparser.api.v1.Variables.API_V1_URI;
@@ -21,7 +23,7 @@ import static com.dp_ua.iksparser.api.v1.Variables.HEAT_LINE_URI;
 
 @RestController
 @Slf4j
-@RequestMapping(API_V1_URI)
+@RequestMapping(API_V1_URI + HEAT_LINE_URI)
 @Tag(name = "HeatLine Management")
 public class HeatLineController {
     @Autowired
@@ -29,7 +31,7 @@ public class HeatLineController {
 
     @Operation(summary = "Get heatLine info by id",
             description = "Get heatLine info by id")
-    @GetMapping(HEAT_LINE_URI + "/{id}")
+    @GetMapping("/{id}")
     @Transactional
     public ResponseEntity<HeatLineDto> getHeatLineInfo(
             HttpServletRequest request,
@@ -42,16 +44,17 @@ public class HeatLineController {
                 request.getRemoteAddr(),
                 request.getHeader("User-Agent"));
 
-        HeatLineDto heatLine = heatLineService.convertToDto(heatLineService.findById(id));
-        if (heatLine == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(heatLine);
+        Optional<HeatLineEntity> heatLine = heatLineService.findById(id);
+
+        return heatLine.isEmpty() ?
+                ResponseEntity.notFound().build()
+                :
+                ResponseEntity.ok(heatLineService.convertToDto(heatLine.get()));
     }
 
     @Operation(summary = "Get heatLines by id list",
             description = "Get heatLines by provided list of ids")
-    @PostMapping(HEAT_LINE_URI + "/list")
+    @PostMapping("/list")
     @Transactional
     public ResponseEntity<List<HeatLineDto>> getHeatLinesByIds(
             HttpServletRequest request,
@@ -61,9 +64,14 @@ public class HeatLineController {
                 ids,
                 request.getRemoteAddr(),
                 request.getHeader("User-Agent"));
+
+        if (Objects.isNull(ids) || ids.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
         List<HeatLineDto> heatLines = ids.stream()
                 .map(heatLineService::findById)
-                .filter(Objects::nonNull)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .map(heatLineService::convertToDto)
                 .collect(Collectors.toList());
 

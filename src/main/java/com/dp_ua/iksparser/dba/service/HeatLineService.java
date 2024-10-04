@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @Transactional
@@ -26,8 +27,8 @@ public class HeatLineService {
     }
 
     @Transactional
-    public HeatLineEntity findById(Long id) {
-        return repo.findById(id).orElse(null);
+    public Optional<HeatLineEntity> findById(Long id) {
+        return repo.findById(id);
     }
 
     public HeatLineDto convertToDto(HeatLineEntity heatLineEntity) {
