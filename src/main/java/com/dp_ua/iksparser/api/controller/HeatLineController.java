@@ -46,10 +46,10 @@ public class HeatLineController {
 
         Optional<HeatLineEntity> heatLine = heatLineService.findById(id);
 
-        return heatLine.isEmpty() ?
-                ResponseEntity.notFound().build()
-                :
-                ResponseEntity.ok(heatLineService.convertToDto(heatLine.get()));
+        return heatLine.map(heatLineEntity ->
+                        ResponseEntity.ok(heatLineService.convertToDto(heatLineEntity)))
+                .orElseGet(() ->
+                        ResponseEntity.notFound().build());
     }
 
     @Operation(summary = "Get heatLines by id list",

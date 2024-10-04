@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.text.Collator;
@@ -124,11 +123,6 @@ public class ParticipantService {
         return repo.findAll();
     }
 
-    public Page<ParticipantDto> getAll(Pageable pageable) {
-        return repo.findAll(pageable)
-                .map(this::convertToDto);
-    }
-
     public ParticipantDto convertToDto(ParticipantEntity participant) {
         ParticipantDto dto = new ParticipantDto();
         dto.setId(participant.getId());
@@ -151,11 +145,5 @@ public class ParticipantService {
 
     public long getCount() {
         return repo.count();
-    }
-
-    public Page<ParticipantEntity> findAll(int page, int pageSize) {
-        Sort sort = Sort.by(Sort.Order.asc("surname"), Sort.Order.asc("name"));
-        Pageable pageable = pageableService.createPageRequestWithSort(page, pageSize, sort);
-        return repo.findAll(pageable);
     }
 }

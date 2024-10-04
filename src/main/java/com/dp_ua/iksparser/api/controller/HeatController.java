@@ -45,10 +45,10 @@ public class HeatController {
                 request.getHeader("User-Agent"));
 
         Optional<HeatEntity> heat = heatService.findById(id);
-        return heat.isEmpty() ?
-                ResponseEntity.notFound().build()
-                :
-                ResponseEntity.ok(heatService.convertToDto(heat.get()));
+        return heat.map(heatEntity ->
+                        ResponseEntity.ok(heatService.convertToDto(heatEntity)))
+                .orElseGet(() ->
+                        ResponseEntity.notFound().build());
     }
 
     @Operation(summary = "Get heats by id list",
@@ -66,7 +66,7 @@ public class HeatController {
         if (Objects.isNull(ids) || ids.isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
-        
+
         List<HeatDto> heats = ids.stream()
                 .map(heatService::findById)
                 .filter(Optional::isPresent)

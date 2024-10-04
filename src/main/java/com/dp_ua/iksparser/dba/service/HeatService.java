@@ -8,7 +8,6 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -39,9 +38,5 @@ public class HeatService {
         dto.setName(heat.getName());
         dto.setHeatLines(heat.getHeatLines().stream().map(HeatLineEntity::getId).toList());
         return dto;
-    }
-
-    public List<HeatDto> convertToDtoList(List<HeatEntity> heats) {
-        return heats.stream().map(this::convertToDto).toList();
     }
 }

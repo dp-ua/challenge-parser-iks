@@ -77,7 +77,7 @@ public class ParticipantController {
 
         Optional<ParticipantEntity> participant = participantService.findById(id);
         return participant
-                .map(p -> participantService.convertToDto(p))
+                .map(participantService::convertToDto)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -97,7 +97,7 @@ public class ParticipantController {
 
         List<ParticipantDto> participants = ids.stream()
                 .map(participantService::findById)
-                .filter(p -> p.isPresent())
+                .filter(Optional::isPresent)
                 .map(p -> participantService.convertToDto(p.get()))
                 .toList();
         return ResponseEntity.ok(participants);
