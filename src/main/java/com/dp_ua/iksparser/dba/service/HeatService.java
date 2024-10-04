@@ -1,14 +1,15 @@
 package com.dp_ua.iksparser.dba.service;
 
+import com.dp_ua.iksparser.dba.dto.HeatDto;
 import com.dp_ua.iksparser.dba.entity.HeatEntity;
 import com.dp_ua.iksparser.dba.entity.HeatLineEntity;
-import com.dp_ua.iksparser.dba.dto.HeatDto;
 import com.dp_ua.iksparser.dba.repo.HeatRepo;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @Transactional
@@ -28,8 +29,8 @@ public class HeatService {
         repo.delete(heat);
     }
 
-    public HeatEntity findById(Long id) {
-        return repo.findById(id).orElse(null);
+    public Optional<HeatEntity> findById(Long id) {
+        return repo.findById(id);
     }
 
     public HeatDto convertToDto(HeatEntity heat) {
