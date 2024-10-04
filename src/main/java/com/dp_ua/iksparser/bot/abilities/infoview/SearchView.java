@@ -101,9 +101,11 @@ public class SearchView {
 
         StringBuilder message = new StringBuilder();
 
-        message.append(LOOK)
+        message
+                .append(LOOK)
+                .append(SPACE)
                 .append(BOLD)
-                .append("Знайдено спортсмена: ")
+                .append("Спортсмен: ")
                 .append(BOLD)
                 .append(END_LINE)
                 .append(participantView.info(participant))
@@ -113,6 +115,7 @@ public class SearchView {
                 .append(END_LINE)
                 .append(END_LINE)
                 .append(HEAT)
+                .append(SPACE)
                 .append("Приймає участь у змаганнях: ")
                 .append(END_LINE);
 
