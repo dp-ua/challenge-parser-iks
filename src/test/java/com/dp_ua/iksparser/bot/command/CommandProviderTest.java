@@ -49,7 +49,6 @@ public class CommandProviderTest {
                         competition
                         competitionnotloaded
                         competitions
-                        parcompdet
                         shpartdet
                         participants
                         salps
@@ -70,9 +69,10 @@ public class CommandProviderTest {
                 .substring(1);
 
         Assert.assertEquals("""
-                        /menu головне меню
+                        /menu Меню
                         /start Розпочати роботу
-                        /competitions Список змагань"""
+                        /competitions 🏆 Список змагань
+                        /participants 🏃Список атлетів"""
                 , result);
     }
 }

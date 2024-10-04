@@ -59,7 +59,7 @@ public class ParticipantService {
 
     public Page<ParticipantEntity> findAllBySurnameAndNameParts(List<String> parts, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        List<String> maskedLowerCaseParts = getMaskedLowerCaseParts(parts);
+        List<String> maskedLowerCaseParts = parts != null ? getMaskedLowerCaseParts(parts) : Collections.emptyList();
 
         if (maskedLowerCaseParts.isEmpty()) {
             return repo.findAll(pageable);
