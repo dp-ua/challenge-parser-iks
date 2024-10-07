@@ -8,6 +8,8 @@ import lombok.ToString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import static com.dp_ua.iksparser.bot.command.CommandArgumentName.PAGE;
+
 
 @Component
 @ToString
@@ -30,7 +32,24 @@ public class CommandSubscriptionsList extends BaseCommand {
     @Override
     protected void perform(Message message) {
         String chatId = message.getChatId();
-        long commandArgument = getCommandArgument(message.getMessageText());
-        subscribeFacade.showSubscriptionsList(chatId, commandArgument, message.getEditMessageId());
+        Integer editMessageId = message.getEditMessageId();
+        int page = getPage(message);
+
+        subscribeFacade.showSubscriptionsList(chatId, page, editMessageId);
+    }
+
+    private int getPage(Message message) {
+        try {
+            return Integer.parseInt(parseArgumentFromFullText(message.getMessageText(), PAGE));
+        } catch (Exception e) {
+            return DEFAULT_START_PAGE;
+        }
+    }
+
+    public static String getCallBackCommand(int page) {
+        return SLASH + command +
+                BRACKET_OPEN +
+                paramPage(page) +
+                BRACKET_CLOSE;
     }
 }

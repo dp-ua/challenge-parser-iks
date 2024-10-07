@@ -20,6 +20,7 @@ import static com.dp_ua.iksparser.service.MessageCreator.SERVICE;
 @Slf4j
 public abstract class BaseCommand implements CommandInterface {
     public static final int DEFAULT_NO_PAGE_ARGUMENT = -1;
+    public static final int DEFAULT_START_PAGE = 0;
     protected static final String PARAM_DELIMITER = ",";
     protected static final String BRACKET_OPEN = " {";
     protected static final String BRACKET_CLOSE = "}";
@@ -115,6 +116,10 @@ public abstract class BaseCommand implements CommandInterface {
 
     protected static String paramAction(ActionType action) {
         return paramObject(ACTION, action.toString());
+    }
+
+    protected static String paramPage(int page) {
+        return paramObject(PAGE, String.valueOf(page));
     }
 
     protected static String paramObject(CommandArgumentName name, String value) {

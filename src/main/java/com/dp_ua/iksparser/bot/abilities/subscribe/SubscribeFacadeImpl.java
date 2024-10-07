@@ -1,6 +1,9 @@
 package com.dp_ua.iksparser.bot.abilities.subscribe;
 
 import com.dp_ua.iksparser.bot.abilities.infoview.SubscriptionView;
+import com.dp_ua.iksparser.bot.abilities.response.ResponseContainer;
+import com.dp_ua.iksparser.bot.abilities.response.ResponseContentFactory;
+import com.dp_ua.iksparser.bot.abilities.response.ResponseContentGenerator;
 import com.dp_ua.iksparser.bot.event.SendMessageEvent;
 import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
 import com.dp_ua.iksparser.dba.entity.HeatLineEntity;
@@ -8,23 +11,29 @@ import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
 import com.dp_ua.iksparser.dba.entity.SubscriberEntity;
 import com.dp_ua.iksparser.dba.service.SubscriberService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 
 import java.util.List;
 
+import static com.dp_ua.iksparser.bot.abilities.response.ResponseType.SUBSCRIPTIONS_LIST;
 import static com.dp_ua.iksparser.service.MessageCreator.SERVICE;
 
 @Component
 @Slf4j
 public class SubscribeFacadeImpl implements SubscribeFacade {
+    @Value("${view.participants.pageSize}")
+    private int pageSize;
     @Autowired
     SubscriberService subscriberService;
     @Autowired
     ApplicationEventPublisher publisher;
+    @Autowired
+    ResponseContentFactory responseContentFactory;
 
     @Autowired
     SubscriptionView view;
@@ -81,11 +90,17 @@ public class SubscribeFacadeImpl implements SubscribeFacade {
     }
 
     @Override
-    public void showSubscriptionsList(String chatId, long commandArgument, Integer editMessageId) {
-        List<SubscriberEntity> subscriptions = getSubscriptions(chatId);
-        log.info("Subscriptions list: {}", subscriptions);
-        // TODO:
-        throw new NotImplementedException("Not implemented yet");
+    public void showSubscriptionsList(String chatId, int page, Integer editMessageId) {
+        Page<ParticipantEntity> subscriptions = getSubscriptions(chatId, page);
+        ResponseContentGenerator generator = responseContentFactory.getContentForResponse(SUBSCRIPTIONS_LIST);
+        ResponseContainer content = generator.getContainer(subscriptions);
+
+        SendMessageEvent sendMessageEvent = SERVICE.getSendMessageEvent(chatId, editMessageId, content);
+        publisher.publishEvent(sendMessageEvent);
+    }
+
+    private Page<ParticipantEntity> getSubscriptions(String chatId, int page) {
+        return subscriberService.getSubscriptions(chatId, page, pageSize);
     }
 
     @Override

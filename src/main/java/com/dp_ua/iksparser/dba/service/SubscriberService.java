@@ -3,8 +3,11 @@ package com.dp_ua.iksparser.dba.service;
 import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
 import com.dp_ua.iksparser.dba.entity.SubscriberEntity;
 import com.dp_ua.iksparser.dba.repo.SubscriberRepo;
+import com.dp_ua.iksparser.service.PageableService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -13,6 +16,8 @@ import java.util.List;
 @Slf4j
 public class SubscriberService {
     private final SubscriberRepo repo;
+    @Autowired
+    PageableService pageableService;
 
     @Autowired
     public SubscriberService(SubscriberRepo repo) {
@@ -46,6 +51,11 @@ public class SubscriberService {
 
     public List<SubscriberEntity> findAllByChatId(String chatId) {
         return repo.findByChatId(chatId);
+    }
+
+    public Page<ParticipantEntity> getSubscriptions(String chatId, int page, int pageSize) {
+        Pageable pageRequest = pageableService.createPageRequest(page, pageSize);
+        return repo.findParticipantsByChatId(chatId, pageRequest);
     }
 
     public void unsubscribeAll(ParticipantEntity p) {
