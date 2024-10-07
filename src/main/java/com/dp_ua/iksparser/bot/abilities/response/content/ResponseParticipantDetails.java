@@ -12,6 +12,7 @@ import com.dp_ua.iksparser.bot.command.impl.participants.CommandParticipantDetai
 import com.dp_ua.iksparser.bot.command.impl.participants.CommandShowHeatLinesInCompetitionForParticipant;
 import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
 import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -82,11 +83,16 @@ public class ResponseParticipantDetails implements ResponseContentGenerator {
         markup.setKeyboard(rows);
 
         rows.add(getNavigationButtons(competitionsPage, participant, page));
+        rows.addAll(getProfileButton(participant));
         rows.add(getSubscribeActionButton(subscribed, page, participant));
         rows.add(getCompetitionsNavButtons(competitions, participant));
         rows.add(getBackButton());
 
         return markup;
+    }
+
+    private @NonNull List<List<InlineKeyboardButton>> getProfileButton(ParticipantEntity participant) {
+        return participantView.getParticipantProfileButtonLink(participant).getKeyboard();
     }
 
     private String competitionsInfo(Page<CompetitionEntity> competitionsPage) {
@@ -138,7 +144,7 @@ public class ResponseParticipantDetails implements ResponseContentGenerator {
         );
     }
 
-    private static List<InlineKeyboardButton> getBackButton() {
+    private List<InlineKeyboardButton> getBackButton() {
         return SERVICE.getBackButton(CommandMenu.getCallBackCommand());
     }
 
@@ -151,7 +157,7 @@ public class ResponseParticipantDetails implements ResponseContentGenerator {
         return row2;
     }
 
-    private static List<InlineKeyboardButton> getNavigationButtons(Page<CompetitionEntity> competitionsPage, ParticipantEntity participant, int page) {
+    private List<InlineKeyboardButton> getNavigationButtons(Page<CompetitionEntity> competitionsPage, ParticipantEntity participant, int page) {
         List<InlineKeyboardButton> row1 = new ArrayList<>();
 
         if (competitionsPage.getTotalPages() > 1) {

@@ -139,7 +139,7 @@ public enum MessageCreator {
     }
 
     public String cleanMarkdown(String input) {
-         return input.replaceAll("`", "’").replaceAll("[*_`\\[\\]\\\\/]", "");
+        return input.replaceAll("`", "’").replaceAll("[*_`\\[\\]\\\\/]", "");
     }
 
     public InlineKeyboardButton getKeyboardButton(String text, String callbackData) {
@@ -148,6 +148,14 @@ public enum MessageCreator {
         button.setCallbackData(callbackData);
         return button;
     }
+
+    public InlineKeyboardButton getURLButton(String text, String url) {
+        final InlineKeyboardButton button = new InlineKeyboardButton();
+        button.setText(text);
+        button.setUrl(url);
+        return button;
+    }
+
 
     public SendMessageEvent getAnswerCallbackQuery(String callBackQueryId, String message) {
         if (message == null) return null;

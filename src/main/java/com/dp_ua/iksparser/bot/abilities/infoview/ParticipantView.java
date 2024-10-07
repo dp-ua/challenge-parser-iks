@@ -61,6 +61,23 @@ public class ParticipantView {
                 END_LINE;
     }
 
+    public InlineKeyboardMarkup getParticipantProfileButtonLink(ParticipantEntity participant) {
+        InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
+        List<InlineKeyboardButton> row = new ArrayList<>();
+        String url = participant.getUrl();
+        if (url != null && !url.isEmpty()) {
+            InlineKeyboardButton button = SERVICE.getURLButton(
+                    ATHLETE + " Профіль спортсмена",
+                    participant.getUrl()
+            );
+            row.add(button);
+            rows.add(row);
+        }
+        keyboard.setKeyboard(rows);
+        return keyboard;
+    }
+
     public InlineKeyboardMarkup getShowParticipantsKeyboard() {
         InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
