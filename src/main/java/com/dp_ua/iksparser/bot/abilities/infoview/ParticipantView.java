@@ -61,21 +61,15 @@ public class ParticipantView {
                 END_LINE;
     }
 
-    public InlineKeyboardMarkup getParticipantProfileButtonLink(ParticipantEntity participant) {
-        InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
-        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
-        List<InlineKeyboardButton> row = new ArrayList<>();
+    public InlineKeyboardButton getParticipantProfileButtonLink(ParticipantEntity participant) {
         String url = participant.getUrl();
         if (url != null && !url.isEmpty()) {
-            InlineKeyboardButton button = SERVICE.getURLButton(
+            return SERVICE.getURLButton(
                     ATHLETE + " Профіль спортсмена",
                     participant.getUrl()
             );
-            row.add(button);
-            rows.add(row);
         }
-        keyboard.setKeyboard(rows);
-        return keyboard;
+        return null;
     }
 
     public InlineKeyboardMarkup getShowParticipantsKeyboard() {

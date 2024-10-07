@@ -21,6 +21,7 @@ import com.dp_ua.iksparser.dba.service.CompetitionService;
 import com.dp_ua.iksparser.dba.service.HeatLineService;
 import com.dp_ua.iksparser.dba.service.ParticipantService;
 import com.dp_ua.iksparser.exeption.ParsingException;
+import com.dp_ua.iksparser.service.YearRange;
 import com.dp_ua.iksparser.service.parser.MainParserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -591,10 +592,9 @@ public class CompetitionFacadeImpl extends FacadeMethods implements CompetitionF
     public String getInfoAboutCompetitions() {
         long allCount = competitionService.count();
         int filledCount = competitionService.getFilledCompetitions().size();
-        List<String> minMaxYears = competitionService.getMinAndMaxYear();
-        List<String> years = List.of(String.valueOf(minMaxYears.get(0)), String.valueOf(minMaxYears.get(1)));
+        YearRange yearRange = competitionService.getMinAndMaxYear();
 
-        return competitionView.getCompetitionsInfo(allCount, filledCount, years);
+        return competitionView.getCompetitionsInfo(allCount, filledCount, yearRange);
     }
 
     @Override

@@ -2,7 +2,17 @@ spring:
   profiles:
     active: test
   jpa:
-    open-in-view: false
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=false
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
 
 view:
   participants:
@@ -24,6 +34,9 @@ logging:
   level:
     root: INFO
     com.dp_ua: DEBUG
+    org.hibernate.SQL: INFO
+    org.hibernate.type.descriptor.sql.BasicTypeDescriptor: INFO
+    com.zaxxer.hikari: INFO
   file: file.log
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

@@ -8,6 +8,7 @@ import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
 import com.dp_ua.iksparser.dba.repo.CompetitionRepo;
 import com.dp_ua.iksparser.service.PageableService;
 import com.dp_ua.iksparser.service.SqlPreprocessorService;
+import com.dp_ua.iksparser.service.YearRange;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -51,13 +52,25 @@ public class CompetitionService {
         return repo.findAllWithFilledDays();
     }
 
-    public List<String> getMinAndMaxYear() {
-        List<Object[]> objects = repo.findMinAndMaxYear();
-        if (objects.size() == 1) {
-            Object[] object = objects.get(0);
-            return List.of(object[0].toString(), object[1].toString());
+    public YearRange getMinAndMaxYear() {
+        List<String> beginDates = repo.findAllBeginDates();
+
+        List<Integer> years = beginDates.stream()
+                .map(date -> {
+                    try {
+                        return LocalDate.parse(date, FORMATTER).getYear();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .filter(year -> year != null)
+                .sorted()
+                .toList();
+
+        if (!years.isEmpty()) {
+            return new YearRange(years.get(0).toString(), years.get(years.size() - 1).toString());
         }
-        return List.of();
+        return new YearRange(null, null);
     }
 
     private final Comparator<String> dateComparator = (o1, o2) -> {
