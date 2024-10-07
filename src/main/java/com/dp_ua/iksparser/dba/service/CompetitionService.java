@@ -47,6 +47,19 @@ public class CompetitionService {
         return all;
     }
 
+    public List<CompetitionEntity> getFilledCompetitions() {
+        return repo.findAllWithFilledDays();
+    }
+
+    public List<String> getMinAndMaxYear() {
+        List<Object[]> objects = repo.findMinAndMaxYear();
+        if (objects.size() == 1) {
+            Object[] object = objects.get(0);
+            return List.of(object[0].toString(), object[1].toString());
+        }
+        return List.of();
+    }
+
     private final Comparator<String> dateComparator = (o1, o2) -> {
         LocalDate date1 = getParsedDate(o1);
         LocalDate date2 = getParsedDate(o2);

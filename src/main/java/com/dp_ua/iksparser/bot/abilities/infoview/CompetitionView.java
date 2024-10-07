@@ -300,9 +300,7 @@ public class CompetitionView {
         return rows;
     }
 
-    public String getCompetitionsInfo(List<CompetitionEntity> competitions, List<String> years) {
-        long filledCompetitionsCount = competitions.stream().filter(CompetitionEntity::isFilled).count();
-        int competitionsCount = competitions.size();
+    public String getCompetitionsInfo(long allCompetitions, long filledCompetitions, List<String> years) {
         String yearStart = years.get(0);
         String yearFinish = years.get(years.size() - 1);
 
@@ -311,7 +309,7 @@ public class CompetitionView {
                 .append(COMPETITION)
                 .append("Всього змагань в базі: ")
                 .append(BOLD)
-                .append(competitionsCount)
+                .append(allCompetitions)
                 .append(BOLD)
                 .append(END_LINE)
                 .append(CALENDAR)
@@ -328,7 +326,7 @@ public class CompetitionView {
                 .append(RESULT)
                 .append("Змагань, по яким заповнена інформація: ")
                 .append(BOLD)
-                .append(filledCompetitionsCount)
+                .append(filledCompetitions)
                 .append(BOLD)
                 .append(END_LINE);
         return sb.toString();

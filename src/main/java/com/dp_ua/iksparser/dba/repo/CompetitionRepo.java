@@ -31,5 +31,11 @@ public interface CompetitionRepo extends CrudRepository<CompetitionEntity, Long>
             "GROUP BY c.id " +
             "ORDER BY c.updated DESC")
     Page<CompetitionEntity> findCompetitionsByParticipant(@Param("id") Long participantId, Pageable pageRequest);
+
+    @Query("SELECT MIN(EXTRACT(YEAR FROM TO_DATE(c.beginDate, 'DD.MM.YYYY'))), MAX(EXTRACT(YEAR FROM TO_DATE(c.beginDate, 'DD.MM.YYYY'))) FROM CompetitionEntity c")
+    List<Object[]> findMinAndMaxYear();
+
+    @Query("SELECT c FROM CompetitionEntity c WHERE c.days IS NOT EMPTY")
+    List<CompetitionEntity> findAllWithFilledDays();
 }
 

@@ -30,7 +30,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Consumer;
@@ -590,14 +589,12 @@ public class CompetitionFacadeImpl extends FacadeMethods implements CompetitionF
 
     @Override
     public String getInfoAboutCompetitions() {
-        List<CompetitionEntity> competitions = competitionService.findAllOrderByBeginDateDesc();
-        List<String> years = competitions.stream().map(c -> {
-            String beginDate = c.getBeginDate();
-            LocalDate date = competitionService.getParsedDate(beginDate);
-            return date.getYear();
-        }).distinct().sorted().map(String::valueOf).toList();
+        long allCount = competitionService.count();
+        int filledCount = competitionService.getFilledCompetitions().size();
+        List<String> minMaxYears = competitionService.getMinAndMaxYear();
+        List<String> years = List.of(String.valueOf(minMaxYears.get(0)), String.valueOf(minMaxYears.get(1)));
 
-        return competitionView.getCompetitionsInfo(competitions, years);
+        return competitionView.getCompetitionsInfo(allCount, filledCount, years);
     }
 
     @Override
