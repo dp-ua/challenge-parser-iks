@@ -82,11 +82,21 @@ public class ResponseParticipantDetails implements ResponseContentGenerator {
         markup.setKeyboard(rows);
 
         rows.add(getNavigationButtons(competitionsPage, participant, page));
+        rows.add(getProfileButton(participant));
         rows.add(getSubscribeActionButton(subscribed, page, participant));
         rows.add(getCompetitionsNavButtons(competitions, participant));
         rows.add(getBackButton());
 
         return markup;
+    }
+
+    private List<InlineKeyboardButton> getProfileButton(ParticipantEntity participant) {
+        InlineKeyboardButton button = participantView.getParticipantProfileButtonLink(participant);
+        List<InlineKeyboardButton> row = new ArrayList<>();
+        if (button != null) {
+            row.add(button);
+        }
+        return row;
     }
 
     private String competitionsInfo(Page<CompetitionEntity> competitionsPage) {
@@ -138,7 +148,7 @@ public class ResponseParticipantDetails implements ResponseContentGenerator {
         );
     }
 
-    private static List<InlineKeyboardButton> getBackButton() {
+    private List<InlineKeyboardButton> getBackButton() {
         return SERVICE.getBackButton(CommandMenu.getCallBackCommand());
     }
 
@@ -151,7 +161,7 @@ public class ResponseParticipantDetails implements ResponseContentGenerator {
         return row2;
     }
 
-    private static List<InlineKeyboardButton> getNavigationButtons(Page<CompetitionEntity> competitionsPage, ParticipantEntity participant, int page) {
+    private List<InlineKeyboardButton> getNavigationButtons(Page<CompetitionEntity> competitionsPage, ParticipantEntity participant, int page) {
         List<InlineKeyboardButton> row1 = new ArrayList<>();
 
         if (competitionsPage.getTotalPages() > 1) {

@@ -31,5 +31,11 @@ public interface CompetitionRepo extends CrudRepository<CompetitionEntity, Long>
             "GROUP BY c.id " +
             "ORDER BY c.updated DESC")
     Page<CompetitionEntity> findCompetitionsByParticipant(@Param("id") Long participantId, Pageable pageRequest);
+
+    @Query("SELECT c.beginDate FROM CompetitionEntity c")
+    List<String> findAllBeginDates();
+
+    @Query("SELECT c FROM CompetitionEntity c WHERE c.days IS NOT EMPTY")
+    List<CompetitionEntity> findAllWithFilledDays();
 }
 

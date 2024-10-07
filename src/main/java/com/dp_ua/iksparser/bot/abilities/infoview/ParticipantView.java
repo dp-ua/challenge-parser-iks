@@ -61,6 +61,17 @@ public class ParticipantView {
                 END_LINE;
     }
 
+    public InlineKeyboardButton getParticipantProfileButtonLink(ParticipantEntity participant) {
+        String url = participant.getUrl();
+        if (url != null && !url.isEmpty()) {
+            return SERVICE.getURLButton(
+                    ATHLETE + " Профіль спортсмена",
+                    participant.getUrl()
+            );
+        }
+        return null;
+    }
+
     public InlineKeyboardMarkup getShowParticipantsKeyboard() {
         InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();

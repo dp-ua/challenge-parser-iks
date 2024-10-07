@@ -178,7 +178,7 @@ public class SubscriptionView {
         List<InlineKeyboardButton> row = new ArrayList<>();
         InlineKeyboardButton button = SERVICE.getKeyboardButton(
                 SUBSCRIBE + " Переглянути підписки",
-                "/" + CommandSubscriptionsList.command
+                CommandSubscriptionsList.getCallBackCommand(0)
         );
         row.add(button);
         rows.add(row);

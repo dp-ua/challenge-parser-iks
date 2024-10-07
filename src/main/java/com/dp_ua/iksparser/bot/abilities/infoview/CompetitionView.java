@@ -6,6 +6,7 @@ import com.dp_ua.iksparser.bot.command.impl.competition.CommandCompetitions;
 import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
 import com.dp_ua.iksparser.dba.entity.CompetitionStatus;
 import com.dp_ua.iksparser.dba.entity.HeatLineEntity;
+import com.dp_ua.iksparser.service.YearRange;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -300,35 +301,30 @@ public class CompetitionView {
         return rows;
     }
 
-    public String getCompetitionsInfo(List<CompetitionEntity> competitions, List<String> years) {
-        long filledCompetitionsCount = competitions.stream().filter(CompetitionEntity::isFilled).count();
-        int competitionsCount = competitions.size();
-        String yearStart = years.get(0);
-        String yearFinish = years.get(years.size() - 1);
-
+    public String getCompetitionsInfo(long allCompetitions, long filledCompetitions, YearRange years) {
         StringBuilder sb = new StringBuilder();
         sb
                 .append(COMPETITION)
                 .append("Всього змагань в базі: ")
                 .append(BOLD)
-                .append(competitionsCount)
+                .append(allCompetitions)
                 .append(BOLD)
                 .append(END_LINE)
                 .append(CALENDAR)
                 .append("Дата : з ")
                 .append(BOLD)
-                .append(yearStart)
+                .append(years.getMinYear())
                 .append(BOLD)
                 .append(" по ")
                 .append(BOLD)
-                .append(yearFinish)
+                .append(years.getMaxYear())
                 .append(BOLD)
                 .append(" роки")
                 .append(END_LINE)
                 .append(RESULT)
                 .append("Змагань, по яким заповнена інформація: ")
                 .append(BOLD)
-                .append(filledCompetitionsCount)
+                .append(filledCompetitions)
                 .append(BOLD)
                 .append(END_LINE);
         return sb.toString();

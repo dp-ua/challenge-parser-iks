@@ -21,6 +21,7 @@ import com.dp_ua.iksparser.dba.service.CompetitionService;
 import com.dp_ua.iksparser.dba.service.HeatLineService;
 import com.dp_ua.iksparser.dba.service.ParticipantService;
 import com.dp_ua.iksparser.exeption.ParsingException;
+import com.dp_ua.iksparser.service.YearRange;
 import com.dp_ua.iksparser.service.parser.MainParserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Consumer;
@@ -590,14 +590,11 @@ public class CompetitionFacadeImpl extends FacadeMethods implements CompetitionF
 
     @Override
     public String getInfoAboutCompetitions() {
-        List<CompetitionEntity> competitions = competitionService.findAllOrderByBeginDateDesc();
-        List<String> years = competitions.stream().map(c -> {
-            String beginDate = c.getBeginDate();
-            LocalDate date = competitionService.getParsedDate(beginDate);
-            return date.getYear();
-        }).distinct().sorted().map(String::valueOf).toList();
+        long allCount = competitionService.count();
+        int filledCount = competitionService.getFilledCompetitions().size();
+        YearRange yearRange = competitionService.getMinAndMaxYear();
 
-        return competitionView.getCompetitionsInfo(competitions, years);
+        return competitionView.getCompetitionsInfo(allCount, filledCount, yearRange);
     }
 
     @Override

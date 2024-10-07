@@ -20,8 +20,7 @@ public interface SubscribeFacade {
 
     void showSubscriptions(String chatId, long commandArgument, Integer editMessageId);
 
-
-    void showSubscriptionsList(String chatId, long commandArgument, Integer editMessageId);
+    void showSubscriptionsList(String chatId, int page, Integer editMessageId);
 
     String getInfoAboutSubscribes(String chatId);
 }
