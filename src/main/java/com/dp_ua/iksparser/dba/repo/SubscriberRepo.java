@@ -22,6 +22,6 @@ public interface SubscriberRepo extends JpaRepository<SubscriberEntity, Long> {
 
     void deleteAllByParticipant(ParticipantEntity p);
 
-    @Query("SELECT s.participant FROM SubscriberEntity s WHERE s.chatId = :chatId ORDER BY s.participant.surname ASC, s.participant.name ASC")
+    @Query(value = "SELECT p.* FROM participant_entity p JOIN subscriber_entity s ON p.id = s.participant_id WHERE s.chat_id = :chatId ORDER BY p.surname COLLATE \"uk-UA-x-icu\" ASC, p.name COLLATE \"uk-UA-x-icu\" ASC", nativeQuery = true)
     Page<ParticipantEntity> findParticipantsByChatId(@Param("chatId") String chatId, Pageable pageable);
 }
