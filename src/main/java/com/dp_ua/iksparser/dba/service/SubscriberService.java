@@ -10,7 +10,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+import java.text.Collator;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -55,7 +59,15 @@ public class SubscriberService {
 
     public Page<ParticipantEntity> getSubscriptions(String chatId, int page, int pageSize) {
         Pageable pageRequest = pageableService.createPageRequest(page, pageSize);
-        return repo.findParticipantsByChatId(chatId, pageRequest);
+
+        List<ParticipantEntity> participants = repo.findParticipantsByChatId(chatId)
+                .stream()
+                .sorted(Comparator
+                        .comparing(ParticipantEntity::getSurname, Collator.getInstance(new Locale("uk", "UA")))
+                        .thenComparing(ParticipantEntity::getName, Collator.getInstance(new Locale("uk", "UA"))))
+                .collect(Collectors.toList());
+
+        return pageableService.getPage(participants, pageRequest);
     }
 
     public void unsubscribeAll(ParticipantEntity p) {
