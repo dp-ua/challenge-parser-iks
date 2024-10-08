@@ -22,4 +22,6 @@ public interface SubscriberRepo extends JpaRepository<SubscriberEntity, Long> {
 
     @Query("SELECT s.participant FROM SubscriberEntity s WHERE s.chatId = :chatId ORDER BY s.participant.surname ASC, s.participant.name ASC")
     List<ParticipantEntity> findParticipantsByChatId(@Param("chatId") String chatId);
+
+    int countByChatId(String chatId);
 }

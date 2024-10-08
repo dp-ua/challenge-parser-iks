@@ -13,9 +13,19 @@ import org.springframework.stereotype.Component;
 @ToString
 public class CommandSubscriptions extends BaseCommand {
     public final static String command = "subscriptions";
-    private final boolean isInTextCommand = false;
+    protected static final String DESCRIPTION = Icon.STAR + " Підписки";
     @Autowired
     private SubscribeFacade subscribeFacade;
+
+    @Override
+    public boolean isNeedToAddToMenu() {
+        return true;
+    }
+
+    @Override
+    public String description() {
+        return DESCRIPTION;
+    }
 
     @Override
     public String command() {
@@ -24,7 +34,7 @@ public class CommandSubscriptions extends BaseCommand {
 
     @Override
     protected String getTextForCallBackAnswer(Message message) {
-        return Icon.SUBSCRIBE + " Підписки " + Icon.SUBSCRIBE;
+        return DESCRIPTION;
     }
 
     @Override

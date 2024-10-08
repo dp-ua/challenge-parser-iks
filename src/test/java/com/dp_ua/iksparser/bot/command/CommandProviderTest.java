@@ -72,7 +72,8 @@ public class CommandProviderTest {
                         /menu Меню
                         /start Розпочати роботу
                         /competitions 🏆 Список змагань
-                        /participants 🏃Список атлетів"""
+                        /participants 🏃Список атлетів
+                        /subscriptions ⭐ Підписки"""
                 , result);
     }
 }

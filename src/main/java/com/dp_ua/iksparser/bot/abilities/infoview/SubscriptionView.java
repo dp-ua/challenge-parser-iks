@@ -128,7 +128,7 @@ public class SubscriptionView {
     public String subscriptions(List<SubscriberEntity> subscriptions) {
         return whatIsSubscriptions() +
                 END_LINE +
-                subscriptionsDetails(subscriptions);
+                subscriptionsDetails(subscriptions.size());
     }
 
     public String whatIsSubscriptions() {
@@ -154,18 +154,17 @@ public class SubscriptionView {
         return sb.toString();
     }
 
-    public String subscriptionsDetails(List<SubscriberEntity> subscriptions) {
-        int size = subscriptions.size();
+    public String subscriptionsDetails(int subscriptionsCount) {
         StringBuilder sb = new StringBuilder();
         sb
                 .append(SUBSCRIBE)
                 .append(" Ви підписані на ")
                 .append(BOLD)
-                .append(size)
+                .append(subscriptionsCount)
                 .append(BOLD)
                 .append(SPACE)
                 .append(ITALIC)
-                .append(size == 1 ? "атлета" : "атлетів")
+                .append(subscriptionsCount == 1 ? "атлета" : "атлетів")
                 .append(ITALIC)
                 .append(ATHLETE)
                 .append(END_LINE);
