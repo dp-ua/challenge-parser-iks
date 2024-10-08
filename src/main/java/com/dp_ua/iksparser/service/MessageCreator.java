@@ -68,7 +68,7 @@ public enum MessageCreator {
     public List<InlineKeyboardButton> getMainButton() {
         List<InlineKeyboardButton> row = new ArrayList<>();
         InlineKeyboardButton button = SERVICE.getKeyboardButton(
-                MENU + " Повернутись в меню", "/" + CommandMenu.command
+                MENU + " Меню", "/" + CommandMenu.command
         );
         row.add(button);
         return row;

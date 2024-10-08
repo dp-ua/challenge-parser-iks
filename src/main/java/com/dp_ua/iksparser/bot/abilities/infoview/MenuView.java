@@ -8,8 +8,8 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.dp_ua.iksparser.service.MessageCreator.END_LINE;
-import static com.dp_ua.iksparser.service.MessageCreator.ITALIC;
+import static com.dp_ua.iksparser.bot.Icon.*;
+import static com.dp_ua.iksparser.service.MessageCreator.*;
 
 @Component
 public class MenuView {
@@ -60,5 +60,40 @@ public class MenuView {
         InlineKeyboardMarkup result = new InlineKeyboardMarkup();
         result.setKeyboard(resultKeyboard);
         return result;
+    }
+
+    public String startText(String visibleName, String botURL) {
+        StringBuilder sb = new StringBuilder();
+        sb
+                .append("Вітаю, мене звуть ")
+                .append(LINK)
+                .append(visibleName)
+                .append(SPACE)
+                .append(ROBOT)
+                .append(LINK_END)
+                .append(LINK_SEPARATOR)
+                .append(botURL)
+                .append(LINK_SEPARATOR_END)
+                .append(END_LINE)
+                .append("Я допоможу тобі знайти інформацію про змагання")
+                .append(EVENT)
+                .append(", спортсменів")
+                .append(ATHLETE)
+                .append(" та тренерів")
+                .append(COACH)
+                .append(END_LINE)
+                .append(END_LINE)
+                .append("Для початку роботи скористайся кнопкою в меню");
+        return sb.toString();
+    }
+
+    public InlineKeyboardMarkup startButtons() {
+        InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
+        keyboard.setKeyboard(rows);
+
+        rows.add(SERVICE.getMainButton());
+
+        return keyboard;
     }
 }

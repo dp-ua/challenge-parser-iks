@@ -3,6 +3,9 @@ package com.dp_ua.iksparser.bot.abilities;
 import com.dp_ua.iksparser.bot.abilities.competition.CompetitionFacade;
 import com.dp_ua.iksparser.bot.abilities.infoview.MenuView;
 import com.dp_ua.iksparser.bot.abilities.participant.ParticipantFacade;
+import com.dp_ua.iksparser.bot.abilities.response.ResponseContainer;
+import com.dp_ua.iksparser.bot.abilities.response.ResponseContentFactory;
+import com.dp_ua.iksparser.bot.abilities.response.ResponseContentGenerator;
 import com.dp_ua.iksparser.bot.abilities.subscribe.SubscribeFacade;
 import com.dp_ua.iksparser.bot.event.SendMessageEvent;
 import jakarta.transaction.Transactional;
@@ -12,6 +15,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 
+import static com.dp_ua.iksparser.bot.abilities.response.ResponseType.START;
 import static com.dp_ua.iksparser.service.MessageCreator.SERVICE;
 
 @Component
@@ -27,12 +31,14 @@ public class MainFacadeImpl implements MainFacade {
     ParticipantFacade participantFacade;
     @Autowired
     ApplicationEventPublisher publisher;
+    @Autowired
+    ResponseContentFactory responseContentFactory;
 
     @Override
     @Transactional
     public void menu(String chatId, String argument, Integer editMessageId) {
         log.info("Show menu for chatId: {}, argument:{}", chatId, argument);
-
+        // TODO use ResponseContentGenerator
         String competitionsInfo = competitionFacade.getInfoAboutCompetitions();
         String participantsInfo = participantFacade.getInfoAboutParticipants();
         String subscribeInfo = subscribeFacade.getInfoAboutSubscribes(chatId);
@@ -40,6 +46,15 @@ public class MainFacadeImpl implements MainFacade {
         InlineKeyboardMarkup buttons = menuView.menuButtons();
 
         SendMessageEvent sendMessageEvent = SERVICE.getSendMessageEvent(chatId, menuText, buttons, editMessageId);
+        publisher.publishEvent(sendMessageEvent);
+    }
+
+    @Override
+    public void start(String chatId) {
+        ResponseContentGenerator generator = responseContentFactory.getContentForResponse(START);
+        ResponseContainer content = generator.getContainer();
+
+        SendMessageEvent sendMessageEvent = SERVICE.getSendMessageEvent(chatId, null, content);
         publisher.publishEvent(sendMessageEvent);
     }
 }
