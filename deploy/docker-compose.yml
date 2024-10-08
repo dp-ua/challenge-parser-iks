@@ -36,11 +36,15 @@ services:
       POSTGRES_USER: ${IKS_DB_USERNAME}
       POSTGRES_PASSWORD: ${IKS_DB_PASSWORD}
       PGDATA: /var/lib/postgresql/data/pgdata
+      LANG: uk_UA.UTF-8
+      LANGUAGE: uk_UA:uk
+      LC_ALL: uk_UA.UTF-8
     ports:
       - "5432:5432"
     volumes:
       - ./db/create_db.sql:/docker-entrypoint-initdb.d/create_db.sql
       - .:/var/lib/postgresql/data
+    command: bash -c "apk update && apk add --no-cache gettext && /usr/bin/envsubst && exec postgres"
     restart: unless-stopped
 
   pgadmin:
