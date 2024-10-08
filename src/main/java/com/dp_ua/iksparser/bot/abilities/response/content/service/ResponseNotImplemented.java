@@ -1,4 +1,4 @@
-package com.dp_ua.iksparser.bot.abilities.response.content;
+package com.dp_ua.iksparser.bot.abilities.response.content.service;
 
 import com.dp_ua.iksparser.bot.Icon;
 import com.dp_ua.iksparser.bot.abilities.response.ResponseContentGenerator;
