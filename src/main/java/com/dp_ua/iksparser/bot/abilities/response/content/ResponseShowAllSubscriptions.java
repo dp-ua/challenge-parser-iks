@@ -23,12 +23,13 @@ import static com.dp_ua.iksparser.service.MessageCreator.*;
 @Scope("prototype")
 @ResponseTypeMarker(SUBSCRIPTIONS_LIST)
 public class ResponseShowAllSubscriptions implements ResponseContentGenerator {
+    protected static final int ARGS_PARTICIPANTS_INDEX = 0;
     @Autowired
     ParticipantView participantView;
 
     @Override
     public String messageText(Object... args) {
-        Page<ParticipantEntity> participants = (Page<ParticipantEntity>) getArgumentObject(0, args).orElseThrow();
+        Page<ParticipantEntity> participants = (Page<ParticipantEntity>) getArgumentObject(ARGS_PARTICIPANTS_INDEX, args).orElseThrow();
 
         StringBuilder sb = new StringBuilder();
 
@@ -51,13 +52,19 @@ public class ResponseShowAllSubscriptions implements ResponseContentGenerator {
 
     @Override
     public InlineKeyboardMarkup keyboard(Object... args) {
-        Page<ParticipantEntity> participants = (Page<ParticipantEntity>) getArgumentObject(0, args).orElseThrow();
+        Page<ParticipantEntity> participants = (Page<ParticipantEntity>) getArgumentObject(ARGS_PARTICIPANTS_INDEX, args).orElseThrow();
 
         InlineKeyboardMarkup keyboard = participantView.getParticipantsKeyboard(participants);
         List<InlineKeyboardButton> navigation = getNavigationButtons(participants);
+        List<InlineKeyboardButton> menu = getMenuButton();
         keyboard.getKeyboard().add(0, navigation);
+        keyboard.getKeyboard().add(menu);
 
         return keyboard;
+    }
+
+    private List<InlineKeyboardButton> getMenuButton() {
+        return SERVICE.getMainButton();
     }
 
     private List<InlineKeyboardButton> getNavigationButtons(Page<ParticipantEntity> participants) {

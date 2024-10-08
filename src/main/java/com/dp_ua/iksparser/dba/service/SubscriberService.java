@@ -57,6 +57,9 @@ public class SubscriberService {
         return repo.findByChatId(chatId);
     }
 
+    public int subscribersCount(String chatId){
+        return repo.countByChatId(chatId);
+    }
     public Page<ParticipantEntity> getSubscriptions(String chatId, int page, int pageSize) {
         Pageable pageRequest = pageableService.createPageRequest(page, pageSize);
 

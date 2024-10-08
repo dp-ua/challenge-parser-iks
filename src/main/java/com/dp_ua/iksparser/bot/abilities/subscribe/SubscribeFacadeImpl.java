@@ -105,8 +105,8 @@ public class SubscribeFacadeImpl implements SubscribeFacade {
 
     @Override
     public String getInfoAboutSubscribes(String chatId) {
-        List<SubscriberEntity> subscriptions = subscriberService.findAllByChatId(chatId);
-        return view.subscriptionsDetails(subscriptions);
+        int count = subscriberService.subscribersCount(chatId);
+        return view.subscriptionsDetails(count);
     }
 
     private List<SubscriberEntity> getSubscriptions(String chatId) {
