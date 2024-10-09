@@ -29,6 +29,7 @@ telegram:
     name: MyBotT
     reconnectTimeout: 10000
     adminId: 1234567890
+    visibleName: AthleteSearch
 
 logging:
   level:

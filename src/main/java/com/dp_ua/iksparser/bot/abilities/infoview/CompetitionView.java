@@ -295,7 +295,7 @@ public class CompetitionView {
 
         InlineKeyboardButton button = SERVICE.getKeyboardButton(
                 COMPETITION + " Переглянути змагання",
-                CommandCompetitions.getCallbackCommand(0));
+                CommandCompetitions.getCallbackCommand());
         row.add(button);
         rows.add(row);
         return rows;

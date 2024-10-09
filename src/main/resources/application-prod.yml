@@ -41,6 +41,7 @@ telegram:
     name: ${IKS_TELEGRAM_BOT_NAME}
     reconnectTimeout: 10000
     adminId: ${IKS_TELEGRAM_ADMIN_ID}
+    visibleName: AthleteSearch
 
 logging:
   level:

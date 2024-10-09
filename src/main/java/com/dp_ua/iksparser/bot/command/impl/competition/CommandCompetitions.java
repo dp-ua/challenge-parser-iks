@@ -55,11 +55,15 @@ public class CommandCompetitions extends BaseCommand {
         }
     }
 
-    public static String getCallbackCommand(long page) {
-        return "/" + command + " {\"" + PAGE.getValue() + "\":\"" + page + "\"}";
+    public static String getCallbackCommand(int page) {
+        return SLASH +
+                command +
+                BRACKET_OPEN +
+                paramPage(page) +
+                BRACKET_CLOSE;
     }
 
     public static String getCallbackCommand() {
-        return "/" + command;
+        return getCallbackCommand(DEFAULT_NO_PAGE_ARGUMENT);
     }
 }

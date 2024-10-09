@@ -27,6 +27,7 @@ public enum MessageCreator {
     public static final String END_LINE = "\n";
     public static final String BOLD = "*";
     public static final String SPACE = " ";
+    public static final String SPACE_LONG = "   ";
     public static final String ITALIC = "_";
     public static final String CODE = "`";
     public static final String LINK = "[";
@@ -68,7 +69,7 @@ public enum MessageCreator {
     public List<InlineKeyboardButton> getMainButton() {
         List<InlineKeyboardButton> row = new ArrayList<>();
         InlineKeyboardButton button = SERVICE.getKeyboardButton(
-                MENU + " Повернутись в меню", "/" + CommandMenu.command
+                MENU + " Меню", "/" + CommandMenu.command
         );
         row.add(button);
         return row;

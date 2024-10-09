@@ -42,6 +42,7 @@ telegram:
     name: ${TEST_TELEGRAM_BOT_NAME}
     reconnectTimeout: 10000
     adminId: ${TEST_TELEGRAM_ADMIN_ID}
+    visibleName: AthleteSearch
 
 logging:
   level:
