@@ -10,6 +10,8 @@ public enum ResponseType {
     SEARCH_BY_BIB_NUMBER,
     FIND_PARTICIPANT_IN_COMPETITION,
 
+    NEW_EVENT_INFORM,
+
     START,
     MENU,
 }

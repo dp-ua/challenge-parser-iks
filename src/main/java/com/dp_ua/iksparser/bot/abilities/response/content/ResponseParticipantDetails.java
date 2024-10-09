@@ -9,7 +9,6 @@ import com.dp_ua.iksparser.bot.abilities.response.ResponseContentGenerator;
 import com.dp_ua.iksparser.bot.abilities.response.ResponseTypeMarker;
 import com.dp_ua.iksparser.bot.command.impl.CommandMenu;
 import com.dp_ua.iksparser.bot.command.impl.participants.CommandParticipantDetails;
-import com.dp_ua.iksparser.bot.command.impl.participants.CommandShowHeatLinesInCompetitionForParticipant;
 import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
 import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
 import lombok.extern.slf4j.Slf4j;
@@ -142,10 +141,7 @@ public class ResponseParticipantDetails implements ResponseContentGenerator {
     }
 
     private InlineKeyboardButton getCompetitionDetailsButton(String buttonText, CompetitionEntity competition, ParticipantEntity participant) {
-        return SERVICE.getKeyboardButton(
-                buttonText,
-                CommandShowHeatLinesInCompetitionForParticipant.getCallbackCommand(participant.getId(), competition.getId())
-        );
+        return competitionView.participantInCompetitionButton(buttonText, competition, participant);
     }
 
     private List<InlineKeyboardButton> getBackButton() {

@@ -1,19 +1,31 @@
 package com.dp_ua.iksparser.dba;
 
 import com.dp_ua.iksparser.App;
+import com.dp_ua.iksparser.bot.abilities.subscribe.SubscribeFacade;
 import com.dp_ua.iksparser.bot.command.CommandProvider;
+import com.dp_ua.iksparser.bot.event.SendMessageEvent;
+import com.dp_ua.iksparser.bot.performer.SendMessagePerformer;
 import com.dp_ua.iksparser.dba.entity.*;
 import com.dp_ua.iksparser.dba.service.*;
+import com.dp_ua.iksparser.service.cron.CronCompetitionUpdater;
+import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
 import java.util.List;
+import java.util.Optional;
+
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @Slf4j
 @RunWith(SpringRunner.class)
@@ -23,6 +35,10 @@ public class ComplexDBATest {
     App app;
     @MockBean
     CommandProvider commandProvider;
+    @MockBean
+    SendMessagePerformer sendMessagePerformer;
+    @MockBean
+    CronCompetitionUpdater cronCompetitionUpdater;
 
     @Autowired
     private CompetitionService competitionService;
@@ -38,39 +54,57 @@ public class ComplexDBATest {
     private ParticipantService participantService;
     @Autowired
     private CoachService coachService;
+    @Autowired
+    SubscribeFacade subscribeFacade;
+
+
+    @PostConstruct
+    public void setUp() {
+        log.warn("setUp");
+        fillDB();
+    }
+
+    @Test
+    public void shouldInformAboutNewEvents() {
+        HeatLineEntity heatLine = heatLineService.findAll().iterator().next();
+        ParticipantEntity participant = heatLine.getParticipant();
+
+        subscribeFacade.operateParticipantWithHeatlines(participant, List.of(heatLine));
+        ArgumentCaptor<SendMessageEvent> captor = ArgumentCaptor.forClass(SendMessageEvent.class);
+
+        verify(sendMessagePerformer, times(1)).onApplicationEvent(captor.capture());
+        SendMessage message = (SendMessage) captor.getValue().getMessage();
+        Assert.assertEquals("""
+                \uD83D\uDD14Ви підписані на учасника:\s
+                
+                [\uD83C\uDFC3surname firstName ](url) born\uD83C\uDF82
+                   \uD83D\uDDFA️region, team
+                Приймає участь у змаганнях: _name_
+                  \uD83D\uDCC5_ Дата: _beginDate - endDate null
+                  \uD83D\uDDFA️_ Місце проведення: _country, *city*  [посилання\uD83C\uDF10](url)
+                
+                Є результати змагання:
+                \uD83C\uDFF7️ dayName, time, [eventName, category, round](resultUrl) [\uD83D\uDCCA](resultUrl), heatName, д.1,bib.bib
+                
+                """, message.getText());
+    }
+
+    @Test
+    public void shouldGetCompetitionByHeatLine() {
+        // given
+        HeatLineEntity heatLine = heatLineService.findAll().iterator().next();
+
+        // when
+        Optional<CompetitionEntity> competition = competitionService.getCompetitionByHeatLine(heatLine);
+
+        // then
+        assert competition.isPresent();
+        assert competition.get().getName().equals("name");
+    }
 
     @Test
     @Transactional
     public void shouldSaveAndLoadFullCompetition_withEntities() {
-        // given . Create full competition with all entities
-        CompetitionEntity competition = getCompetition();
-        DayEntity day = getDay();
-        competition.addDay(day);
-        day.setCompetition(competition);
-
-        EventEntity event = getEvent();
-        day.addEvent(event);
-        event.setDay(day);
-
-        HeatEntity heat = getHeatEntity();
-        event.addHeat(heat);
-        heat.setEvent(event);
-
-        HeatLineEntity heatLine = getHeatLineEntity(heat);
-        heat.addHeatLine(heatLine);
-        heatLine.setHeat(heat);
-
-        ParticipantEntity participant = getParticipantEntity();
-        heatLine.setParticipant(participant);
-        participant.addHeatLine(heatLine);
-
-        CoachEntity coach = getCoachEntity();
-        heatLine.addCoach(coach);
-        coach.addHeatLine(heatLine);
-
-        competitionService.save(competition);
-        competitionService.flush();
-
         // when load competition by name
         CompetitionEntity competitionFromDb = competitionService.findByName("name");
 
@@ -143,6 +177,39 @@ public class ComplexDBATest {
             assert heatLineEntity.getLane().equals("1");
             assert heatLineEntity.getBib().equals("bib");
         });
+    }
+
+    private void fillDB() {
+        CompetitionEntity competition = getCompetition();
+        DayEntity day = getDay();
+        competition.addDay(day);
+        day.setCompetition(competition);
+
+        EventEntity event = getEvent();
+        day.addEvent(event);
+        event.setDay(day);
+
+        HeatEntity heat = getHeatEntity();
+        event.addHeat(heat);
+        heat.setEvent(event);
+
+        HeatLineEntity heatLine = getHeatLineEntity(heat);
+        log.warn("heatLine: {}", heatLine.getId());
+        heat.addHeatLine(heatLine);
+        heatLine.setHeat(heat);
+
+        ParticipantEntity participant = getParticipantEntity();
+        heatLine.setParticipant(participant);
+        participant.addHeatLine(heatLine);
+
+        CoachEntity coach = getCoachEntity();
+        heatLine.addCoach(coach);
+        coach.addHeatLine(heatLine);
+
+        competitionService.save(competition);
+        competitionService.flush();
+
+        subscribeFacade.subscribe("chatId", participant);
     }
 
     private CoachEntity getCoachEntity() {

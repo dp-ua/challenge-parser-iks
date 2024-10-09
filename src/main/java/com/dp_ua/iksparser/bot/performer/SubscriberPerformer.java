@@ -7,7 +7,6 @@ import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
@@ -19,8 +18,6 @@ import java.util.Map;
 public class SubscriberPerformer implements ApplicationListener<SubscribeEvent> {
     @Autowired
     SubscribeFacade facade;
-    @Autowired
-    ApplicationEventPublisher publisher;
 
     @Override
     @Transactional

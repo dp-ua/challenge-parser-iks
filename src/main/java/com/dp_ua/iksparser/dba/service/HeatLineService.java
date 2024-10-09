@@ -31,6 +31,9 @@ public class HeatLineService {
         return repo.findById(id);
     }
 
+    public Iterable<HeatLineEntity> findAll() {
+        return repo.findAll();
+    }
     public HeatLineDto convertToDto(HeatLineEntity heatLineEntity) {
         HeatLineDto dto = new HeatLineDto();
         dto.setId(heatLineEntity.getId());
