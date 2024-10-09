@@ -3,9 +3,11 @@ package com.dp_ua.iksparser.bot.abilities.infoview;
 import com.dp_ua.iksparser.bot.Icon;
 import com.dp_ua.iksparser.bot.command.impl.competition.CommandCompetition;
 import com.dp_ua.iksparser.bot.command.impl.competition.CommandCompetitions;
+import com.dp_ua.iksparser.bot.command.impl.participants.CommandShowHeatLinesInCompetitionForParticipant;
 import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
 import com.dp_ua.iksparser.dba.entity.CompetitionStatus;
 import com.dp_ua.iksparser.dba.entity.HeatLineEntity;
+import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
 import com.dp_ua.iksparser.service.YearRange;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
@@ -341,5 +343,12 @@ public class CompetitionView {
 
         keyboard.setKeyboard(rows);
         return keyboard;
+    }
+
+    public InlineKeyboardButton participantInCompetitionButton(String buttonText, CompetitionEntity competition, ParticipantEntity participant) {
+        return SERVICE.getKeyboardButton(
+                buttonText,
+                CommandShowHeatLinesInCompetitionForParticipant.getCallbackCommand(participant.getId(), competition.getId())
+        );
     }
 }

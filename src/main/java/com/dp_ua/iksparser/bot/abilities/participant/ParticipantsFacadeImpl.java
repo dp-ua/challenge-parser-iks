@@ -21,7 +21,6 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 import java.util.List;
-import java.util.Optional;
 
 import static com.dp_ua.iksparser.bot.abilities.response.ResponseType.*;
 import static com.dp_ua.iksparser.bot.command.CommandArgumentName.*;
@@ -44,26 +43,6 @@ public class ParticipantsFacadeImpl extends FacadeMethods implements Participant
     StateService stateService;
     @Autowired
     CompetitionService competitionService;
-
-    @Override
-    public void subscribe(String chatId, long commandArgument, Integer editMessageId) {
-        log.info("SUBSCRIBE chatId: {}, commandArgument: {}", chatId, commandArgument);
-        Optional<ParticipantEntity> optionalParticipant = participantService.findById(commandArgument);
-        optionalParticipant.ifPresent(participant -> {
-            subscribeFacade.subscribe(chatId, participant);
-            subscribeFacade.inform(chatId, participant, editMessageId);
-        });
-    }
-
-    @Override
-    public void unsubscribe(String chatId, long commandArgument, Integer editMessageId) {
-        log.info("UNSUBSCRIBE chatId: {}, commandArgument: {}", chatId, commandArgument);
-        Optional<ParticipantEntity> optionalParticipant = participantService.findById(commandArgument);
-        optionalParticipant.ifPresent(participant -> {
-            subscribeFacade.unsubscribe(chatId, participant);
-            subscribeFacade.inform(chatId, participant, editMessageId);
-        });
-    }
 
     @Override
     public String getInfoAboutParticipants() {

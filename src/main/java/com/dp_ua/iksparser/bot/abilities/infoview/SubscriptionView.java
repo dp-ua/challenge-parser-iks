@@ -1,8 +1,6 @@
 package com.dp_ua.iksparser.bot.abilities.infoview;
 
-import com.dp_ua.iksparser.bot.command.impl.subscribe.CommandSubscribe;
 import com.dp_ua.iksparser.bot.command.impl.subscribe.CommandSubscriptionsList;
-import com.dp_ua.iksparser.bot.command.impl.subscribe.CommandUnsubscribe;
 import com.dp_ua.iksparser.dba.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -75,17 +73,6 @@ public class SubscriptionView {
         return result;
     }
 
-
-    public String subscriptionText(ParticipantEntity participant, boolean subscribed) {
-        String text = participantView.info(participant);
-        if (subscribed) {
-            text = SUBSCRIBE + " Ви підписані на спортсмена: " + END_LINE + text;
-        } else {
-            text = UNSUBSCRIBE + " Ви відписані від спортсмена: " + END_LINE + text;
-        }
-        return text;
-    }
-
     private InlineKeyboardButton button(boolean subscribed, String callbackData) {
         return subscribed ?
                 SERVICE.getKeyboardButton(BUTTON_TEXT_UNSUBSCRIBE, callbackData) :
@@ -98,31 +85,6 @@ public class SubscriptionView {
 
     public InlineKeyboardButton buttonUnsubscribe(String callbackData) {
         return button(true, callbackData);
-    }
-
-    // todo remove. use buttonSubscribe and buttonUnsubscribe instead
-    public InlineKeyboardMarkup button(ParticipantEntity participant, boolean subscribed) {
-        InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
-        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
-
-        List<InlineKeyboardButton> row = new ArrayList<>();
-        InlineKeyboardButton button;
-        if (subscribed) {
-            button = SERVICE.getKeyboardButton(
-                    BUTTON_TEXT_UNSUBSCRIBE,
-                    "/" + CommandUnsubscribe.command + " " + participant.getId()
-            );
-        } else {
-            button = SERVICE.getKeyboardButton(
-                    BUTTON_TEXT_SUBSCRIBE,
-                    "/" + CommandSubscribe.command + " " + participant.getId()
-            );
-        }
-        row.add(button);
-        rows.add(row);
-
-        keyboard.setKeyboard(rows);
-        return keyboard;
     }
 
     public String subscriptions(List<SubscriberEntity> subscriptions) {

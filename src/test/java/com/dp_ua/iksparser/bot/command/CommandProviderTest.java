@@ -53,10 +53,8 @@ public class CommandProviderTest {
                         participants
                         salps
                         showhtlincomfpart
-                        subscribe
                         subscriptions
-                        subscriptionslist
-                        unsubscribe""",
+                        subscriptionslist""",
                 actual);
     }
 

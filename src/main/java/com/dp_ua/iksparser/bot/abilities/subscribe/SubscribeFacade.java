@@ -14,8 +14,6 @@ public interface SubscribeFacade {
 
     void unsubscribe(String chatId, ParticipantEntity participant);
 
-    void inform(String chatId, ParticipantEntity participant, Integer editMessageId);
-
     void operateParticipantWithHeatlines(ParticipantEntity participant, List<HeatLineEntity> heatLines);
 
     void showSubscriptions(String chatId, long commandArgument, Integer editMessageId);

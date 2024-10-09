@@ -6,9 +6,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CompetitionRepo extends CrudRepository<CompetitionEntity, Long> {
@@ -18,6 +20,8 @@ public interface CompetitionRepo extends CrudRepository<CompetitionEntity, Long>
 
     List<CompetitionEntity> findAllByOrderByUpdated();
 
+    @Override
+    @NonNull
     List<CompetitionEntity> findAll();
 
     void flush();
@@ -37,5 +41,13 @@ public interface CompetitionRepo extends CrudRepository<CompetitionEntity, Long>
 
     @Query("SELECT c FROM CompetitionEntity c WHERE c.days IS NOT EMPTY")
     List<CompetitionEntity> findAllWithFilledDays();
+
+    @Query("SELECT c FROM HeatLineEntity hl " +
+            "JOIN hl.heat h " +
+            "JOIN h.event e " +
+            "JOIN e.day d " +
+            "JOIN d.competition c " +
+            "WHERE hl.id = :id")
+    Optional<CompetitionEntity> findCompetitionByHeatLine(Long id);
 }
 
