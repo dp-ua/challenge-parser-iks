@@ -75,15 +75,30 @@ public class MenuView {
                 .append(botURL)
                 .append(LINK_SEPARATOR_END)
                 .append(END_LINE)
-                .append("Я допоможу тобі знайти інформацію про змагання")
+                .append(END_LINE)
+                .append("Я допоможу тобі знайти інформацію про")
+                .append(END_LINE)
+                .append(SPACE_LONG)
                 .append(EVENT)
-                .append(", спортсменів")
+                .append(SPACE)
+                .append("змагання")
+                .append(END_LINE)
+                .append(SPACE_LONG)
                 .append(ATHLETE)
-                .append(" та тренерів")
+                .append(SPACE)
+                .append("спортсменів")
+                .append(END_LINE)
+                .append(SPACE_LONG)
                 .append(COACH)
+                .append(SPACE)
+                .append("та тренерів")
+
                 .append(END_LINE)
                 .append(END_LINE)
-                .append("Для початку роботи скористайся кнопкою в меню");
+                .append("Для початку роботи скористайся кнопкою меню")
+                .append(SPACE)
+                .append(MENU);
+
         return sb.toString();
     }
 

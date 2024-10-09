@@ -11,4 +11,5 @@ public enum ResponseType {
     FIND_PARTICIPANT_IN_COMPETITION,
 
     START,
+    MENU,
 }
