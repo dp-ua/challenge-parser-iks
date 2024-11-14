@@ -1,27 +1,15 @@
 #For Docker and Prod server
 server:
   port: 8181
-#  servlet:
-#    context-path: /iksparser
 management:
   endpoints:
     web:
       exposure:
         include: health
 
-view:
-  participants:
-    pageSize: 10
-  competitions:
-    general:
-      pageSize: 5
-    detailed:
-      pageSize: 3
-
 spring:
   config:
-    activate:
-      on-profile: prod
+    import: application-common.yml
   datasource:
     url: jdbc:postgresql://iks-db/iks_db
     driver-class-name: org.postgresql.Driver
@@ -48,9 +36,3 @@ logging:
     root: INFO
     com.dp_ua: INFO
     com.dp_ua.iksparser.dba: WARN
-
-  file:
-    name: ./logs/file.log
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

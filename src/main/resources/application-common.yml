@@ -1,0 +1,15 @@
+view:
+  participants:
+    pageSize: 10
+  competitions:
+    general:
+      pageSize: 5
+    detailed:
+      pageSize: 3
+
+logging:
+  file:
+    name: ./logs/file.log
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
