@@ -1,22 +1,15 @@
 #For local test in IDE
 server:
   port: 8181
-    #  servlet:
-    #    context-path: /iksparser
 management:
   endpoints:
     web:
       exposure:
         include: health
 
-view:
-  participants:
-    pageSize: 10
-
 spring:
   config:
-    activate:
-      on-profile: dev
+    import: application-common.yml
   datasource:
     url: jdbc:h2:mem:mydb
     driverClassName: org.h2.Driver
@@ -48,9 +41,3 @@ logging:
     root: INFO
     com.dp_ua: DEBUG
     com.dp_ua.iksparser.dba: INFO
-
-  file:
-    name: ./logs/file.log
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

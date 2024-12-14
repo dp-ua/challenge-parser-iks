@@ -1,27 +1,15 @@
 #For local test in IDE
 server:
   port: 8181
-    #  servlet:
-    #    context-path: /iksparser
 management:
   endpoints:
     web:
       exposure:
         include: health
 
-view:
-  participants:
-    pageSize: 10
-  competitions:
-    general:
-      pageSize: 5
-    detailed:
-      pageSize: 3
-
 spring:
   config:
-    activate:
-      on-profile: dev-postgres
+    import: application-common.yml
   datasource:
     url: jdbc:postgresql://172.25.70.57/iks_db
     driver-class-name: org.postgresql.Driver
@@ -30,8 +18,8 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
+      show-sql: true
       ddl-auto: update
-    show-sql: true
   output:
     ansi:
       enabled: DETECT
@@ -49,9 +37,3 @@ logging:
     root: INFO
     com.dp_ua: DEBUG
     com.dp_ua.iksparser.dba: INFO
-
-  file:
-    name: ./logs/file.log
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

@@ -27,12 +27,17 @@ public class ResponseInformAboutNewEvents implements ResponseContentGenerator {
     private static final int ARGS_PARTICIPANT_INDEX = 0;
     private static final int ARGS_COMPETITION_INDEX = 1;
     private static final int ARGS_HEATLINES_INDEX = 2;
-    @Autowired
-    SubscriptionView subscriptionView;
-    @Autowired
-    ParticipantView participantView;
-    @Autowired
-    CompetitionView competitionView;
+    private final SubscriptionView subscriptionView;
+    private final ParticipantView participantView;
+    private final CompetitionView competitionView;
+
+    public ResponseInformAboutNewEvents(@Autowired SubscriptionView subscriptionView,
+                                        @Autowired ParticipantView participantView,
+                                        @Autowired CompetitionView competitionView) {
+        this.subscriptionView = subscriptionView;
+        this.participantView = participantView;
+        this.competitionView = competitionView;
+    }
 
     @Override
     public String messageText(Object... args) {
@@ -58,8 +63,13 @@ public class ResponseInformAboutNewEvents implements ResponseContentGenerator {
                 competition,
                 participant);
 
-        keyboardRows.add(List.of(participantButton));
-        keyboardRows.add(List.of(competitionInfoButton));
+        // TODO make return Optional
+        if (participantButton != null) {
+            keyboardRows.add(List.of(participantButton));
+        }
+        if (competitionInfoButton != null) {
+            keyboardRows.add(List.of(competitionInfoButton));
+        }
 
         return keyboard;
     }
