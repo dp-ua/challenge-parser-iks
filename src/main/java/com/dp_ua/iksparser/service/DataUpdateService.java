@@ -122,13 +122,13 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
         return isDateForUpdate(date, now) || isStatusForUpdate(status);
     }
 
-    private static boolean isStatusForUpdate(String status) {
+    private boolean isStatusForUpdate(String status) {
         return C_IN_PROGRESS.getName().equals(status) ||
                 C_NOT_STARTED.getName().equals(status) ||
                 C_PLANED.getName().equals(status);
     }
 
-    private static boolean isDateForUpdate(LocalDate date, LocalDate now) {
+    private boolean isDateForUpdate(LocalDate date, LocalDate now) {
         return date.isEqual(now) ||                                    // today
                 date.isEqual(now.minusDays(1)) || // yesterday
                 date.isEqual(now.minusDays(2)); // day before yesterday
@@ -198,7 +198,7 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
         return participations;
     }
 
-    private static void extractParticipants(HeatEntity heat, Map<ParticipantEntity, List<HeatLineEntity>> participations) {
+    private  void extractParticipants(HeatEntity heat, Map<ParticipantEntity, List<HeatLineEntity>> participations) {
         heat.getHeatLines().forEach(heatLine -> {
             ParticipantEntity participant = heatLine.getParticipant();
             if (participations.containsKey(participant)) {
@@ -258,7 +258,7 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
         day.addEvent(event);
     }
 
-    private static boolean isHasNewInformation(EventEntity newEvent, EventEntity oldEvent) {
+    private boolean isHasNewInformation(EventEntity newEvent, EventEntity oldEvent) {
         return newEvent.hasResultUrl() && !oldEvent.hasResultUrl() ||
                 newEvent.hasStartListUrl() && !oldEvent.hasStartListUrl();
     }
