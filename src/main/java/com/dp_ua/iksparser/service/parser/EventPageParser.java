@@ -10,6 +10,7 @@ import com.dp_ua.iksparser.dba.service.HeatService;
 import com.dp_ua.iksparser.dba.service.ParticipantService;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
@@ -26,13 +27,16 @@ public class EventPageParser {
     private final ParticipantService participantService;
     private final CoachService coachService;
     private final HeatLineService heatLineService;
+    private final ServiceParser serviceParser;
 
     public EventPageParser(HeatService heatService, ParticipantService participantService,
-                           CoachService coachService, HeatLineService heatLineService) {
+                           CoachService coachService, HeatLineService heatLineService,
+                           ServiceParser serviceParser) {
         this.heatService = heatService;
         this.participantService = participantService;
         this.coachService = coachService;
         this.heatLineService = heatLineService;
+        this.serviceParser = serviceParser;
     }
 
     @Transactional
@@ -92,8 +96,8 @@ public class EventPageParser {
     }
 
     private ParticipantEntity getParticipantFromRow(Elements cells) {
-        String surname = cleanEmoji(cells.get(5).childNode(0).childNode(0).toString());
-        String name = cleanEmoji(cells.get(6).childNode(0).childNode(0).toString());
+        String surname = normalizeText(parseSurname(cells));
+        String name = normalizeText(parseName(cells));
         String team = cells.get(9).text();
         String region = cells.get(8).text();
         String born = cells.get(7).text();
@@ -107,9 +111,30 @@ public class EventPageParser {
         return participant;
     }
 
-    private String cleanEmoji(String input) {
-        // Удаляем эмодзи 🎂
-        return input.replace("🎂", "").trim();
+    private String parseSurname(Elements cells) {
+        try {
+            return cells.get(5).childNode(0).childNode(0).toString();
+        } catch (Exception e) {
+            log.error("Surname not found.");
+            return "";
+        }
+    }
+
+    private String parseName(Elements cells) {
+        try {
+            return cells.get(6).childNode(0).childNode(0).toString();
+        } catch (Exception e) {
+            log.error("Name not found.");
+            return "";
+        }
+    }
+
+    private String normalizeText(String text) {
+        String result = serviceParser.cleanTextFromEmoji(text);
+        if (!StringUtils.equals(result, text)) {
+            log.info("Text normalized: [{}] -> [{}]", text, result);
+        }
+        return result;
     }
 
     private void setRelationsBetweenHeatAndHeatLine(HeatEntity heat, HeatLineEntity heatLine) {
