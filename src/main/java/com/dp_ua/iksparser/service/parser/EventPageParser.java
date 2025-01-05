@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 @Component
 @Slf4j
@@ -84,8 +85,7 @@ public class EventPageParser {
     }
 
     private static List<String> getCoachesFromRow(Elements cells) {
-        return List.of(cells.get(10).text().split(","))
-                .stream()
+        return Stream.of(cells.get(10).text().split(","))
                 .map(String::trim)
                 .filter(s -> !s.isEmpty())
                 .toList();
