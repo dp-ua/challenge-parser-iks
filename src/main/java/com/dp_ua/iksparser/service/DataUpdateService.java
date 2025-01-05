@@ -107,7 +107,7 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
         List<EventEntity> newEvents = operateAndGetNewEventsForDays(competition, document);
         Map<ParticipantEntity, List<HeatLineEntity>> participations = operateEventsToParseHeats(newEvents);
         competitionService.save(competition); // save all cascades
-        if (participations.size() > 0 && isNeedToInformSubscribers(competition)) {
+        if (!participations.isEmpty() && isNeedToInformSubscribers(competition)) {
             log.info("Informing subscribers about new participants: [{}]", participations.size());
             publisher.publishEvent(new SubscribeEvent(this, participations));
         } else {
@@ -122,13 +122,13 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
         return isDateForUpdate(date, now) || isStatusForUpdate(status);
     }
 
-    private static boolean isStatusForUpdate(String status) {
+    private boolean isStatusForUpdate(String status) {
         return C_IN_PROGRESS.getName().equals(status) ||
                 C_NOT_STARTED.getName().equals(status) ||
                 C_PLANED.getName().equals(status);
     }
 
-    private static boolean isDateForUpdate(LocalDate date, LocalDate now) {
+    private boolean isDateForUpdate(LocalDate date, LocalDate now) {
         return date.isEqual(now) ||                                    // today
                 date.isEqual(now.minusDays(1)) || // yesterday
                 date.isEqual(now.minusDays(2)); // day before yesterday
@@ -198,7 +198,7 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
         return participations;
     }
 
-    private static void extractParticipants(HeatEntity heat, Map<ParticipantEntity, List<HeatLineEntity>> participations) {
+    private void extractParticipants(HeatEntity heat, Map<ParticipantEntity, List<HeatLineEntity>> participations) {
         heat.getHeatLines().forEach(heatLine -> {
             ParticipantEntity participant = heatLine.getParticipant();
             if (participations.containsKey(participant)) {
@@ -213,43 +213,69 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
 
     private List<EventEntity> operateAndGetNewEventsForDays(CompetitionEntity competition, Document document) {
         List<EventEntity> newEventResults = new ArrayList<>();
+
         competition.getDays().forEach(day -> {
-            List<EventEntity> updatedEvents = new ArrayList<>();
-            try {
-                updatedEvents = competitionParser.getUnsavedEvents(document, day);
-            } catch (Exception e) {
-                log.warn("Error parsing events for competition[{}], day[{}]: {}",
-                        competition.getId(), day.getDateId(), e.getMessage());
-            }
+            List<EventEntity> updatedEvents = getUpdatedEvents(competition, document, day);
             List<EventEntity> oldEvents = day.getEvents();
 
             if (oldEvents.isEmpty()) {
-                updatedEvents.forEach(event -> {
-                    if (event.hasStartListUrl()) {
-                        newEventResults.add(event);
-                    }
-                    saveEventAndSetRelationsToDay(event, day);
-                });
+                newEventResults.addAll(handleNewEvents(day, updatedEvents));
             } else {
-                updatedEvents.forEach(newEvent -> oldEvents.stream()
-                        .filter(newEvent::isTheSame)
-                        .findFirst()
-                        .ifPresentOrElse(oldEvent -> {
-                                    if (isHasNewInformation(newEvent, oldEvent)) {
-                                        newEventResults.add(oldEvent);
-                                        oldEvent.updateEventDetails(newEvent);
-                                    }
-                                },
-                                () -> {
-                                    saveEventAndSetRelationsToDay(newEvent, day);
-                                    if (newEvent.hasStartListUrl() || newEvent.hasResultUrl()) {
-                                        newEventResults.add(newEvent);
-                                    }
-                                }
-                        ));
+                newEventResults.addAll(processUpdatedEvents(day, updatedEvents, oldEvents));
             }
         });
+
         return newEventResults;
+    }
+
+    private List<EventEntity> getUpdatedEvents(CompetitionEntity competition, Document document, DayEntity day) {
+        try {
+            return competitionParser.getUnsavedEvents(document, day);
+        } catch (Exception e) {
+            log.warn("Error parsing events for competition[{}], day[{}]: {}",
+                    competition.getId(), day.getDateId(), e.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    private List<EventEntity> handleNewEvents(DayEntity day, List<EventEntity> updatedEvents) {
+        List<EventEntity> newResults = new ArrayList<>();
+        updatedEvents.forEach(event -> {
+            if (event.hasStartListUrl()) {
+                newResults.add(event);
+            }
+            saveEventAndSetRelationsToDay(event, day);
+        });
+        return newResults;
+    }
+
+    private List<EventEntity> processUpdatedEvents(DayEntity day, List<EventEntity> updatedEvents, List<EventEntity> oldEvents) {
+        return updatedEvents.stream()
+                .map(newEvent -> oldEvents.stream()
+                        .filter(newEvent::isTheSame)
+                        .findFirst()
+                        .map(oldEvent -> handleExistingEvent(newEvent, oldEvent))
+                        .orElseGet(() -> handleNewEvent(day, newEvent))
+                )
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList();
+    }
+
+    private Optional<EventEntity> handleExistingEvent(EventEntity newEvent, EventEntity oldEvent) {
+        if (isHasNewInformation(newEvent, oldEvent)) {
+            oldEvent.updateEventDetails(newEvent);
+            return Optional.of(oldEvent);
+        }
+        return Optional.empty();
+    }
+
+    private Optional<EventEntity> handleNewEvent(DayEntity day, EventEntity newEvent) {
+        saveEventAndSetRelationsToDay(newEvent, day);
+        if (newEvent.hasStartListUrl() || newEvent.hasResultUrl()) {
+            return Optional.of(newEvent);
+        }
+        return Optional.empty();
     }
 
     private void saveEventAndSetRelationsToDay(EventEntity event, DayEntity day) {
@@ -258,7 +284,7 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
         day.addEvent(event);
     }
 
-    private static boolean isHasNewInformation(EventEntity newEvent, EventEntity oldEvent) {
+    private boolean isHasNewInformation(EventEntity newEvent, EventEntity oldEvent) {
         return newEvent.hasResultUrl() && !oldEvent.hasResultUrl() ||
                 newEvent.hasStartListUrl() && !oldEvent.hasStartListUrl();
     }

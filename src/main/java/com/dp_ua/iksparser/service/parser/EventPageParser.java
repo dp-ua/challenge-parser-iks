@@ -12,24 +12,28 @@ import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 @Component
 @Slf4j
 public class EventPageParser {
-    @Autowired
-    private HeatService heatService;
-    @Autowired
-    private ParticipantService participantService;
-    @Autowired
-    private CoachService coachService;
-    @Autowired
-    private HeatLineService heatLineService;
+    private final HeatService heatService;
+    private final ParticipantService participantService;
+    private final CoachService coachService;
+    private final HeatLineService heatLineService;
+
+    public EventPageParser(HeatService heatService, ParticipantService participantService,
+                           CoachService coachService, HeatLineService heatLineService) {
+        this.heatService = heatService;
+        this.participantService = participantService;
+        this.coachService = coachService;
+        this.heatLineService = heatLineService;
+    }
 
     @Transactional
     public List<HeatEntity> getHeats(Document document) {
@@ -81,16 +85,15 @@ public class EventPageParser {
     }
 
     private static List<String> getCoachesFromRow(Elements cells) {
-        return List.of(cells.get(10).text().split(","))
-                .stream()
+        return Stream.of(cells.get(10).text().split(","))
                 .map(String::trim)
                 .filter(s -> !s.isEmpty())
                 .toList();
     }
 
     private ParticipantEntity getParticipantFromRow(Elements cells) {
-        String surname = cells.get(5).childNode(0).childNode(0).toString();
-        String name = cells.get(6).childNode(0).childNode(0).toString();
+        String surname = cleanEmoji(cells.get(5).childNode(0).childNode(0).toString());
+        String name = cleanEmoji(cells.get(6).childNode(0).childNode(0).toString());
         String team = cells.get(9).text();
         String region = cells.get(8).text();
         String born = cells.get(7).text();
@@ -102,6 +105,11 @@ public class EventPageParser {
         }
         updateParticipantUrl(participant, url);
         return participant;
+    }
+
+    private String cleanEmoji(String input) {
+        // Удаляем эмодзи 🎂
+        return input.replace("🎂", "").trim();
     }
 
     private void setRelationsBetweenHeatAndHeatLine(HeatEntity heat, HeatLineEntity heatLine) {

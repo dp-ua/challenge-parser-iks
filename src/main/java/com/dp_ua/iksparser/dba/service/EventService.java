@@ -1,7 +1,8 @@
 package com.dp_ua.iksparser.dba.service;
 
-import com.dp_ua.iksparser.dba.entity.EventEntity;
 import com.dp_ua.iksparser.dba.dto.EventDto;
+import com.dp_ua.iksparser.dba.entity.DomainElement;
+import com.dp_ua.iksparser.dba.entity.EventEntity;
 import com.dp_ua.iksparser.dba.repo.EventRepo;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,10 +32,6 @@ public class EventService {
         return repo.findById(id).orElse(null);
     }
 
-    public List<EventDto> convertToDtoList(List<EventEntity> events) {
-        return events.stream().map(this::convertToDto).toList();
-    }
-
     public EventDto convertToDto(EventEntity eventEntity) {
         EventDto eventDto = new EventDto();
         eventDto.setId(eventEntity.getId());
@@ -44,7 +41,11 @@ public class EventService {
         eventDto.setRound(eventEntity.getRound());
         eventDto.setStartListUrl(eventEntity.getStartListUrl());
         eventDto.setResultUrl(eventEntity.getResultUrl());
-        eventDto.setHeats(eventEntity.getHeats().stream().map(heat -> heat.getId()).toList());
+        eventDto.setHeats(eventEntity.getHeats().stream().map(DomainElement::getId).toList());
         return eventDto;
+    }
+
+    public void delete(EventEntity event) {
+        repo.delete(event);
     }
 }
