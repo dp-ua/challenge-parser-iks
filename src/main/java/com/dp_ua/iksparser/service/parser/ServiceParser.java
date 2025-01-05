@@ -19,12 +19,16 @@ public class ServiceParser {
         return new DayEntity(date, dateId, dayName, dayNameEn);
     }
 
-    private static void checkParts(String[] parts) {
+    private void checkParts(String[] parts) {
         if (parts.length != 7) {
             throw new IllegalArgumentException("Wrong input string");
         }
         if (!parts[3].equals("|")) {
             throw new IllegalArgumentException("Wrong input string");
         }
+    }
+
+    public String cleanTextFromEmoji(String input) {
+        return input.replaceAll("[\\p{So}\\p{Cn}]", "").trim();
     }
 }
