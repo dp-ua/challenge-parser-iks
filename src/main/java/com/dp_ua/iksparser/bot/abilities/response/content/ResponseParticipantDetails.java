@@ -138,7 +138,7 @@ public class ResponseParticipantDetails implements ResponseContentGenerator {
 
         for (int i = 0; i < competitions.size(); i++) {
             CompetitionEntity competition = competitions.get(i);
-            String buttonText = Icon.getIconicNumber(i + 1) + " " + competitionView.icon(competition) + " " + competition.getName();
+            String buttonText = Icon.getIconicNumber(i + 1) + " " + competitionView.icon(competition).orElse(Icon.LOOK) + " " + competition.getName();
             row.add(getCompetitionDetailsButton(buttonText, competition, participant));
         }
         return row;
