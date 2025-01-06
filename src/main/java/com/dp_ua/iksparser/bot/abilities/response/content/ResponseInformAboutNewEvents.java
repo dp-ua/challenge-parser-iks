@@ -57,19 +57,14 @@ public class ResponseInformAboutNewEvents implements ResponseContentGenerator {
         List<List<InlineKeyboardButton>> keyboardRows = new ArrayList<>();
         keyboard.setKeyboard(keyboardRows);
 
-        InlineKeyboardButton participantButton = participantView.getParticipantProfileButtonLink(participant);
+        participantView.getParticipantProfileButtonLink(participant)
+                .ifPresent(button -> keyboardRows.add(List.of(button)));
+
         InlineKeyboardButton competitionInfoButton = competitionView.participantInCompetitionButton(
                 Icon.COMPETITION + " Інформація по змаганню",
                 competition,
                 participant);
-
-        // TODO make return Optional
-        if (participantButton != null) {
-            keyboardRows.add(List.of(participantButton));
-        }
-        if (competitionInfoButton != null) {
-            keyboardRows.add(List.of(competitionInfoButton));
-        }
+        keyboardRows.add(List.of(competitionInfoButton));
 
         return keyboard;
     }

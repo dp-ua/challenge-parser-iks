@@ -13,13 +13,14 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.dp_ua.iksparser.bot.Icon.*;
 import static com.dp_ua.iksparser.service.MessageCreator.*;
 
 @Component
 public class ParticipantView {
-    public static int ROW_LIMIT_BUTTON = 5; //todo move to properties
+    public static final int ROW_LIMIT_BUTTON = 5; //todo move to properties
 
     public String info(ParticipantEntity participant) {
         StringBuilder sb = new StringBuilder();
@@ -61,15 +62,15 @@ public class ParticipantView {
                 END_LINE;
     }
 
-    public InlineKeyboardButton getParticipantProfileButtonLink(ParticipantEntity participant) {
+    public Optional<InlineKeyboardButton> getParticipantProfileButtonLink(ParticipantEntity participant) {
         String url = participant.getUrl();
         if (url != null && !url.isEmpty()) {
-            return SERVICE.getURLButton(
+            return Optional.of(SERVICE.getKeyboardButton(
                     ATHLETE + " Профіль спортсмена",
                     participant.getUrl()
-            );
+            ));
         }
-        return null;
+        return Optional.empty();
     }
 
     public InlineKeyboardMarkup getShowParticipantsKeyboard() {

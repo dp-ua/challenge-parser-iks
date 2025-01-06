@@ -12,7 +12,6 @@ import com.dp_ua.iksparser.bot.command.impl.participants.CommandParticipantDetai
 import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
 import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
@@ -22,6 +21,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import static com.dp_ua.iksparser.bot.abilities.response.ResponseType.PARTICIPANT_DETAILS;
 import static com.dp_ua.iksparser.service.MessageCreator.END_LINE;
@@ -38,12 +38,16 @@ public class ResponseParticipantDetails implements ResponseContentGenerator {
     private static final int ARGS_SUBSCRIBED_INDEX = 2;
     public static final String TEXT_TOOK_PART_IN_COMPETITIONS = "Приймав участь у змаганнях:";
     public static final String TEXT_DIDNT_TAKE_PART_IN_COMPETITIONS = "Не приймав участь у змаганнях";
-    @Autowired
-    ParticipantView participantView;
-    @Autowired
-    CompetitionView competitionView;
-    @Autowired
-    SubscriptionView subscriptionView;
+    private final ParticipantView participantView;
+    private final CompetitionView competitionView;
+    private final SubscriptionView subscriptionView;
+
+    public ResponseParticipantDetails(ParticipantView participantView, CompetitionView competitionView,
+                                      SubscriptionView subscriptionView) {
+        this.participantView = participantView;
+        this.competitionView = competitionView;
+        this.subscriptionView = subscriptionView;
+    }
 
     @Override
     public String messageText(Object... args) {
@@ -90,11 +94,11 @@ public class ResponseParticipantDetails implements ResponseContentGenerator {
     }
 
     private List<InlineKeyboardButton> getProfileButton(ParticipantEntity participant) {
-        InlineKeyboardButton button = participantView.getParticipantProfileButtonLink(participant);
         List<InlineKeyboardButton> row = new ArrayList<>();
-        if (button != null) {
-            row.add(button);
-        }
+
+        participantView.getParticipantProfileButtonLink(participant)
+                .ifPresent(row::add);
+
         return row;
     }
 
@@ -189,17 +193,34 @@ public class ResponseParticipantDetails implements ResponseContentGenerator {
         if (args.length != ARGS_SIZE) {
             throw new IllegalArgumentException("Invalid args size: " + args.length + ", expected: " + ARGS_SIZE);
         }
-        Optional<?> argumentObject = getArgumentObject(ARGS_PARTICIPANT_INDEX, args);
-        if (argumentObject.isEmpty() || !(argumentObject.get() instanceof ParticipantEntity)) {
-            throw new IllegalArgumentException("Invalid argument type: " + argumentObject.get().getClass().getName());
+
+        validateArgument(
+                getArgumentObject(ARGS_PARTICIPANT_INDEX, args),
+                ParticipantEntity.class::isInstance,
+                "Expected ParticipantEntity"
+        );
+
+        validateArgument(
+                getArgumentObject(ARGS_COMPETITIONS_INDEX, args),
+                value -> value instanceof Page<?>,
+                "Expected Page<?>"
+        );
+
+        validateArgument(
+                getArgument(ARGS_SUBSCRIBED_INDEX, args),
+                value -> value.matches("true|false"),
+                "Expected 'true' or 'false'"
+        );
+    }
+
+
+    private <T> void validateArgument(Optional<T> argument, Predicate<T> predicate, String errorMessage) {
+        if (argument.isEmpty()) {
+            throw new IllegalArgumentException("Argument is missing: " + errorMessage);
         }
-        argumentObject = getArgumentObject(ARGS_COMPETITIONS_INDEX, args);
-        if (argumentObject.isEmpty() || !(argumentObject.get() instanceof Page<?>)) {
-            throw new IllegalArgumentException("Invalid argument type: " + argumentObject.get().getClass().getName());
-        }
-        Optional<String> argument = getArgument(ARGS_SUBSCRIBED_INDEX, args);
-        if (argument.isEmpty() || !argument.get().matches("true|false")) {
-            throw new IllegalArgumentException("Invalid argument type: " + argument.get().getClass().getName());
+        T value = argument.get();
+        if (!predicate.test(value)) {
+            throw new IllegalArgumentException("Invalid argument: " + errorMessage + ", got: " + value.getClass().getName());
         }
     }
 
