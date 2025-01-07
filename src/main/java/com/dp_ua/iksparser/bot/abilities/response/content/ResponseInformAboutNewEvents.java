@@ -69,10 +69,12 @@ public class ResponseInformAboutNewEvents implements ResponseContentGenerator {
         return keyboard;
     }
 
+    @SuppressWarnings("unchecked")
     private CompetitionEntity getCompetition(Object[] args) {
         return (CompetitionEntity) getArgumentObject(ARGS_COMPETITION_INDEX, args).orElseThrow();
     }
 
+    @SuppressWarnings("unchecked")
     private List<HeatLineEntity> getHeatLines(Object[] args) {
         return (List<HeatLineEntity>) getArgumentObject(ARGS_HEATLINES_INDEX, args).orElseThrow();
     }
