@@ -230,15 +230,14 @@ public class CompetitionView {
     }
 
     public Optional<Icon> icon(CompetitionEntity competition) {
-        CompetitionStatus status = CompetitionStatus.getByName(competition.getStatus());
-        return switch (status) {
-            case C_CANCELED -> Optional.of(GRAY_CIRCLE);
-            case C_PLANED -> Optional.of(BLUE_CIRCLE);
-            case C_NOT_STARTED -> Optional.of(GREEN_CIRCLE);
-            case C_IN_PROGRESS -> Optional.of(RED_CIRCLE);
-            case C_FINISHED -> Optional.of(LIGHT_GRAY_CIRCLE);
-            default -> Optional.empty();
-        };
+        return CompetitionStatus.getByName(competition.getStatus())
+                .map(status -> switch (status) {
+                    case C_CANCELED -> GRAY_CIRCLE;
+                    case C_PLANED -> BLUE_CIRCLE;
+                    case C_NOT_STARTED -> GREEN_CIRCLE;
+                    case C_IN_PROGRESS -> RED_CIRCLE;
+                    case C_FINISHED -> LIGHT_GRAY_CIRCLE;
+                });
     }
 
     public String details(CompetitionEntity competition) {

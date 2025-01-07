@@ -3,6 +3,8 @@ package com.dp_ua.iksparser.dba.entity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.Optional;
+
 @Getter
 @AllArgsConstructor
 public enum CompetitionStatus {
@@ -14,12 +16,12 @@ public enum CompetitionStatus {
 
     private final String name;
 
-    public static CompetitionStatus getByName(String name) {
+    public static Optional<CompetitionStatus> getByName(String name) {
         for (CompetitionStatus status : CompetitionStatus.values()) {
             if (status.getName().equals(name)) {
-                return status;
+                return Optional.of(status);
             }
         }
-        return null;
+        return Optional.empty();
     }
 }
