@@ -69,7 +69,6 @@ public class ResponseInformAboutNewEvents implements ResponseContentGenerator {
         return keyboard;
     }
 
-    @SuppressWarnings("unchecked")
     private CompetitionEntity getCompetition(Object[] args) {
         return (CompetitionEntity) getArgumentObject(ARGS_COMPETITION_INDEX, args).orElseThrow();
     }

@@ -213,7 +213,7 @@ public class ResponseParticipantDetails implements ResponseContentGenerator {
         );
     }
 
-
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private <T> void validateArgument(Optional<T> argument, Predicate<T> predicate, String errorMessage) {
         if (argument.isEmpty()) {
             throw new IllegalArgumentException("Argument is missing: " + errorMessage);
@@ -224,6 +224,7 @@ public class ResponseParticipantDetails implements ResponseContentGenerator {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private Page<CompetitionEntity> getCompetitions(Object[] args) {
         return (Page<CompetitionEntity>) getArgumentObject(ARGS_COMPETITIONS_INDEX, args).orElseThrow();
     }
