@@ -25,14 +25,6 @@ fi
 echo "=======Starting docker-compose========"
 docker-compose up -d
 
-echo "Проверяем, существует ли SSL-сертификат..."
-if [ -f "/etc/letsencrypt/live/bots.dns-cloud.net/fullchain.pem" ]; then
-    echo "SSL-сертификат уже существует. Пропускаем запрос Certbot."
-else
-    echo "Запрашиваем новый SSL-сертификат..."
-    docker-compose run --rm certbot certonly --webroot -w /var/lib/letsencrypt -d bots.dns-cloud.net --email pavel.reshetilo@gmail.com --agree-tos --no-eff-email --rsa-key-size 4096 --debug --verbose
-fi
-
 # Check if the docker-compose up command was successful
 if [ $? -eq 0 ]; then
     echo "docker-compose up succeeded"
