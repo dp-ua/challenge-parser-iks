@@ -57,19 +57,14 @@ public class ResponseInformAboutNewEvents implements ResponseContentGenerator {
         List<List<InlineKeyboardButton>> keyboardRows = new ArrayList<>();
         keyboard.setKeyboard(keyboardRows);
 
-        InlineKeyboardButton participantButton = participantView.getParticipantProfileButtonLink(participant);
+        participantView.getParticipantProfileButtonLink(participant)
+                .ifPresent(button -> keyboardRows.add(List.of(button)));
+
         InlineKeyboardButton competitionInfoButton = competitionView.participantInCompetitionButton(
                 Icon.COMPETITION + " Інформація по змаганню",
                 competition,
                 participant);
-
-        // TODO make return Optional
-        if (participantButton != null) {
-            keyboardRows.add(List.of(participantButton));
-        }
-        if (competitionInfoButton != null) {
-            keyboardRows.add(List.of(competitionInfoButton));
-        }
+        keyboardRows.add(List.of(competitionInfoButton));
 
         return keyboard;
     }
@@ -78,6 +73,7 @@ public class ResponseInformAboutNewEvents implements ResponseContentGenerator {
         return (CompetitionEntity) getArgumentObject(ARGS_COMPETITION_INDEX, args).orElseThrow();
     }
 
+    @SuppressWarnings("unchecked")
     private List<HeatLineEntity> getHeatLines(Object[] args) {
         return (List<HeatLineEntity>) getArgumentObject(ARGS_HEATLINES_INDEX, args).orElseThrow();
     }

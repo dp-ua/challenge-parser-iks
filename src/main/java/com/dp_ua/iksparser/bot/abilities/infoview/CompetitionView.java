@@ -16,6 +16,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -173,7 +174,6 @@ public class CompetitionView {
 
     public String date(CompetitionEntity competition) {
         StringBuilder sb = new StringBuilder();
-        Icon iconForStatus = icon(competition);
         sb
                 .append(SPACE)
                 .append(SPACE)
@@ -183,9 +183,14 @@ public class CompetitionView {
                 .append(ITALIC)
                 .append(competition.getBeginDate())
                 .append(" - ")
-                .append(competition.getEndDate())
-                .append(" ")
-                .append(iconForStatus);
+                .append(competition.getEndDate());
+
+        icon(competition).ifPresent(icon ->
+                sb
+                        .append(" ")
+                        .append(icon)
+        );
+
         return sb.toString();
     }
 
@@ -224,16 +229,15 @@ public class CompetitionView {
         return sb.toString();
     }
 
-    public Icon icon(CompetitionEntity competition) {
-        CompetitionStatus status = CompetitionStatus.getByName(competition.getStatus());
-        if (status == null) return null;
-        return switch (status) {
-            case C_CANCELED -> GRAY_CIRCLE;
-            case C_PLANED -> BLUE_CIRCLE;
-            case C_NOT_STARTED -> GREEN_CIRCLE;
-            case C_IN_PROGRESS -> RED_CIRCLE;
-            case C_FINISHED -> LIGHT_GRAY_CIRCLE;
-        };
+    public Optional<Icon> icon(CompetitionEntity competition) {
+        return CompetitionStatus.getByName(competition.getStatus())
+                .map(status -> switch (status) {
+                    case C_CANCELED -> GRAY_CIRCLE;
+                    case C_PLANED -> BLUE_CIRCLE;
+                    case C_NOT_STARTED -> GREEN_CIRCLE;
+                    case C_IN_PROGRESS -> RED_CIRCLE;
+                    case C_FINISHED -> LIGHT_GRAY_CIRCLE;
+                });
     }
 
     public String details(CompetitionEntity competition) {
