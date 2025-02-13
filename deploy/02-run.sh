@@ -25,6 +25,9 @@ fi
 echo "=======Starting docker-compose========"
 docker-compose up -d
 
+echo "Запрашиваем SSL-сертификат, если его нет..."
+docker-compose run --rm certbot certonly --webroot -w /var/lib/letsencrypt -d bots.dns-cloud.net --email your@email.com --agree-tos --no-eff-email --rsa-key-size 4096
+
 # Check if the docker-compose up command was successful
 if [ $? -eq 0 ]; then
     echo "docker-compose up succeeded"

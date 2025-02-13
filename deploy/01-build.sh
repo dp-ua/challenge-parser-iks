@@ -35,5 +35,8 @@ cp deploy/02-run.sh "$target_directory/"
 # Копируем папку db и её содержимое рекурсивно
 cp -r deploy/db "$target_directory/"
 
+# Копируем конфиг Nginx
+cp -r deploy/nginx "$target_directory/"
+
 ls -la "$target_directory"
 echo "---------------------- Finish Deploy docker compose file -------------------"
