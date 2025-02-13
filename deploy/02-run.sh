@@ -30,7 +30,7 @@ if [ -f "/etc/letsencrypt/live/bots.dns-cloud.net/fullchain.pem" ]; then
     echo "SSL-сертификат уже существует. Пропускаем запрос Certbot."
 else
     echo "Запрашиваем новый SSL-сертификат..."
-    docker-compose run --rm certbot certonly --webroot -w /var/lib/letsencrypt -d bots.dns-cloud.net --email pavel.reshetilo@gmail.com --agree-tos --no-eff-email --rsa-key-size 4096
+    docker-compose run --rm certbot certonly --webroot -w /var/lib/letsencrypt -d bots.dns-cloud.net --email pavel.reshetilo@gmail.com --agree-tos --no-eff-email --rsa-key-size 4096 --debug
 fi
 
 # Check if the docker-compose up command was successful
