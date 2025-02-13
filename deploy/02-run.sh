@@ -26,7 +26,7 @@ echo "=======Starting docker-compose========"
 docker-compose up -d
 
 echo "Проверяем, существует ли SSL-сертификат..."
-if [ -d "/etc/letsencrypt/live/bots.dns-cloud.net" ]; then
+if [ -f "/etc/letsencrypt/live/bots.dns-cloud.net/fullchain.pem" ]; then
     echo "SSL-сертификат уже существует. Пропускаем запрос Certbot."
 else
     echo "Запрашиваем новый SSL-сертификат..."
