@@ -9,13 +9,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static com.dp_ua.iksparser.api.v1.Variables.API_V1_URI;
-import static com.dp_ua.iksparser.api.v1.Variables.COACH_URI;
+import static com.dp_ua.iksparser.api.v1.Variables.*;
 
 @RestController
 @Slf4j
@@ -67,8 +67,12 @@ public class CoachController {
             description = "Get coach by name")
     @GetMapping()
     @Transactional
-    public ResponseEntity<List<CoachDto>> getCoachByName(
+    public ResponseEntity<Page<CoachDto>> getCoachByName(
             HttpServletRequest request,
+            @Schema(description = "Page number for results pagination", defaultValue = "0")
+            @RequestParam(defaultValue = "0") int page,
+            @Schema(description = "Size of the page for results pagination", defaultValue = DEFAULT_PAGE_SIZE)
+            @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) int size,
             @Schema(description = "Coach name(or part) to search by. Case insensitive.")
             @RequestParam String text) {
 
@@ -78,6 +82,6 @@ public class CoachController {
                 request.getRemoteAddr(),
                 request.getHeader("User-Agent"));
 
-        return ResponseEntity.ok(coachService.getByNamePartialMatch(text));
+        return ResponseEntity.ok(coachService.getByNamePartialMatch(text, page, size));
     }
 }
