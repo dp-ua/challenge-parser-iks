@@ -19,7 +19,7 @@ import static com.dp_ua.iksparser.api.v1.Variables.COACH_URI;
 
 @RestController
 @Slf4j
-@RequestMapping(API_V1_URI)
+@RequestMapping(API_V1_URI + COACH_URI)
 @Tag(name = "Coach Management")
 public class CoachController {
     @Autowired
@@ -27,7 +27,7 @@ public class CoachController {
 
     @Operation(summary = "Get coach info by id",
             description = "Get coach info by id")
-    @GetMapping(COACH_URI + "/{id}")
+    @GetMapping("/{id}")
     @Transactional
     public ResponseEntity<CoachDto> getCoachInfo(
             HttpServletRequest request,
@@ -49,7 +49,7 @@ public class CoachController {
 
     @Operation(summary = "Get coaches info by id list",
             description = "Get coaches info by provided list of ids")
-    @PostMapping(COACH_URI + "/list")
+    @PostMapping("/list")
     @Transactional
     public ResponseEntity<List<CoachDto>> getCoachesByIds(
             HttpServletRequest request,
@@ -65,19 +65,19 @@ public class CoachController {
 
     @Operation(summary = "Get coach by name",
             description = "Get coach by name")
-    @GetMapping(COACH_URI + "/name/{name}")
+    @GetMapping()
     @Transactional
     public ResponseEntity<List<CoachDto>> getCoachByName(
             HttpServletRequest request,
             @Schema(description = "Coach name(or part) to search by. Case insensitive.")
-            @PathVariable String name) {
+            @RequestParam String text) {
 
-        log.info("URI: {}, name: {} Request from IP: {}, User-Agent: {}",
+        log.info("URI: {}, text: {} Request from IP: {}, User-Agent: {}",
                 request.getRequestURI(),
-                name,
+                text,
                 request.getRemoteAddr(),
                 request.getHeader("User-Agent"));
 
-        return ResponseEntity.ok(coachService.getByNamePartialMatch(name));
+        return ResponseEntity.ok(coachService.getByNamePartialMatch(text));
     }
 }

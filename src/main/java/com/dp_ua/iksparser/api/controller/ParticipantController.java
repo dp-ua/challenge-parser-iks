@@ -39,7 +39,7 @@ public class ParticipantController {
     }
 
     @Operation(summary = "Get all participants",
-            description = "Get all participants with pagination. Filtred by name parts. Ordered by [Surname,Name")
+            description = "Get all participants with pagination. Filtered by name parts. Ordered by [Surname,Name")
     @GetMapping()
     public Page<ParticipantDto> getAllParticipants(
             HttpServletRequest request,
@@ -47,18 +47,22 @@ public class ParticipantController {
             @RequestParam(defaultValue = "0") int page,
             @Schema(description = "Size of the page for results pagination", defaultValue = DEFAULT_PAGE_SIZE)
             @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) int size,
-            @RequestParam(required = false) List<String> nameParts) {
+            @Schema(description = "Text for surname and name search(case-insensitive)", example = "Віктор Павлік")
+            @RequestParam(required = false) String text) {
 
-        log.info("URI: {}, page: {}, size: {}, nameParts: [{}], Request from IP: {}, User-Agent: {}",
+        log.info("URI: {}, page: {}, size: {}, text: [{}], Request from IP: {}, User-Agent: {}",
                 request.getRequestURI(),
-                page, size, nameParts,
+                page, size, text,
                 request.getRemoteAddr(),
                 request.getHeader("User-Agent"));
-
-        List<String> safeNameParts = nameParts != null ? nameParts : Collections.emptyList();
+        List<String> safeNameParts = convertTextToList(text);
 
         return participantService.findAllBySurnameAndNameParts(safeNameParts, page, size)
                 .map(participantService::convertToDto);
+    }
+
+    private List<String> convertTextToList(String text) {
+        return text != null ? List.of(text.split(" ")) : Collections.emptyList();
     }
 
     @Operation(summary = "Get participant by ID",
