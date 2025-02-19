@@ -7,6 +7,8 @@ import com.dp_ua.iksparser.service.SqlPreprocessorService;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -45,6 +47,10 @@ public class CoachService {
         return repo.findByNameContainingIgnoreCase(partialName);
     }
 
+    public Page<CoachEntity> searchByNamePartialMatch(String partialName, PageRequest pageRequest) {
+        return repo.findByNameContainingIgnoreCase(partialName, pageRequest);
+    }
+
     public CoachEntity findById(Long id) {
         return repo.findById(id).orElse(null);
     }
@@ -70,11 +76,8 @@ public class CoachService {
         return coachDto;
     }
 
-
-    public List<CoachDto> getByNamePartialMatch(String name) {
+    public Page<CoachDto> getByNamePartialMatch(String name, int page, int size) {
         String namePart = sqlPreprocessorService.escapeSpecialCharacters(name);
-        return searchByNamePartialMatch(namePart).stream()
-                .map(this::convertToDto)
-                .toList();
+        return searchByNamePartialMatch(namePart, PageRequest.of(page, size)).map(this::convertToDto);
     }
 }
