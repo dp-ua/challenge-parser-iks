@@ -9,5 +9,5 @@ public class Variables {
     public static final String HEAT_URI = "/heat";
     public static final String HEAT_LINE_URI = "/heat-line";
     public static final String PARTICIPANT_URI = "/participants";
-    public static final String COACH_URI = "/coach";
+    public static final String COACH_URI = "/coaches";
 }
