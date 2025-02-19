@@ -65,7 +65,7 @@ public class ParticipantView {
     public Optional<InlineKeyboardButton> getParticipantProfileButtonLink(ParticipantEntity participant) {
         String url = participant.getUrl();
         if (url != null && !url.isEmpty()) {
-            return Optional.of(SERVICE.getKeyboardButton(
+            return Optional.of(SERVICE.getURLButton(
                     ATHLETE + " Профіль спортсмена",
                     participant.getUrl()
             ));

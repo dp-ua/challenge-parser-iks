@@ -85,13 +85,13 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
             updateCompetition(competition);
             changeStatus(competitionId, U_STARTED, U_UPDATED);
         } catch (Exception e) {
-            log.error("Error updating competition {}", competitionId, e);
+            log.error("[{}]Error updating competition", competitionId, e);
             changeStatus(competitionId, U_STARTED, U_ERROR);
         } catch (ParsingException e) {
-            log.warn("Error parsing competition {}, reason:{}", competitionId, e.getMessage());
+            log.warn("[{}] Error parsing competition, reason:{}", competitionId, e.getMessage());
             changeStatus(competitionId, U_STARTED, U_INFORM_ERROR);
         } finally {
-            log.info("Finished updating competition {}", competitionId);
+            log.info("[{}]Finished updating competition", competitionId);
             lock.unlock();
             updating.remove(competitionId);
             List.of(U_UPDATED, U_INFORM_ERROR).forEach(status -> sendMessages(competitionId, status));
@@ -100,26 +100,29 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
 
     @Transactional
     private void updateCompetition(CompetitionEntity competition) throws ParsingException {
-        log.info("Updating competition {}", competition.getId());
+        log.info("[{}] Updating competition", competition.getId());
         Document document = downloader.getDocument(competition.getUrl());
 
         operateDaysAndAddItToCompetition(competition, document);
         List<EventEntity> newEvents = operateAndGetNewEventsForDays(competition, document);
         Map<ParticipantEntity, List<HeatLineEntity>> participations = operateEventsToParseHeats(newEvents);
-        competitionService.save(competition); // save all cascades
-        if (!participations.isEmpty() && isNeedToInformSubscribers(competition)) {
-            log.info("Informing subscribers about new participants: [{}]", participations.size());
+        competitionService.save(competition);
+        if (participations.isEmpty()) {
+            log.info("[{}]No new participants", competition.getId());
+        } else if (isNeedToInformSubscribers(competition)) {
+            log.info("[{}] Informing subscribers about new participants: [{}]",
+                    competition.getId(), participations.size());
             publisher.publishEvent(new SubscribeEvent(this, participations));
         } else {
-            log.info("Old competition. No need to inform subscribers about new participants [{}]", participations.size());
+            log.info("[{}] No need to inform subscribers. Status: [{}], end date: [{}]",
+                    competition.getId(), competition.getStatus(), competition.getEndDate());
         }
     }
 
     private boolean isNeedToInformSubscribers(CompetitionEntity competition) {
-        LocalDate now = LocalDate.now();
         LocalDate date = competitionService.getParsedDate(competition.getEndDate());
         String status = competition.getStatus();
-        return isDateForUpdate(date, now) || isStatusForUpdate(status);
+        return isDateForUpdate(date) || isStatusForUpdate(status);
     }
 
     private boolean isStatusForUpdate(String status) {
@@ -128,7 +131,9 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
                 C_PLANED.getName().equals(status);
     }
 
-    private boolean isDateForUpdate(LocalDate date, LocalDate now) {
+    private boolean isDateForUpdate(LocalDate date) {
+        // if date is more than 2 days ago - no need to inform
+        LocalDate now = LocalDate.now();
         return date.isEqual(now) ||                                    // today
                 date.isEqual(now.minusDays(1)) || // yesterday
                 date.isEqual(now.minusDays(2)); // day before yesterday
