@@ -65,7 +65,7 @@ public class CoachController {
             @Schema(description = "Size of the page for results pagination", defaultValue = DEFAULT_PAGE_SIZE)
             @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) int size,
             @Schema(description = "Coach name(or part) to search by. Case insensitive.")
-            @RequestParam String text) {
+            @RequestParam(required = false) String text) {
 
         return ResponseEntity.ok(coachService.getByNamePartialMatch(text, page, size));
     }
