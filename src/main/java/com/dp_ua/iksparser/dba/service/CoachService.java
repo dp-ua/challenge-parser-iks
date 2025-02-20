@@ -1,31 +1,31 @@
 package com.dp_ua.iksparser.dba.service;
 
-import com.dp_ua.iksparser.dba.dto.CoachDto;
-import com.dp_ua.iksparser.dba.entity.CoachEntity;
-import com.dp_ua.iksparser.dba.repo.CoachRepo;
-import com.dp_ua.iksparser.service.SqlPreprocessorService;
-import jakarta.transaction.Transactional;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.List;
+import java.util.Objects;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import com.dp_ua.iksparser.dba.dto.CoachDto;
+import com.dp_ua.iksparser.dba.entity.CoachEntity;
+import com.dp_ua.iksparser.dba.repo.CoachRepo;
+import com.dp_ua.iksparser.service.SqlPreprocessorService;
+
+import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Transactional
 @Slf4j
 public class CoachService {
     private final CoachRepo repo;
+    private final SqlPreprocessorService sqlPreprocessorService;
 
-    @Autowired
-    public CoachService(CoachRepo repo) {
+    public CoachService(CoachRepo repo, SqlPreprocessorService sqlPreprocessorService) {
         this.repo = repo;
+        this.sqlPreprocessorService = sqlPreprocessorService;
     }
-
-    @Autowired
-    private SqlPreprocessorService sqlPreprocessorService;
 
     @Transactional
     public CoachEntity save(CoachEntity coach) {
@@ -62,7 +62,7 @@ public class CoachService {
     public List<CoachDto> getCoachesDtoList(List<Long> ids) {
         return ids.stream()
                 .map(this::getCoachDto)
-                .filter(coachDto -> coachDto != null)
+                .filter(Objects::nonNull)
                 .toList();
     }
 
@@ -77,7 +77,7 @@ public class CoachService {
     }
 
     public Page<CoachDto> getByNamePartialMatch(String name, int page, int size) {
-        String namePart = sqlPreprocessorService.escapeSpecialCharacters(name);
+        String namePart = sqlPreprocessorService.escapeSpecialCharacters(Objects.requireNonNullElse(name, ""));
         return searchByNamePartialMatch(namePart, PageRequest.of(page, size)).map(this::convertToDto);
     }
 }
