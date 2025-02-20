@@ -23,7 +23,6 @@ public class RequestLoggingAspect {
         logMessage.append(", Request from IP: ").append(request.getRemoteAddr());
         logMessage.append(", User-Agent: ").append(request.getHeader("User-Agent"));
 
-        // Логирование указанных параметров
         String[] parametersToLog = logRequestDetails.parameters();
         for (String param : parametersToLog) {
             String paramValue = request.getParameter(param);
