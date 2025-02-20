@@ -30,21 +30,18 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @Slf4j
 @RequestMapping(API_V1_URI + PARTICIPANT_URI)
 @Tag(name = "Participant Management")
+@RequiredArgsConstructor
 public class ParticipantController {
 
     private final ParticipantService participantService;
     private final CompetitionFacade competitionFacade;
-
-    public ParticipantController(ParticipantService service, CompetitionFacade competitionFacade) {
-        this.participantService = service;
-        this.competitionFacade = competitionFacade;
-    }
 
     @Operation(summary = "Get all participants",
             description = "Get all participants with pagination. Filtered by name parts. Ordered by [Surname,Name")

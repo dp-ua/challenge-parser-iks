@@ -22,18 +22,16 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @Slf4j
 @RequestMapping(API_V1_URI)
 @Tag(name = "Day Management")
+@RequiredArgsConstructor
 public class DayController {
     private final DayService dayService;
-
-    public DayController(DayService dayService) {
-        this.dayService = dayService;
-    }
 
     @Operation(summary = "Get day info by id",
             description = "Get day info by id")
