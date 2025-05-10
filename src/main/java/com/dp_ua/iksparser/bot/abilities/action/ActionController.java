@@ -1,38 +1,39 @@
 package com.dp_ua.iksparser.bot.abilities.action;
 
+import static com.dp_ua.iksparser.bot.command.CommandArgumentName.ACTION;
+import static com.dp_ua.iksparser.bot.command.CommandArgumentName.PARTICIPANT_ID;
+
+import java.util.Optional;
+
+import org.json.JSONException;
+import org.springframework.stereotype.Component;
+
 import com.dp_ua.iksparser.bot.abilities.subscribe.SubscribeFacade;
 import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
 import com.dp_ua.iksparser.dba.service.ParticipantService;
 import com.dp_ua.iksparser.service.JsonReader;
+
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.json.JSONException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import java.util.Optional;
-
-import static com.dp_ua.iksparser.bot.command.CommandArgumentName.ACTION;
-import static com.dp_ua.iksparser.bot.command.CommandArgumentName.PARTICIPANT_ID;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class ActionController {
-    @Autowired
-    JsonReader jsonReader;
-    @Autowired
-    SubscribeFacade subscriptions;
-    @Autowired
-    ParticipantService participantService;
+    private final JsonReader jsonReader;
+    private final SubscribeFacade subscriptions;
+    private final ParticipantService participantService;
 
     public void performAction(ActionType action, String userId, String text) {
         log.info("ActionController: action: {}, userId: {}, text: {}", action, userId, text);
         long participantId = getParticipantId(text);
-        ParticipantEntity participant = participantService.findById(participantId).orElseThrow(() -> new IllegalArgumentException("Participant not found by id: " + participantId));
+        ParticipantEntity participant = participantService.findById(participantId)
+                .orElseThrow(() -> new IllegalArgumentException("Participant not found by id: " + participantId));
         switch (action) { // todo make personal perfomers for actions, use Annotation, remove switch
             case SUB:
                 subscriptions.subscribe(userId, participant);
                 break;
-            case UNSUB:
+            case UNS:
                 subscriptions.unsubscribe(userId, participant);
                 break;
             default:

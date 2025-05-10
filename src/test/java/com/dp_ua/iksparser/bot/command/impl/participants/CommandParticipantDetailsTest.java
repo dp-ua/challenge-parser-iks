@@ -1,16 +1,17 @@
 package com.dp_ua.iksparser.bot.command.impl.participants;
 
-import com.dp_ua.iksparser.bot.abilities.action.ActionType;
-import org.junit.Before;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import com.dp_ua.iksparser.bot.abilities.action.ActionType;
 
 class CommandParticipantDetailsTest {
     CommandParticipantDetails command;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         command = new CommandParticipantDetails();
     }
 
@@ -19,7 +20,7 @@ class CommandParticipantDetailsTest {
         // given
         int page = 1;
         long id = 2;
-        String expected = "/shpartdet {\"pg\":\"1\",\"pid\":\"2\"}";
+        String expected = "/shpartdet {\"pg\":\"1\",\"pi\":\"2\"}";
         // when
         String actual = CommandParticipantDetails.getCallbackCommand(page, id);
         // then
@@ -31,7 +32,7 @@ class CommandParticipantDetailsTest {
         // given
         int page = 1;
         long id = 2;
-        String expected = "/shpartdet {\"pg\":\"1\",\"pid\":\"2\",\"act\":\"SUB\"}";
+        String expected = "/shpartdet {\"pg\":\"1\",\"pi\":\"2\",\"a\":\"SUB\"}";
         // when
         String actual = CommandParticipantDetails.getCallbackCommand(page, id, ActionType.SUB);
         // then

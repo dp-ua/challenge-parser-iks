@@ -1,5 +1,20 @@
 package com.dp_ua.iksparser.bot.abilities.response.content;
 
+import static com.dp_ua.iksparser.bot.abilities.response.ResponseType.PARTICIPANT_DETAILS;
+import static com.dp_ua.iksparser.service.MessageCreator.END_LINE;
+import static com.dp_ua.iksparser.service.MessageCreator.SERVICE;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
+
+import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+
 import com.dp_ua.iksparser.bot.Icon;
 import com.dp_ua.iksparser.bot.abilities.action.ActionType;
 import com.dp_ua.iksparser.bot.abilities.infoview.CompetitionView;
@@ -11,21 +26,8 @@ import com.dp_ua.iksparser.bot.command.impl.CommandMenu;
 import com.dp_ua.iksparser.bot.command.impl.participants.CommandParticipantDetails;
 import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
 import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
+
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Predicate;
-
-import static com.dp_ua.iksparser.bot.abilities.response.ResponseType.PARTICIPANT_DETAILS;
-import static com.dp_ua.iksparser.service.MessageCreator.END_LINE;
-import static com.dp_ua.iksparser.service.MessageCreator.SERVICE;
 
 @Component
 @Scope("prototype")
@@ -186,7 +188,7 @@ public class ResponseParticipantDetails implements ResponseContentGenerator {
     }
 
     private InlineKeyboardButton unsubscribeButton(int page, ParticipantEntity participant) {
-        return subscriptionView.buttonUnsubscribe(CommandParticipantDetails.getCallbackCommand(page, participant.getId(), ActionType.UNSUB));
+        return subscriptionView.buttonUnsubscribe(CommandParticipantDetails.getCallbackCommand(page, participant.getId(), ActionType.UNS));
     }
 
     private void validateArgs(Object[] args) {

@@ -4,10 +4,10 @@ import lombok.Getter;
 
 @Getter
 public enum CommandArgumentName {
-    PARTICIPANT_ID("pid"),
-    COMPETITION_ID("cid"),
+    PARTICIPANT_ID("pi"),
+    COMPETITION_ID("ci"),
     PAGE("pg"),
-    ACTION("act"),
+    ACTION("a"),
     SEARCH("sh"),
     ;
     private final String value;
