@@ -1,6 +1,16 @@
 package com.dp_ua.iksparser.bot.abilities.response.content.search;
 
-import com.dp_ua.iksparser.bot.abilities.action.ActionType;
+import static com.dp_ua.iksparser.bot.abilities.action.ActionType.SUB;
+import static com.dp_ua.iksparser.bot.abilities.action.ActionType.UNS;
+import static com.dp_ua.iksparser.bot.abilities.response.ResponseType.FIND_PARTICIPANT_IN_COMPETITION;
+
+import java.util.List;
+
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+
 import com.dp_ua.iksparser.bot.abilities.infoview.SearchView;
 import com.dp_ua.iksparser.bot.abilities.infoview.SubscriptionView;
 import com.dp_ua.iksparser.bot.abilities.response.ResponseContentGenerator;
@@ -9,32 +19,22 @@ import com.dp_ua.iksparser.bot.command.impl.participants.CommandShowHeatLinesInC
 import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
 import com.dp_ua.iksparser.dba.entity.HeatLineEntity;
 import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
-import java.util.List;
-import java.util.Optional;
-
-import static com.dp_ua.iksparser.bot.abilities.action.ActionType.UNSUB;
-import static com.dp_ua.iksparser.bot.abilities.response.ResponseType.FIND_PARTICIPANT_IN_COMPETITION;
+import lombok.RequiredArgsConstructor;
 
 @Component
 @Scope("prototype")
 @ResponseTypeMarker(FIND_PARTICIPANT_IN_COMPETITION)
+@RequiredArgsConstructor
 public class ResponseFindParticipantInCompetition implements ResponseContentGenerator {
     private static final int ARGS_SIZE = 4;
     private static final int ARGS_PARTICIPANT_INDEX = 0;
     private static final int ARGS_COMPETITION_INDEX = 1;
     private static final int ARGS_HEAT_LINES_INDEX = 2;
     private static final int ARGS_SUBSCRIBED_INDEX = 3;
-    @Autowired
-    SearchView searchView;
-    @Autowired
-    SubscriptionView subscriptionView;
 
+    private final SearchView searchView;
+    private final SubscriptionView subscriptionView;
 
     @Override
     public String messageText(Object... args) {
@@ -53,10 +53,9 @@ public class ResponseFindParticipantInCompetition implements ResponseContentGene
 
         ParticipantEntity participant = getParticipant(args);
         CompetitionEntity competition = getCompetition(args);
-        boolean subscribed = getSuscribed(args);
+        boolean subscribed = getSubscribed(args);
 
         InlineKeyboardMarkup result = new InlineKeyboardMarkup();
-
         InlineKeyboardButton inlineKeyboardButton = getSubscribeButton(subscribed, competition, participant);
         result.setKeyboard(List.of(List.of(inlineKeyboardButton)));
 
@@ -64,51 +63,46 @@ public class ResponseFindParticipantInCompetition implements ResponseContentGene
     }
 
     private InlineKeyboardButton getSubscribeButton(boolean subscribed, CompetitionEntity competition, ParticipantEntity participant) {
-        return subscribed ?
-                subscriptionView.buttonUnsubscribe(
-                        CommandShowHeatLinesInCompetitionForParticipant.getCallbackCommand(participant.getId(), competition.getId(), UNSUB))
-                :
-                subscriptionView.buttonSubscribe(
-                        CommandShowHeatLinesInCompetitionForParticipant.getCallbackCommand(participant.getId(), competition.getId(), ActionType.SUB));
+        return subscribed
+                ? subscriptionView.buttonUnsubscribe(
+                CommandShowHeatLinesInCompetitionForParticipant.getCallbackCommand(
+                        participant.getId(), competition.getId(), UNS))
+                : subscriptionView.buttonSubscribe(
+                CommandShowHeatLinesInCompetitionForParticipant.getCallbackCommand(
+                        participant.getId(), competition.getId(), SUB));
     }
 
     private ParticipantEntity getParticipant(Object[] args) {
-        return (ParticipantEntity) getArgumentObject(ARGS_PARTICIPANT_INDEX, args).orElseThrow();
+        return getArgumentObject(ARGS_PARTICIPANT_INDEX, args)
+                .filter(ParticipantEntity.class::isInstance)
+                .map(ParticipantEntity.class::cast)
+                .orElseThrow(() -> new IllegalArgumentException("Participant not found or has wrong type"));
     }
 
     private CompetitionEntity getCompetition(Object[] args) {
-        return (CompetitionEntity) getArgumentObject(ARGS_COMPETITION_INDEX, args).orElseThrow();
+        return getArgumentObject(ARGS_COMPETITION_INDEX, args)
+                .filter(CompetitionEntity.class::isInstance)
+                .map(CompetitionEntity.class::cast)
+                .orElseThrow(() -> new IllegalArgumentException("Competition not found or has wrong type"));
     }
 
     private List<HeatLineEntity> getHeatLines(Object[] args) {
-        return (List<HeatLineEntity>) getArgumentObject(ARGS_HEAT_LINES_INDEX, args).orElseThrow();
+        return getArgumentObject(ARGS_HEAT_LINES_INDEX, args)
+                .filter(List.class::isInstance)
+                .map(obj -> (List<HeatLineEntity>) obj)
+                .orElseThrow(() -> new IllegalArgumentException("Heat lines not found or has wrong type"));
     }
 
-    private boolean getSuscribed(Object[] args) {
-        return Boolean.parseBoolean(getArgument(ARGS_SUBSCRIBED_INDEX, args).orElseThrow());
+    private boolean getSubscribed(Object[] args) {
+        return getArgument(ARGS_SUBSCRIBED_INDEX, args)
+                .map(Boolean::parseBoolean)
+                .orElseThrow(() -> new IllegalArgumentException("Subscribed flag not found"));
     }
 
     private void validateArgs(Object[] args) {
         if (args.length != ARGS_SIZE) {
             throw new IllegalArgumentException("Invalid args size: " + args.length + ", expected: " + ARGS_SIZE);
         }
-        Optional<?> participant = getArgumentObject(ARGS_PARTICIPANT_INDEX, args);
-        if (!(participant.orElseThrow() instanceof ParticipantEntity)) {
-            throw new IllegalArgumentException("Invalid argument type: " + participant.get().getClass().getName() +
-                    ", expected: " + ParticipantEntity.class.getName());
-        }
-        Optional<?> competition = getArgumentObject(ARGS_COMPETITION_INDEX, args);
-        if (!(competition.orElseThrow() instanceof CompetitionEntity)) {
-            throw new IllegalArgumentException("Invalid argument type: " + competition.get().getClass().getName() +
-                    ", expected: " + CompetitionEntity.class.getName());
-        }
-        Optional<?> heatLines = getArgumentObject(ARGS_HEAT_LINES_INDEX, args);
-        if (!(heatLines.orElseThrow() instanceof List)) {
-            throw new IllegalArgumentException("Invalid argument type: List of HeatLineEntity not found");
-        }
-        Optional<String> subscribed = getArgument(ARGS_SUBSCRIBED_INDEX, args);
-        if (subscribed.isEmpty()) {
-            throw new IllegalArgumentException("Invalid argument type: subscribed not found");
-        }
     }
+
 }

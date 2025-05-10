@@ -1,6 +1,8 @@
 package com.dp_ua.iksparser.bot.command;
 
-import com.dp_ua.iksparser.App;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,8 +12,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.dp_ua.iksparser.App;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -52,7 +53,7 @@ public class CommandProviderTest {
                         shpartdet
                         participants
                         salps
-                        showhtlincomfpart
+                        shlcfp
                         subscriptions
                         subscriptionslist""",
                 actual);

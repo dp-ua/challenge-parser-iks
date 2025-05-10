@@ -1,26 +1,28 @@
 package com.dp_ua.iksparser.bot.command.impl.participants;
 
+import static com.dp_ua.iksparser.bot.Icon.ATHLETE;
+
+import org.springframework.stereotype.Component;
+
 import com.dp_ua.iksparser.bot.abilities.action.ActionType;
 import com.dp_ua.iksparser.bot.abilities.competition.CompetitionFacade;
 import com.dp_ua.iksparser.bot.command.BaseCommand;
 import com.dp_ua.iksparser.bot.command.CommandArgumentName;
 import com.dp_ua.iksparser.bot.message.Message;
-import lombok.ToString;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-import static com.dp_ua.iksparser.bot.Icon.ATHLETE;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 @Component
 @ToString
+@RequiredArgsConstructor
 public class CommandShowHeatLinesInCompetitionForParticipant extends BaseCommand {
-    private final static String command = "showhtlincomfpart"; // show heat lines in competition for participant
-    @Autowired
-    CompetitionFacade competitionFacade;
+    private static final String COMMAND = "shlcfp"; // show heat lines in competition for participant
+    private final CompetitionFacade competitionFacade;
 
     @Override
     public String command() {
-        return command;
+        return COMMAND;
     }
 
     @Override
@@ -40,7 +42,7 @@ public class CommandShowHeatLinesInCompetitionForParticipant extends BaseCommand
     }
 
     public static String getCallbackCommand(long participantId, long competitionId) {
-        return SLASH + command + BRACKET_OPEN
+        return SLASH + COMMAND + BRACKET_OPEN
                 + paramParticipant(participantId)
                 + PARAM_DELIMITER
                 + paramCompetition(competitionId)
@@ -48,7 +50,7 @@ public class CommandShowHeatLinesInCompetitionForParticipant extends BaseCommand
     }
 
     public static String getCallbackCommand(long participantId, long competitionId, ActionType action) {
-        return SLASH + command + BRACKET_OPEN
+        return SLASH + COMMAND + BRACKET_OPEN
                 + paramParticipant(participantId)
                 + PARAM_DELIMITER
                 + paramCompetition(competitionId)

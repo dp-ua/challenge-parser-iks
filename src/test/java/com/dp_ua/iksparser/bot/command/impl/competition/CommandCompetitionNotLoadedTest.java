@@ -1,9 +1,9 @@
 package com.dp_ua.iksparser.bot.command.impl.competition;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class CommandCompetitionNotLoadedTest {
     CommandCompetitionNotLoaded commandCompetitionNotLoaded;
@@ -15,7 +15,7 @@ class CommandCompetitionNotLoadedTest {
 
     @Test
     void shouldGenerateCorrectCallBackText(){
-        String expected = "/competitionnotloaded {\"cid\":\"1\"}";
+        String expected = "/competitionnotloaded {\"ci\":\"1\"}";
         String actual = CommandCompetitionNotLoaded.getCallBackCommand(1);
         assertEquals(expected, actual);
     }
