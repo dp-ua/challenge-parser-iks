@@ -20,7 +20,6 @@ import org.springframework.stereotype.Component;
 import com.dp_ua.iksparser.dba.dto.CompetitionDto;
 import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
 import com.dp_ua.iksparser.dba.entity.CompetitionStatus;
-import com.dp_ua.iksparser.dba.entity.DayEntity;
 import com.dp_ua.iksparser.dba.entity.HeatLineEntity;
 import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
 import com.dp_ua.iksparser.dba.repo.CompetitionRepo;
@@ -39,6 +38,7 @@ public class CompetitionService {
     private final CompetitionRepo repo;
     private final SqlPreprocessorService sqlPreprocessorService;
     private final PageableService pageableService;
+    private final DayService dayService;
 
     public List<CompetitionEntity> findAllOrderByUpdated() {
         return repo.findAllByOrderByUpdated();
@@ -181,7 +181,7 @@ public class CompetitionService {
     public CompetitionDto toDTO(CompetitionEntity competition) {
         CompetitionDto dto = new CompetitionDto();
         dto.setId(competition.getId());
-        dto.setDays(competition.getDays().stream().map(DayEntity::getId).toList());
+        dto.setDays(competition.getDays().stream().map(dayService::toDTO).toList());
         dto.setName(competition.getName());
         dto.setStatus(competition.getStatus());
         dto.setBeginDate(competition.getBeginDate());

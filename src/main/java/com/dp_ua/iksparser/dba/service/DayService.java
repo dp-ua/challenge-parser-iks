@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 
 import com.dp_ua.iksparser.dba.dto.DayDto;
 import com.dp_ua.iksparser.dba.entity.DayEntity;
-import com.dp_ua.iksparser.dba.entity.DomainElement;
 import com.dp_ua.iksparser.dba.repo.DayRepo;
 
 import jakarta.transaction.Transactional;
@@ -18,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 public class DayService {
 
     private final DayRepo repo;
+    private final EventService eventService;
 
     public DayEntity save(DayEntity day) {
         return repo.save(day);
@@ -31,8 +31,9 @@ public class DayService {
         dayDto.setDayNameEn(day.getDayNameEn());
         dayDto.setEvents(day.getEvents()
                 .stream()
-                .map(DomainElement::getId)
-                .toList());
+                .map(eventService::toDTO)
+                .toList()
+        );
         return dayDto;
     }
 

@@ -1,17 +1,18 @@
 package com.dp_ua.iksparser.dba.dto;
 
+import java.util.List;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.List;
 
 @Setter
 @Getter
 @EqualsAndHashCode
 @NoArgsConstructor
 public class EventDto {
+
     private Long id;
     private String time;
     private String eventName;
@@ -19,5 +20,6 @@ public class EventDto {
     private String round;
     private String startListUrl;
     private String resultUrl;
-    private List<Long> heats;
+    private List<HeatDto> heats;
+
 }
