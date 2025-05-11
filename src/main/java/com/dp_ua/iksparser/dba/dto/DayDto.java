@@ -17,6 +17,6 @@ public class DayDto {
     private String date;
     private String dayName;
     private String dayNameEn;
-    private List<EventDto> events;
+    private List<Long> events;
 
 }

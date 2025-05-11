@@ -15,6 +15,6 @@ public class HeatDto {
 
     private long id;
     private String name;
-    private List<HeatLineDto> heatLines;
+    private List<Long> heatLines;
 
 }

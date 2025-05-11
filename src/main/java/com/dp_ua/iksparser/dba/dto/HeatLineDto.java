@@ -17,6 +17,6 @@ public class HeatLineDto {
     private String lane;
     private String bib;
     private ParticipantDto participant;
-    private List<CoachDto> coaches;
+    private List<Long> coaches;
 
 }

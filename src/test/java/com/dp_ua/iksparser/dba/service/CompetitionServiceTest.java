@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Page;
 
@@ -112,8 +111,6 @@ class CompetitionServiceTest {
 
     @TestConfiguration
     static class CompetitionServiceTestContextConfiguration {
-        @MockBean
-        private DayService dayService;
 
         @Bean
         public SqlPreprocessorService sqlPreprocessorService() {
@@ -124,7 +121,7 @@ class CompetitionServiceTest {
         public CompetitionService competitionService(CompetitionRepo repo,
                                                      SqlPreprocessorService sqlPreprocessorService,
                                                      PageableService pageableService) {
-            return new CompetitionService(repo, sqlPreprocessorService, pageableService, dayService);
+            return new CompetitionService(repo, sqlPreprocessorService, pageableService);
         }
 
         @Bean
