@@ -1,38 +1,44 @@
 package com.dp_ua.iksparser.dba.service;
 
-import com.dp_ua.iksparser.dba.dto.CompetitionDto;
-import com.dp_ua.iksparser.dba.entity.*;
-import com.dp_ua.iksparser.dba.repo.CompetitionRepo;
-import com.dp_ua.iksparser.service.PageableService;
-import com.dp_ua.iksparser.service.SqlPreprocessorService;
-import com.dp_ua.iksparser.service.YearRange;
-import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Component;
+import static com.dp_ua.iksparser.config.Constants.FORMATTER;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Component;
+
+import com.dp_ua.iksparser.dba.dto.CompetitionDto;
+import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
+import com.dp_ua.iksparser.dba.entity.CompetitionStatus;
+import com.dp_ua.iksparser.dba.entity.DayEntity;
+import com.dp_ua.iksparser.dba.entity.HeatLineEntity;
+import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
+import com.dp_ua.iksparser.dba.repo.CompetitionRepo;
+import com.dp_ua.iksparser.service.PageableService;
+import com.dp_ua.iksparser.service.SqlPreprocessorService;
+import com.dp_ua.iksparser.service.YearRange;
+
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 @Component
 @Transactional
+@RequiredArgsConstructor
 public class CompetitionService {
-    public static final String DD_MM_YYYY = "dd.MM.yyyy";
-    public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DD_MM_YYYY);
+
     private final CompetitionRepo repo;
-
-    @Autowired
-    SqlPreprocessorService sqlPreprocessorService;
-    @Autowired
-    PageableService pageableService;
-
-    @Autowired
-    public CompetitionService(CompetitionRepo repo) {
-        this.repo = repo;
-    }
+    private final SqlPreprocessorService sqlPreprocessorService;
+    private final PageableService pageableService;
 
     public List<CompetitionEntity> findAllOrderByUpdated() {
         return repo.findAllByOrderByUpdated();
@@ -57,7 +63,7 @@ public class CompetitionService {
                     try {
                         return LocalDate.parse(date, FORMATTER).getYear();
                     } catch (Exception e) {
-                        throw new RuntimeException(e);
+                        throw new IllegalArgumentException("Invalid date format: " + date, e);
                     }
                 })
                 .filter(year -> year != null)
@@ -169,10 +175,10 @@ public class CompetitionService {
 
     private Page<CompetitionDto> getCompetitionDtos(List<CompetitionEntity> content, int page, int size) {
         Page<CompetitionEntity> result = pageableService.getPage(content, page, size);
-        return result.map(this::convertToDto);
+        return result.map(this::toDTO);
     }
 
-    public CompetitionDto convertToDto(CompetitionEntity competition) {
+    public CompetitionDto toDTO(CompetitionEntity competition) {
         CompetitionDto dto = new CompetitionDto();
         dto.setId(competition.getId());
         dto.setDays(competition.getDays().stream().map(DayEntity::getId).toList());

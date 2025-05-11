@@ -32,6 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "Event Management")
 @RequiredArgsConstructor
 public class EventController {
+
     private final EventService eventService;
 
     @Operation(summary = "Get event info by id",
@@ -47,7 +48,7 @@ public class EventController {
         if (event == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(eventService.convertToDto(event));
+        return ResponseEntity.ok(eventService.toDTO(event));
     }
 
     @Operation(summary = "Get events by id list",
@@ -61,7 +62,7 @@ public class EventController {
         List<EventDto> events = ids.stream()
                 .map(eventService::findById)
                 .filter(Objects::nonNull)
-                .map(eventService::convertToDto)
+                .map(eventService::toDTO)
                 .toList();
 
         if (events.isEmpty()) {

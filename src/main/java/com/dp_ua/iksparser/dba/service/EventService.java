@@ -1,24 +1,23 @@
 package com.dp_ua.iksparser.dba.service;
 
+import java.util.List;
+
+import org.springframework.stereotype.Component;
+
 import com.dp_ua.iksparser.dba.dto.EventDto;
 import com.dp_ua.iksparser.dba.entity.DomainElement;
 import com.dp_ua.iksparser.dba.entity.EventEntity;
 import com.dp_ua.iksparser.dba.repo.EventRepo;
-import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-import java.util.List;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 @Component
 @Transactional
+@RequiredArgsConstructor
 public class EventService {
-    private final EventRepo repo;
 
-    @Autowired
-    public EventService(EventRepo repo) {
-        this.repo = repo;
-    }
+    private final EventRepo repo;
 
     public EventEntity save(EventEntity event) {
         return repo.save(event);
@@ -32,7 +31,7 @@ public class EventService {
         return repo.findById(id).orElse(null);
     }
 
-    public EventDto convertToDto(EventEntity eventEntity) {
+    public EventDto toDTO(EventEntity eventEntity) {
         EventDto eventDto = new EventDto();
         eventDto.setId(eventEntity.getId());
         eventDto.setTime(eventEntity.getTime());

@@ -58,7 +58,7 @@ public class ParticipantController {
         List<String> safeNameParts = convertTextToList(text);
 
         return participantService.findAllBySurnameAndNameParts(safeNameParts, page, size)
-                .map(participantService::convertToDto);
+                .map(participantService::toDTO);
     }
 
     private List<String> convertTextToList(String text) {
@@ -75,7 +75,7 @@ public class ParticipantController {
 
         Optional<ParticipantEntity> participant = participantService.findById(id);
         return participant
-                .map(participantService::convertToDto)
+                .map(participantService::toDTO)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -90,7 +90,7 @@ public class ParticipantController {
         List<ParticipantDto> participants = ids.stream()
                 .map(participantService::findById)
                 .filter(Optional::isPresent)
-                .map(p -> participantService.convertToDto(p.get()))
+                .map(p -> participantService.toDTO(p.get()))
                 .toList();
         return ResponseEntity.ok(participants);
     }

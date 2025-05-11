@@ -1,25 +1,25 @@
 package com.dp_ua.iksparser.dba.service;
 
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.stereotype.Component;
+
 import com.dp_ua.iksparser.dba.dto.HeatLineDto;
 import com.dp_ua.iksparser.dba.entity.CoachEntity;
 import com.dp_ua.iksparser.dba.entity.HeatLineEntity;
 import com.dp_ua.iksparser.dba.repo.HeatLineRepo;
-import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.Optional;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 @Component
 @Transactional
+@RequiredArgsConstructor
 public class HeatLineService {
-    private final HeatLineRepo repo;
 
-    @Autowired
-    public HeatLineService(HeatLineRepo repo) {
-        this.repo = repo;
-    }
+    private final HeatLineRepo repo;
+    private final ParticipantService participantService;
 
     @Transactional
     public HeatLineEntity save(HeatLineEntity heatLineEntity) {
@@ -34,12 +34,13 @@ public class HeatLineService {
     public Iterable<HeatLineEntity> findAll() {
         return repo.findAll();
     }
-    public HeatLineDto convertToDto(HeatLineEntity heatLineEntity) {
+
+    public HeatLineDto toDTO(HeatLineEntity heatLineEntity) {
         HeatLineDto dto = new HeatLineDto();
         dto.setId(heatLineEntity.getId());
         dto.setLane(heatLineEntity.getLane());
         dto.setBib(heatLineEntity.getBib());
-        dto.setParticipant(heatLineEntity.getParticipant());
+        dto.setParticipant(participantService.toDTO(heatLineEntity.getParticipant()));
         dto.setCoaches(heatLineEntity.getCoaches().stream().map(CoachEntity::getId).toList());
         return dto;
     }
@@ -59,4 +60,5 @@ public class HeatLineService {
     public List<HeatLineEntity> getHeatLinesInCompetitionByParticipantId(Long competitionId, Long participantId) {
         return repo.getHeatLinesInCompetitionByParticipantId(competitionId, participantId);
     }
+
 }

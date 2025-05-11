@@ -47,7 +47,7 @@ public class HeatLineController {
         Optional<HeatLineEntity> heatLine = heatLineService.findById(id);
 
         return heatLine.map(heatLineEntity ->
-                        ResponseEntity.ok(heatLineService.convertToDto(heatLineEntity)))
+                        ResponseEntity.ok(heatLineService.toDTO(heatLineEntity)))
                 .orElseGet(() ->
                         ResponseEntity.notFound().build());
     }
@@ -67,7 +67,7 @@ public class HeatLineController {
                 .map(heatLineService::findById)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .map(heatLineService::convertToDto)
+                .map(heatLineService::toDTO)
                 .toList();
 
         return ResponseEntity.ok(heatLines);

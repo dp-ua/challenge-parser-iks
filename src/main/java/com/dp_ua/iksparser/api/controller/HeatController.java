@@ -33,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "Heat Management")
 @RequiredArgsConstructor
 public class HeatController {
+
     private final HeatService heatService;
 
     @Operation(summary = "Get heat info by id",
@@ -46,7 +47,7 @@ public class HeatController {
 
         Optional<HeatEntity> heat = heatService.findById(id);
         return heat.map(heatEntity ->
-                        ResponseEntity.ok(heatService.convertToDto(heatEntity)))
+                        ResponseEntity.ok(heatService.toDto(heatEntity)))
                 .orElseGet(() ->
                         ResponseEntity.notFound().build());
     }
@@ -66,7 +67,7 @@ public class HeatController {
                 .map(heatService::findById)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .map(heatService::convertToDto)
+                .map(heatService::toDto)
                 .toList();
 
         return ResponseEntity.ok(heats);

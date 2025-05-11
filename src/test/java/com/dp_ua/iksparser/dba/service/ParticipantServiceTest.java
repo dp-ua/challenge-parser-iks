@@ -1,9 +1,9 @@
 package com.dp_ua.iksparser.dba.service;
 
-import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
-import com.dp_ua.iksparser.dba.repo.ParticipantRepo;
-import com.dp_ua.iksparser.service.PageableService;
-import com.dp_ua.iksparser.service.SqlPreprocessorService;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,17 +11,19 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
+import com.dp_ua.iksparser.dba.repo.ParticipantRepo;
+import com.dp_ua.iksparser.service.PageableService;
+import com.dp_ua.iksparser.service.SqlPreprocessorService;
 
 @DataJpaTest
-public class ParticipantServiceTest {
+class ParticipantServiceTest {
+
     @Autowired
     ParticipantService service;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         ParticipantEntity participant1 = new ParticipantEntity();
         participant1.setName("Kolya");
         participant1.setSurname("Targetov");
@@ -37,13 +39,13 @@ public class ParticipantServiceTest {
     }
 
     @Test
-    public void shouldFindAll() {
+    void shouldFindAll() {
         Iterable<ParticipantEntity> all = service.findAll();
         assertEquals(3, all.spliterator().getExactSizeIfKnown());
     }
 
     @Test
-    public void shouldFind_OneParticipant_OnlyName() {
+    void shouldFind_OneParticipant_OnlyName() {
         List<ParticipantEntity> found = service.findAllBySurnameAndNameParts(List.of("Kolya"));
         assertEquals(1, found.size());
         assertEquals("Kolya", found.get(0).getName());
@@ -51,7 +53,7 @@ public class ParticipantServiceTest {
     }
 
     @Test
-    public void shouldFind_OneParticipant_NameAndSurname() {
+    void shouldFind_OneParticipant_NameAndSurname() {
         List<ParticipantEntity> found = service.findAllBySurnameAndNameParts(List.of("Kolya", "Targetov"));
         assertEquals(1, found.size());
         assertEquals("Kolya", found.get(0).getName());
@@ -59,7 +61,7 @@ public class ParticipantServiceTest {
     }
 
     @Test
-    public void shouldFind_One_ByNameAndPartOfSurname() {
+    void shouldFind_One_ByNameAndPartOfSurname() {
         List<ParticipantEntity> found = service.findAllBySurnameAndNameParts(List.of("vasya", "target"));
         assertEquals(1, found.size());
         assertEquals("Vasya", found.get(0).getName());
@@ -67,13 +69,13 @@ public class ParticipantServiceTest {
     }
 
     @Test
-    public void shouldFind_TwoParticipant_ByName() {
+    void shouldFind_TwoParticipant_ByName() {
         List<ParticipantEntity> found = service.findAllBySurnameAndNameParts(List.of("Vasya"));
         assertEquals(2, found.size());
     }
 
     @Test
-    public void shouldFind_TwoParticipant_ByPartOfSurname() {
+    void shouldFind_TwoParticipant_ByPartOfSurname() {
         List<ParticipantEntity> found = service.findAllBySurnameAndNameParts(List.of("target"));
         assertEquals(2, found.size());
     }
@@ -86,8 +88,10 @@ public class ParticipantServiceTest {
         }
 
         @Bean
-        public ParticipantService participantService(ParticipantRepo participantRepo) {
-            return new ParticipantService(participantRepo);
+        public ParticipantService participantService(ParticipantRepo participantRepo,
+                                                     SqlPreprocessorService sqlPreprocessorService,
+                                                     PageableService pageableService) {
+            return new ParticipantService(participantRepo, sqlPreprocessorService, pageableService);
         }
 
         @Bean
@@ -95,4 +99,5 @@ public class ParticipantServiceTest {
             return new PageableService();
         }
     }
+
 }
