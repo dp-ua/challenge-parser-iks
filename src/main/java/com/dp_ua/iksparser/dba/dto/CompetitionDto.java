@@ -14,7 +14,7 @@ import lombok.Setter;
 public class CompetitionDto {
 
     private long id;
-    private List<DayDto> days;
+    private List<Long> days;
     private String name;
     private String status;
     private String beginDate;

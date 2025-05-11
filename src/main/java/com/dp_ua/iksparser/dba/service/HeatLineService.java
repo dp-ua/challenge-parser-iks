@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 import com.dp_ua.iksparser.dba.dto.HeatLineDto;
+import com.dp_ua.iksparser.dba.entity.DomainElement;
 import com.dp_ua.iksparser.dba.entity.HeatLineEntity;
 import com.dp_ua.iksparser.dba.repo.HeatLineRepo;
 
@@ -19,7 +20,6 @@ public class HeatLineService {
 
     private final HeatLineRepo repo;
     private final ParticipantService participantService;
-    private final CoachService coachService;
 
     @Transactional
     public HeatLineEntity save(HeatLineEntity heatLineEntity) {
@@ -43,7 +43,7 @@ public class HeatLineService {
         dto.setParticipant(participantService.toDTO(heatLineEntity.getParticipant()));
         dto.setCoaches(heatLineEntity.getCoaches()
                 .stream()
-                .map(coachService::toDto)
+                .map(DomainElement::getId)
                 .toList()
         );
         return dto;

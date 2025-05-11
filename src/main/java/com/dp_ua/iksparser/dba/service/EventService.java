@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 import com.dp_ua.iksparser.dba.dto.EventDto;
+import com.dp_ua.iksparser.dba.entity.DomainElement;
 import com.dp_ua.iksparser.dba.entity.EventEntity;
 import com.dp_ua.iksparser.dba.repo.EventRepo;
 
@@ -17,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 public class EventService {
 
     private final EventRepo repo;
-    private final HeatService heatService;
 
     public EventEntity save(EventEntity event) {
         return repo.save(event);
@@ -42,7 +42,7 @@ public class EventService {
         eventDto.setResultUrl(eventEntity.getResultUrl());
         eventDto.setHeats(eventEntity.getHeats()
                 .stream()
-                .map(heatService::toDto)
+                .map(DomainElement::getId)
                 .toList()
         );
         return eventDto;

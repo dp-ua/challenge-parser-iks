@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 import com.dp_ua.iksparser.dba.dto.HeatDto;
+import com.dp_ua.iksparser.dba.entity.DomainElement;
 import com.dp_ua.iksparser.dba.entity.HeatEntity;
 import com.dp_ua.iksparser.dba.repo.HeatRepo;
 
@@ -17,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 public class HeatService {
 
     private final HeatRepo repo;
-    private final HeatLineService heatLineService;
 
     public HeatEntity save(HeatEntity heat) {
         return repo.save(heat);
@@ -37,7 +37,7 @@ public class HeatService {
         dto.setName(heat.getName());
         dto.setHeatLines(heat.getHeatLines()
                 .stream()
-                .map(heatLineService::toDTO)
+                .map(DomainElement::getId)
                 .toList()
         );
         return dto;

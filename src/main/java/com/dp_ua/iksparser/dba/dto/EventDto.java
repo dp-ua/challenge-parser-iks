@@ -20,6 +20,6 @@ public class EventDto {
     private String round;
     private String startListUrl;
     private String resultUrl;
-    private List<HeatDto> heats;
+    private List<Long> heats;
 
 }
