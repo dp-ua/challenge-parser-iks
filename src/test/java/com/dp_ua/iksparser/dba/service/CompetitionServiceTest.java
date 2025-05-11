@@ -1,24 +1,26 @@
 package com.dp_ua.iksparser.dba.service;
 
-import com.dp_ua.iksparser.dba.dto.CompetitionDto;
-import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
-import com.dp_ua.iksparser.dba.repo.CompetitionRepo;
-import com.dp_ua.iksparser.service.PageableService;
-import com.dp_ua.iksparser.service.SqlPreprocessorService;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Page;
 
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import com.dp_ua.iksparser.dba.dto.CompetitionDto;
+import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
+import com.dp_ua.iksparser.dba.repo.CompetitionRepo;
+import com.dp_ua.iksparser.service.PageableService;
+import com.dp_ua.iksparser.service.SqlPreprocessorService;
 
 @DataJpaTest
-public class CompetitionServiceTest {
+class CompetitionServiceTest {
     @Autowired
     CompetitionService service;
 
@@ -26,33 +28,33 @@ public class CompetitionServiceTest {
     CompetitionRepo repo;
 
     @Test
-    public void shouldLoadCompetition_All() {
+    void shouldLoadCompetition_All() {
         Iterable<CompetitionEntity> all = service.findAllOrderByBeginDateDesc();
         assertEquals(4, all.spliterator().getExactSizeIfKnown());
     }
 
     @Test
-    public void shouldLoadCompetition_FirstPage_Limit2() {
+    void shouldLoadCompetition_FirstPage_Limit2() {
         Page<CompetitionDto> allCompetitions = service.getCompetitions(null, null, 0, 2);
         assertEquals(2, allCompetitions.getContent().size());
     }
 
     @Test
-    public void shouldLoadCompetition_SecondPage_Limit3() {
+    void shouldLoadCompetition_SecondPage_Limit3() {
         Page<CompetitionDto> allCompetitions = service.getCompetitions(null, null, 1, 3);
         assertEquals(1, allCompetitions.getContent().size());
         assertEquals("Test competition alfa", allCompetitions.getContent().get(0).getName());
     }
 
     @Test
-    public void shouldLoadCompetition_OnlyOne_TextInput() {
+    void shouldLoadCompetition_OnlyOne_TextInput() {
         Page<CompetitionDto> allCompetitions = service.getCompetitions("alfa", null, 0, 4);
         assertEquals(1, allCompetitions.getContent().size());
         assertEquals("Test competition alfa", allCompetitions.getContent().get(0).getName());
     }
 
     @Test
-    public void shouldLoadCompetitions_Matched_All() {
+    void shouldLoadCompetitions_Matched_All() {
         Page<CompetitionDto> allCompetitions = service.getCompetitions("Test", null, 0, 4);
         List<CompetitionDto> content = allCompetitions.getContent();
         assertEquals(4, content.size());
@@ -63,21 +65,21 @@ public class CompetitionServiceTest {
     }
 
     @Test
-    public void shouldLoadCompetition_OnlyOne_TextInput_IgnoreCase() {
+    void shouldLoadCompetition_OnlyOne_TextInput_IgnoreCase() {
         Page<CompetitionDto> allCompetitions = service.getCompetitions("Alfa", null, 0, 4);
         assertEquals(1, allCompetitions.getContent().size());
         assertEquals("Test competition alfa", allCompetitions.getContent().get(0).getName());
     }
 
     @Test
-    public void shouldLoadCompetition_OnlyOne_TextInputTwoWorlds_IgnoreCase() {
+    void shouldLoadCompetition_OnlyOne_TextInputTwoWorlds_IgnoreCase() {
         Page<CompetitionDto> allCompetitions = service.getCompetitions("Alfa test", null, 0, 4);
         assertEquals(1, allCompetitions.getContent().size());
         assertEquals("Test competition alfa", allCompetitions.getContent().get(0).getName());
     }
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         System.out.println("Before each");
         prepareCompetitionRepo();
     }
@@ -110,14 +112,19 @@ public class CompetitionServiceTest {
 
     @TestConfiguration
     static class CompetitionServiceTestContextConfiguration {
+        @MockBean
+        private DayService dayService;
+
         @Bean
         public SqlPreprocessorService sqlPreprocessorService() {
             return new SqlPreprocessorService();
         }
 
         @Bean
-        public CompetitionService competitionService(CompetitionRepo repo) {
-            return new CompetitionService(repo);
+        public CompetitionService competitionService(CompetitionRepo repo,
+                                                     SqlPreprocessorService sqlPreprocessorService,
+                                                     PageableService pageableService) {
+            return new CompetitionService(repo, sqlPreprocessorService, pageableService, dayService);
         }
 
         @Bean

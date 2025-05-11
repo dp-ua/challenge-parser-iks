@@ -13,19 +13,17 @@ import com.dp_ua.iksparser.dba.repo.CoachRepo;
 import com.dp_ua.iksparser.service.SqlPreprocessorService;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Transactional
 @Slf4j
+@RequiredArgsConstructor
 public class CoachService {
+
     private final CoachRepo repo;
     private final SqlPreprocessorService sqlPreprocessorService;
-
-    public CoachService(CoachRepo repo, SqlPreprocessorService sqlPreprocessorService) {
-        this.repo = repo;
-        this.sqlPreprocessorService = sqlPreprocessorService;
-    }
 
     @Transactional
     public CoachEntity save(CoachEntity coach) {
@@ -56,7 +54,7 @@ public class CoachService {
     }
 
     public CoachDto getCoachDto(Long id) {
-        return convertToDto(findById(id));
+        return toDto(findById(id));
     }
 
     public List<CoachDto> getCoachesDtoList(List<Long> ids) {
@@ -66,7 +64,7 @@ public class CoachService {
                 .toList();
     }
 
-    public CoachDto convertToDto(CoachEntity coach) {
+    public CoachDto toDto(CoachEntity coach) {
         if (coach == null) {
             return null;
         }
@@ -78,6 +76,7 @@ public class CoachService {
 
     public Page<CoachDto> getByNamePartialMatch(String name, int page, int size) {
         String namePart = sqlPreprocessorService.escapeSpecialCharacters(Objects.requireNonNullElse(name, ""));
-        return searchByNamePartialMatch(namePart, PageRequest.of(page, size)).map(this::convertToDto);
+        return searchByNamePartialMatch(namePart, PageRequest.of(page, size)).map(this::toDto);
     }
+
 }

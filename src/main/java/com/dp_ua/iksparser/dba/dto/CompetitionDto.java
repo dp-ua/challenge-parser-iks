@@ -1,19 +1,20 @@
 package com.dp_ua.iksparser.dba.dto;
 
+import java.util.List;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.List;
 
 @Getter
 @Setter
 @EqualsAndHashCode
 @NoArgsConstructor
 public class CompetitionDto {
+
     private long id;
-    private List<Long> days;
+    private List<DayDto> days;
     private String name;
     private String status;
     private String beginDate;
@@ -21,4 +22,5 @@ public class CompetitionDto {
     private String country;
     private String city;
     private String url;
+
 }

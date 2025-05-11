@@ -10,6 +10,7 @@ import lombok.Setter;
 @EqualsAndHashCode
 @NoArgsConstructor
 public class ParticipantDto {
+
     private long id;
     private String surname;
     private String name;
@@ -17,4 +18,5 @@ public class ParticipantDto {
     private String region;
     private String born;
     private String url;
+
 }

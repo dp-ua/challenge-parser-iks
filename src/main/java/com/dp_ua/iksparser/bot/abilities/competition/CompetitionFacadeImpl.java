@@ -1,5 +1,36 @@
 package com.dp_ua.iksparser.bot.abilities.competition;
 
+import static com.dp_ua.iksparser.bot.Icon.ATHLETE;
+import static com.dp_ua.iksparser.bot.Icon.COACH;
+import static com.dp_ua.iksparser.bot.Icon.FIND;
+import static com.dp_ua.iksparser.bot.Icon.NUMBER;
+import static com.dp_ua.iksparser.bot.abilities.response.ResponseType.FIND_PARTICIPANT_IN_COMPETITION;
+import static com.dp_ua.iksparser.bot.abilities.response.ResponseType.SEARCH_BY_BIB_NUMBER;
+import static com.dp_ua.iksparser.config.Constants.BIB;
+import static com.dp_ua.iksparser.config.Constants.COACH_NAME;
+import static com.dp_ua.iksparser.config.Constants.COMPETITIONS_PAGE_SIZE;
+import static com.dp_ua.iksparser.config.Constants.INPUT_BIB;
+import static com.dp_ua.iksparser.config.Constants.INPUT_SURNAME;
+import static com.dp_ua.iksparser.config.Constants.MAX_CHUNK_SIZE;
+import static com.dp_ua.iksparser.config.Constants.MAX_PARTICIPANTS_SIZE_TO_FIND;
+import static com.dp_ua.iksparser.config.Constants.NAME;
+import static com.dp_ua.iksparser.service.MessageCreator.END_LINE;
+import static com.dp_ua.iksparser.service.MessageCreator.SERVICE;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Consumer;
+
+import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+
 import com.dp_ua.iksparser.bot.abilities.FacadeMethods;
 import com.dp_ua.iksparser.bot.abilities.infoview.CompetitionView;
 import com.dp_ua.iksparser.bot.abilities.infoview.HeatLineView;
@@ -8,7 +39,12 @@ import com.dp_ua.iksparser.bot.abilities.infoview.SearchView;
 import com.dp_ua.iksparser.bot.abilities.response.ResponseContainer;
 import com.dp_ua.iksparser.bot.abilities.response.ResponseContentGenerator;
 import com.dp_ua.iksparser.bot.abilities.subscribe.SubscribeFacade;
-import com.dp_ua.iksparser.bot.command.impl.*;
+import com.dp_ua.iksparser.bot.command.impl.CommandSearchByBibNumber;
+import com.dp_ua.iksparser.bot.command.impl.CommandSearchByBibNumberWithBib;
+import com.dp_ua.iksparser.bot.command.impl.CommandSearchByCoach;
+import com.dp_ua.iksparser.bot.command.impl.CommandSearchByCoachWithName;
+import com.dp_ua.iksparser.bot.command.impl.CommandSearchByName;
+import com.dp_ua.iksparser.bot.command.impl.CommandSearchByNameWithName;
 import com.dp_ua.iksparser.bot.command.impl.competition.CommandCompetitions;
 import com.dp_ua.iksparser.bot.event.SendMessageEvent;
 import com.dp_ua.iksparser.dba.dto.CompetitionDto;
@@ -23,58 +59,25 @@ import com.dp_ua.iksparser.dba.service.ParticipantService;
 import com.dp_ua.iksparser.exeption.ParsingException;
 import com.dp_ua.iksparser.service.YearRange;
 import com.dp_ua.iksparser.service.parser.MainParserService;
+
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-
-import static com.dp_ua.iksparser.bot.Icon.*;
-import static com.dp_ua.iksparser.bot.abilities.response.ResponseType.FIND_PARTICIPANT_IN_COMPETITION;
-import static com.dp_ua.iksparser.bot.abilities.response.ResponseType.SEARCH_BY_BIB_NUMBER;
-import static com.dp_ua.iksparser.service.MessageCreator.END_LINE;
-import static com.dp_ua.iksparser.service.MessageCreator.SERVICE;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class CompetitionFacadeImpl extends FacadeMethods implements CompetitionFacade {
-    public static final int COMPETITIONS_PAGE_SIZE = 3;
-    public static final int MAX_PARTICIPANTS_SIZE_TO_FIND = 5;
-    private static final int MAX_CHUNK_SIZE = 4096;
-    // todo: move to properties or string constants
-    public static final String INPUT_SURNAME = "Введіть прізвище";
-    public static final String INPUT_BIB = "Введіть номер учасника";
-    public static final String COACH_NAME = "coachName";
-    public static final String NAME = "name";
-    public static final String BIB = "bib";
 
-    @Autowired
-    SubscribeFacade subscribeFacade;
-    @Autowired
-    MainParserService mainPageParser;
-    @Autowired
-    CompetitionService competitionService;
-    @Autowired
-    CoachService coachService;
-    @Autowired
-    ParticipantService participantService;
-    @Autowired
-    CompetitionView competitionView;
-    @Autowired
-    HeatLineView heatLineView;
-    @Autowired
-    ParticipantView participantView;
-    @Autowired
-    SearchView searchView;
-    @Autowired
-    HeatLineService heatLineService;
+    private final SubscribeFacade subscribeFacade;
+    private final MainParserService mainPageParser;
+    private final CompetitionService competitionService;
+    private final CoachService coachService;
+    private final ParticipantService participantService;
+    private final CompetitionView competitionView;
+    private final HeatLineView heatLineView;
+    private final ParticipantView participantView;
+    private final SearchView searchView;
+    private final HeatLineService heatLineService;
 
     @Override
     public void showCompetitions(String chatId, int pageNumber, Integer editMessageId) {
@@ -211,12 +214,13 @@ public class CompetitionFacadeImpl extends FacadeMethods implements CompetitionF
     @Override
     public void showAthleteCompetitionParticipationDetails(String chatId, Integer editMessageId,
                                                            long participantId, long competitionId) {
-        log.info("showAthleteCompetitionParticipationDetails. ParticipantId: {}, competitionId: {}, chatId: {}", participantId, competitionId, chatId);
+        log.info("showAthleteCompetitionParticipationDetails. ParticipantId: {}, competitionId: {}, chatId: {}", participantId, competitionId,
+                chatId);
 
         Optional<ParticipantEntity> participant = participantService.findById(participantId);
         CompetitionEntity competition = competitionService.findById(competitionId);
         if (participant.isEmpty() || competition == null) {
-            throw new RuntimeException("Participant:%s or competition:%s not found"
+            throw new IllegalArgumentException("Participant:%s or competition:%s not found"
                     .formatted(participantId, competitionId));
         }
         List<HeatLineEntity> heatlines = heatLineService.getHeatLinesInCompetitionByParticipantId(competitionId, participantId);
@@ -300,7 +304,8 @@ public class CompetitionFacadeImpl extends FacadeMethods implements CompetitionF
         try {
             Thread.sleep(100);
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            log.error("Thread interrupted", e);
+            Thread.currentThread().interrupt();
         }
         InlineKeyboardMarkup keyboard = competitionView.getBackToCompetitionKeyboard(competition);
         publishEvent(prepareSendMessageEvent(
@@ -460,7 +465,7 @@ public class CompetitionFacadeImpl extends FacadeMethods implements CompetitionF
             publishFindMore(chatId, competition, INPUT_BIB);
             return true;
         }
-        if (!bib.matches("[0-9]+")) {
+        if (!bib.matches("\\d+")) {
             log.warn("Bib contains invalid symbols: {}", bib);
             publishTextMessage(chatId, "Ви вказали некоректний біб-номер", null);
             publishFindMore(chatId, competition, INPUT_BIB);
@@ -582,7 +587,7 @@ public class CompetitionFacadeImpl extends FacadeMethods implements CompetitionF
         log.info("Update competitions list. Year: {}", year);
         List<CompetitionEntity> competitions = mainPageParser.parseCompetitions(year);
         competitions
-                .forEach(c -> competitionService.saveOrUpdate(c));
+                .forEach(competitionService::saveOrUpdate);
         competitionService.flush();
         log.info("Competitions parsed. Size: {}, year: {}", competitions.size(), year);
         log.info("Competitions in DB: {}", competitionService.count());
@@ -602,8 +607,8 @@ public class CompetitionFacadeImpl extends FacadeMethods implements CompetitionF
         return participant.getHeatLines().stream()
                 .map(heatLine -> heatLine.getHeat().getEvent().getDay().getCompetition())
                 .distinct()
-                .map(c -> competitionService.convertToDto(c))
-                .collect(Collectors.toList());
+                .map(competitionService::toDTO)
+                .toList();
     }
 
     private void handleCompetition(String chatId, long competitionId,

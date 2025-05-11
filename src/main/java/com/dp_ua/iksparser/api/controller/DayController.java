@@ -31,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "Day Management")
 @RequiredArgsConstructor
 public class DayController {
+
     private final DayService dayService;
 
     @Operation(summary = "Get day info by id",
@@ -46,7 +47,7 @@ public class DayController {
         if (day == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(dayService.convertToDto(day));
+        return ResponseEntity.ok(dayService.toDTO(day));
     }
 
     @Operation(summary = "Get days by id list",
@@ -61,4 +62,5 @@ public class DayController {
         List<DayDto> dayDtos = dayService.convertToDtoList(days);
         return ResponseEntity.ok(dayDtos);
     }
+
 }

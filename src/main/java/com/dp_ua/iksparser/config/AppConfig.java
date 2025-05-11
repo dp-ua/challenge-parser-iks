@@ -1,11 +1,9 @@
-package com.dp_ua.iksparser;
+package com.dp_ua.iksparser.config;
 
-import com.dp_ua.iksparser.bot.Bot;
-import com.dp_ua.iksparser.bot.abilities.response.ResponseContentGenerator;
-import com.dp_ua.iksparser.bot.abilities.response.ResponseType;
-import com.dp_ua.iksparser.bot.abilities.response.ResponseTypeMarker;
-import jakarta.persistence.EntityManagerFactory;
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,9 +17,13 @@ import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import com.dp_ua.iksparser.bot.Bot;
+import com.dp_ua.iksparser.bot.abilities.response.ResponseContentGenerator;
+import com.dp_ua.iksparser.bot.abilities.response.ResponseType;
+import com.dp_ua.iksparser.bot.abilities.response.ResponseTypeMarker;
+
+import jakarta.persistence.EntityManagerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 @Configuration
 @Slf4j

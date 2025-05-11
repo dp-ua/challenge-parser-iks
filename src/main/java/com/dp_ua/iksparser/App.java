@@ -1,11 +1,7 @@
 package com.dp_ua.iksparser;
 
-import com.dp_ua.iksparser.bot.abilities.StateService;
-import com.dp_ua.iksparser.bot.command.CommandProvider;
-import com.dp_ua.iksparser.bot.controller.ControllerService;
-import com.dp_ua.iksparser.bot.event.SendMessageEvent;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.List;
+
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -15,20 +11,23 @@ import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.generics.BotSession;
 
-import java.util.List;
+import com.dp_ua.iksparser.bot.abilities.StateService;
+import com.dp_ua.iksparser.bot.command.CommandProvider;
+import com.dp_ua.iksparser.bot.controller.ControllerService;
+import com.dp_ua.iksparser.bot.event.SendMessageEvent;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class App implements ApplicationListener<ContextRefreshedEvent>, Ordered {
-    @Autowired
-    ControllerService botController;
 
-    @Autowired
-    StateService stateService;
-    @Autowired
-    CommandProvider commandProvider;
-    @Autowired
-    ApplicationEventPublisher publisher;
+    private final ControllerService botController;
+    private final StateService stateService;
+    private final CommandProvider commandProvider;
+    private final ApplicationEventPublisher publisher;
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {

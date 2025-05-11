@@ -33,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "Competition Management")
 @RequiredArgsConstructor
 public class CompetitionController {
+
     private final CompetitionService competitionService;
 
     @Operation(summary = "Get all competitions",
@@ -65,7 +66,7 @@ public class CompetitionController {
         if (competition == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(competitionService.convertToDto(competition));
+        return ResponseEntity.ok(competitionService.toDTO(competition));
     }
 
     @Operation(summary = "Get all statuses",

@@ -10,6 +10,8 @@ import lombok.Setter;
 @EqualsAndHashCode
 @NoArgsConstructor
 public class CoachDto {
+
     private long id;
     private String name;
+
 }

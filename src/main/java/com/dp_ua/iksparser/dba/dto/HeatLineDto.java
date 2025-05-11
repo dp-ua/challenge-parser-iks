@@ -1,21 +1,22 @@
 package com.dp_ua.iksparser.dba.dto;
 
-import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
+import java.util.List;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.List;
 
 @Setter
 @Getter
 @EqualsAndHashCode
 @NoArgsConstructor
 public class HeatLineDto {
+
     private long id;
     private String lane;
     private String bib;
-    private ParticipantEntity participant;
-    private List<Long> coaches;
+    private ParticipantDto participant;
+    private List<CoachDto> coaches;
+
 }
