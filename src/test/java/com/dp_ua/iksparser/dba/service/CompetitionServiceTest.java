@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Page;
 import com.dp_ua.iksparser.dba.dto.CompetitionDto;
 import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
 import com.dp_ua.iksparser.dba.repo.CompetitionRepo;
+import com.dp_ua.iksparser.dba.repo.DayRepo;
 import com.dp_ua.iksparser.service.PageableService;
 import com.dp_ua.iksparser.service.SqlPreprocessorService;
 
@@ -111,6 +113,13 @@ class CompetitionServiceTest {
 
     @TestConfiguration
     static class CompetitionServiceTestContextConfiguration {
+        @Mock
+        private DayRepo dayRepo;
+
+        @Bean
+        public DayService dayService() {
+            return new DayService(dayRepo);
+        }
 
         @Bean
         public SqlPreprocessorService sqlPreprocessorService() {
@@ -120,8 +129,9 @@ class CompetitionServiceTest {
         @Bean
         public CompetitionService competitionService(CompetitionRepo repo,
                                                      SqlPreprocessorService sqlPreprocessorService,
-                                                     PageableService pageableService) {
-            return new CompetitionService(repo, sqlPreprocessorService, pageableService);
+                                                     PageableService pageableService,
+                                                     DayService dayService) {
+            return new CompetitionService(repo, sqlPreprocessorService, pageableService, dayService);
         }
 
         @Bean
