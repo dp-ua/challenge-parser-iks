@@ -104,7 +104,7 @@
                                         <limit>
                                             <counter>LINE</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.10</minimum>
+                                            <minimum>0.18</minimum>
                                         </limit>
                                     </limits>
                                 </rule>
@@ -120,6 +120,17 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.0.0</version>
+                <configuration>
+                    <reportFormat>brief</reportFormat>
+                    <useFile>false</useFile>
+                    <printSummary>true</printSummary>
+                    <trimStackTrace>false</trimStackTrace>
+                </configuration>
             </plugin>
         </plugins>
     </build>
