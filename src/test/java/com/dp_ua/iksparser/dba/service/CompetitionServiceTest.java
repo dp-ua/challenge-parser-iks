@@ -1,12 +1,12 @@
 package com.dp_ua.iksparser.dba.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
 
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -22,42 +22,64 @@ import com.dp_ua.iksparser.service.SqlPreprocessorService;
 
 @DataJpaTest
 class CompetitionServiceTest {
-    @Autowired
-    CompetitionService service;
 
     @Autowired
-    CompetitionRepo repo;
+    private CompetitionService service;
+
+    @Autowired
+    private CompetitionRepo repo;
+
+    @BeforeEach
+    void setUp() {
+        System.out.println("Before each");
+        prepareCompetitionRepo();
+    }
 
     @Test
     void shouldLoadCompetition_All() {
+        // Act
         Iterable<CompetitionEntity> all = service.findAllOrderByBeginDateDesc();
+
+        // Assert
         assertEquals(4, all.spliterator().getExactSizeIfKnown());
     }
 
     @Test
     void shouldLoadCompetition_FirstPage_Limit2() {
+        // Act
         Page<CompetitionDto> allCompetitions = service.getCompetitions(null, null, 0, 2);
+
+        // Assert
         assertEquals(2, allCompetitions.getContent().size());
     }
 
     @Test
     void shouldLoadCompetition_SecondPage_Limit3() {
+        // Act
         Page<CompetitionDto> allCompetitions = service.getCompetitions(null, null, 1, 3);
+
+        // Assert
         assertEquals(1, allCompetitions.getContent().size());
         assertEquals("Test competition alfa", allCompetitions.getContent().get(0).getName());
     }
 
     @Test
     void shouldLoadCompetition_OnlyOne_TextInput() {
+        // Act
         Page<CompetitionDto> allCompetitions = service.getCompetitions("alfa", null, 0, 4);
+
+        // Assert
         assertEquals(1, allCompetitions.getContent().size());
         assertEquals("Test competition alfa", allCompetitions.getContent().get(0).getName());
     }
 
     @Test
     void shouldLoadCompetitions_Matched_All() {
+        // Act
         Page<CompetitionDto> allCompetitions = service.getCompetitions("Test", null, 0, 4);
         List<CompetitionDto> content = allCompetitions.getContent();
+
+        // Assert
         assertEquals(4, content.size());
         assertEquals("Test competition delta", content.get(0).getName());
         assertEquals("Test competition gamma", content.get(1).getName());
@@ -67,22 +89,22 @@ class CompetitionServiceTest {
 
     @Test
     void shouldLoadCompetition_OnlyOne_TextInput_IgnoreCase() {
+        // Act
         Page<CompetitionDto> allCompetitions = service.getCompetitions("Alfa", null, 0, 4);
+
+        // Assert
         assertEquals(1, allCompetitions.getContent().size());
         assertEquals("Test competition alfa", allCompetitions.getContent().get(0).getName());
     }
 
     @Test
-    void shouldLoadCompetition_OnlyOne_TextInputTwoWorlds_IgnoreCase() {
+    void shouldLoadCompetition_OnlyOne_TextInputTwoWords_IgnoreCase() {
+        // Act
         Page<CompetitionDto> allCompetitions = service.getCompetitions("Alfa test", null, 0, 4);
+
+        // Assert
         assertEquals(1, allCompetitions.getContent().size());
         assertEquals("Test competition alfa", allCompetitions.getContent().get(0).getName());
-    }
-
-    @BeforeEach
-    void setUp() {
-        System.out.println("Before each");
-        prepareCompetitionRepo();
     }
 
     private void prepareCompetitionRepo() {
@@ -113,11 +135,11 @@ class CompetitionServiceTest {
 
     @TestConfiguration
     static class CompetitionServiceTestContextConfiguration {
-        @Mock
-        private DayRepo dayRepo;
 
         @Bean
         public DayService dayService() {
+            // ✅ Создаем мок напрямую через Mockito
+            DayRepo dayRepo = mock(DayRepo.class);
             return new DayService(dayRepo);
         }
 
@@ -138,5 +160,7 @@ class CompetitionServiceTest {
         public PageableService pageableService() {
             return new PageableService();
         }
+
     }
+
 }
