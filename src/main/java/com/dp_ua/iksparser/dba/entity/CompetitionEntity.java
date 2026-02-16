@@ -1,13 +1,19 @@
 package com.dp_ua.iksparser.dba.entity;
 
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import org.apache.commons.lang3.StringUtils;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Index;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Entity
@@ -18,6 +24,7 @@ import java.util.Objects;
         @Index(name = "idx_NameDateUrl", columnList = "name,beginDate,url")
 })
 public class CompetitionEntity extends DomainElement {
+
     private String name;
     private String status;
     private String beginDate;
@@ -33,7 +40,9 @@ public class CompetitionEntity extends DomainElement {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CompetitionEntity that = (CompetitionEntity) o;
-        return Objects.equals(getName(), that.getName()) && Objects.equals(getStatus(), that.getStatus()) && Objects.equals(getBeginDate(), that.getBeginDate()) && Objects.equals(getEndDate(), that.getEndDate()) && Objects.equals(getCountry(), that.getCountry()) && Objects.equals(getCity(), that.getCity()) && Objects.equals(getUrl(), that.getUrl());
+        return Objects.equals(getName(), that.getName()) && Objects.equals(getStatus(), that.getStatus()) && Objects.equals(getBeginDate(),
+                that.getBeginDate()) && Objects.equals(getEndDate(), that.getEndDate()) && Objects.equals(getCountry(),
+                that.getCountry()) && Objects.equals(getCity(), that.getCity()) && Objects.equals(getUrl(), that.getUrl());
     }
 
     @Override
@@ -42,7 +51,9 @@ public class CompetitionEntity extends DomainElement {
     }
 
     public String getUrl() {
-        return codeURL(url);
+        return StringUtils.isNotEmpty(url)
+                ? codeURL(url)
+                : null;
     }
 
     public CompetitionEntity() {
@@ -78,4 +89,5 @@ public class CompetitionEntity extends DomainElement {
     public boolean isUrlNotValid() {
         return getUrl().endsWith(".pdf");
     }
+
 }
