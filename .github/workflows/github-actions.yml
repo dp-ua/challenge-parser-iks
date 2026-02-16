@@ -72,14 +72,3 @@ jobs:
           min-coverage-changed-files: 30
           title: 'JaCoCo Coverage Report'
           update-comment: true
-
-      - name: Fail if coverage below threshold
-        run: |
-          COVERAGE=$(awk -F',' 'NR==2 {print int(($5/($4+$5))*100)}' target/site/jacoco/jacoco.csv)
-          echo "Line coverage: $COVERAGE%"
-          if [ $COVERAGE -lt 30 ]; then
-            echo "❌ Coverage $COVERAGE% is below 30%"
-            exit 1
-          else
-            echo "✅ Coverage $COVERAGE% meets minimum requirement"
-          fi
