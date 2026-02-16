@@ -1,10 +1,11 @@
 package com.dp_ua.iksparser.service.parser;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.contains;
+import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -12,18 +13,22 @@ import java.util.List;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
 import com.dp_ua.iksparser.exeption.ExceptionType;
 import com.dp_ua.iksparser.exeption.ParsingException;
 import com.dp_ua.iksparser.service.Downloader;
 
-public class FullCalendarParserTest {
+import lombok.SneakyThrows;
+
+@ExtendWith(MockitoExtension.class)
+class FullCalendarParserTest {
 
     @Mock
     private Downloader downloader;
@@ -33,10 +38,8 @@ public class FullCalendarParserTest {
 
     private Document sampleDocument;
 
-    @Before
-    public void setUp() {
-        MockitoAnnotations.openMocks(this);
-
+    @BeforeEach
+    void setUp() {
         // Создаем образец HTML документа для тестирования
         String html = "<html><body>" +
                 "<table><tbody>" +
@@ -60,7 +63,7 @@ public class FullCalendarParserTest {
     }
 
     @Test
-    public void testParseCompetitions_Success() throws ParsingException {
+    void testParseCompetitions_Success() throws ParsingException {
         // Arrange
         when(downloader.getDocument(anyString())).thenReturn(sampleDocument);
 
@@ -94,17 +97,21 @@ public class FullCalendarParserTest {
         verify(downloader).getDocument(contains("search_year=2023"));
     }
 
-    @Test(expected = ParsingException.class)
-    public void testParseCompetitions_EmptyUrl() throws ParsingException {
+    @Test
+    @SneakyThrows
+    void testParseCompetitions_EmptyUrl() {
         // Arrange
-        when(downloader.getDocument(anyString())).thenThrow(new ParsingException("Url is empty", ExceptionType.EMPTY_URL));
+        when(downloader.getDocument(anyString()))
+                .thenThrow(new ParsingException("Url is empty", ExceptionType.EMPTY_URL));
 
         // Act & Assert (ожидаем исключение)
-        fullCalendarParser.parseCompetitions(2023);
+        assertThrows(ParsingException.class, () -> {
+            fullCalendarParser.parseCompetitions(2023);
+        });
     }
 
     @Test
-    public void testParseCompetitions_NullDocument() throws ParsingException {
+    void testParseCompetitions_NullDocument() throws ParsingException {
         // Arrange
         when(downloader.getDocument(anyString())).thenReturn(null);
 
@@ -117,7 +124,7 @@ public class FullCalendarParserTest {
     }
 
     @Test
-    public void testGetURL() throws Exception {
+    void testGetURL() throws Exception {
         // Используем рефлексию для доступа к приватному методу
         java.lang.reflect.Method method = FullCalendarParser.class.getDeclaredMethod("getURL", int.class);
         method.setAccessible(true);
