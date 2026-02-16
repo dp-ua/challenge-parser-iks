@@ -1,11 +1,13 @@
 package com.dp_ua.iksparser.dba.service;
 
 import static com.dp_ua.iksparser.config.Constants.FORMATTER;
+import static org.apache.commons.lang3.StringUtils.SPACE;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Component;
 import com.dp_ua.iksparser.dba.dto.CompetitionDto;
 import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
 import com.dp_ua.iksparser.dba.entity.CompetitionStatus;
+import com.dp_ua.iksparser.dba.entity.DayEntity;
 import com.dp_ua.iksparser.dba.entity.HeatLineEntity;
 import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
 import com.dp_ua.iksparser.dba.repo.CompetitionRepo;
@@ -66,7 +69,6 @@ public class CompetitionService {
                         throw new IllegalArgumentException("Invalid date format: " + date, e);
                     }
                 })
-                .filter(year -> year != null)
                 .sorted()
                 .toList();
 
@@ -86,10 +88,27 @@ public class CompetitionService {
         return LocalDate.parse(textDate, FORMATTER);
     }
 
+    /**
+     * Saves or updates a competition entity.
+     * If the URL has changed, clears all days and their related data as they need to be re-parsed.
+     *
+     * @param competition The competition entity to save or update
+     * @return The saved or updated competition entity
+     */
     public CompetitionEntity saveOrUpdate(CompetitionEntity competition) {
         Optional<CompetitionEntity> competitionFromDb = getCompetitionFromDb(competition);
         return competitionFromDb
                 .map(competitionEntity -> {
+                    var oldUrl = competitionEntity.getUrl();
+                    var newUrl = competition.getUrl();
+
+                    var urlChanged = (oldUrl == null && newUrl != null) ||
+                            (oldUrl != null && !oldUrl.equals(newUrl));
+
+                    if (urlChanged) {
+                        clearCompetitionDays(competitionEntity);
+                    }
+
                     competitionEntity.fillCompetition(competition);
                     return repo.save(competitionEntity);
                 })
@@ -170,12 +189,30 @@ public class CompetitionService {
     }
 
     private List<String> getParts(String text) {
-        return Arrays.asList(text.split(" "));
+        return Arrays.asList(text.split(SPACE));
     }
 
     private Page<CompetitionDto> getCompetitionDtos(List<CompetitionEntity> content, int page, int size) {
         Page<CompetitionEntity> result = pageableService.getPage(content, page, size);
         return result.map(this::toDTO);
+    }
+
+    /**
+     * Clears all days associated with a competition.
+     * This will cascade delete all events, heats, and heat lines associated with these days.
+     *
+     * @param competition The competition entity whose days should be cleared
+     */
+    private void clearCompetitionDays(CompetitionEntity competition) {
+        if (competition.getDays() != null && !competition.getDays().isEmpty()) {
+            var daysToRemove = new ArrayList<>(competition.getDays());
+
+            for (DayEntity day : daysToRemove) {
+                day.setCompetition(null);
+            }
+
+            competition.getDays().clear();
+        }
     }
 
     public CompetitionDto toDTO(CompetitionEntity competition) {
@@ -240,4 +277,5 @@ public class CompetitionService {
     public Optional<CompetitionEntity> getCompetitionByHeatLine(HeatLineEntity heatLineEntity) {
         return repo.findCompetitionByHeatLine(heatLineEntity.getId());
     }
+
 }
