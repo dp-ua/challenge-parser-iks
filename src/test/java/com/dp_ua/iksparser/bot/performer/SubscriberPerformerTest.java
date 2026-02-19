@@ -47,7 +47,7 @@ import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
 class SubscriberPerformerTest {
 
     @Mock
-    private SubscribeFacade facade;
+    private SubscribeFacade subscribeFacade;
 
     @Mock
     private NotificationQueueService notificationQueueService;
@@ -70,7 +70,7 @@ class SubscriberPerformerTest {
         subscriberPerformer.onApplicationEvent(event);
 
         // Then
-        verify(facade, times(SINGLE_INVOCATION))
+        verify(subscribeFacade, times(SINGLE_INVOCATION))
                 .operateParticipantWithHeatlines(any(ParticipantEntity.class), anyList());
         verify(notificationQueueService, never())
                 .saveNotificationsToQueue(any(ParticipantEntity.class), anyList());
@@ -88,7 +88,7 @@ class SubscriberPerformerTest {
         subscriberPerformer.onApplicationEvent(event);
 
         // Then
-        verify(facade, never())
+        verify(subscribeFacade, never())
                 .operateParticipantWithHeatlines(any(ParticipantEntity.class), anyList());
         verify(notificationQueueService, times(SINGLE_INVOCATION))
                 .saveNotificationsToQueue(any(ParticipantEntity.class), anyList());
@@ -106,7 +106,7 @@ class SubscriberPerformerTest {
         subscriberPerformer.onApplicationEvent(event);
 
         // Then
-        verify(facade, times(SINGLE_INVOCATION))
+        verify(subscribeFacade, times(SINGLE_INVOCATION))
                 .operateParticipantWithHeatlines(any(ParticipantEntity.class), anyList());
         verify(notificationQueueService, times(SINGLE_INVOCATION))
                 .saveNotificationsToQueue(any(ParticipantEntity.class), anyList());
@@ -124,7 +124,7 @@ class SubscriberPerformerTest {
         subscriberPerformer.onApplicationEvent(event);
 
         // Then
-        verify(facade, never())
+        verify(subscribeFacade, never())
                 .operateParticipantWithHeatlines(any(ParticipantEntity.class), anyList());
         verify(notificationQueueService, never())
                 .saveNotificationsToQueue(any(ParticipantEntity.class), anyList());
@@ -135,11 +135,14 @@ class SubscriberPerformerTest {
         // Given
         var event = createTestSubscribeEventWithEmptyParticipations();
 
+        when(notificationConfig.isLegacyEnabled()).thenReturn(LEGACY_ENABLED);
+        when(notificationConfig.isAggregatedEnabled()).thenReturn(AGGREGATED_ENABLED);
+
         // When
         subscriberPerformer.onApplicationEvent(event);
 
         // Then
-        verify(facade, never())
+        verify(subscribeFacade, never())
                 .operateParticipantWithHeatlines(any(ParticipantEntity.class), anyList());
         verify(notificationQueueService, never())
                 .saveNotificationsToQueue(any(ParticipantEntity.class), anyList());
@@ -157,7 +160,7 @@ class SubscriberPerformerTest {
         subscriberPerformer.onApplicationEvent(event);
 
         // Then
-        verify(facade, times(TWO_INVOCATIONS))
+        verify(subscribeFacade, times(TWO_INVOCATIONS))
                 .operateParticipantWithHeatlines(any(ParticipantEntity.class), anyList());
         verify(notificationQueueService, times(TWO_INVOCATIONS))
                 .saveNotificationsToQueue(any(ParticipantEntity.class), anyList());
@@ -180,7 +183,7 @@ class SubscriberPerformerTest {
         subscriberPerformer.onApplicationEvent(event);
 
         // Then
-        verify(facade).operateParticipantWithHeatlines(participant, heatLines);
+        verify(subscribeFacade).operateParticipantWithHeatlines(participant, heatLines);
     }
 
     @Test
@@ -227,7 +230,7 @@ class SubscriberPerformerTest {
         subscriberPerformer.onApplicationEvent(event);
 
         // Then
-        verify(facade, times(THREE_INVOCATIONS))
+        verify(subscribeFacade, times(THREE_INVOCATIONS))
                 .operateParticipantWithHeatlines(any(ParticipantEntity.class), anyList());
         verify(notificationQueueService, times(THREE_INVOCATIONS))
                 .saveNotificationsToQueue(any(ParticipantEntity.class), anyList());
@@ -254,18 +257,18 @@ class SubscriberPerformerTest {
         subscriberPerformer.onApplicationEvent(event);
 
         // Then
-        verify(facade, times(TWO_INVOCATIONS))
+        verify(subscribeFacade, times(TWO_INVOCATIONS))
                 .operateParticipantWithHeatlines(any(ParticipantEntity.class), anyList());
         verify(notificationQueueService, times(TWO_INVOCATIONS))
                 .saveNotificationsToQueue(any(ParticipantEntity.class), anyList());
 
         // Verify specific calls
-        verify(facade).operateParticipantWithHeatlines(participant1, heatLines1);
-        verify(facade).operateParticipantWithHeatlines(participant2, emptyHeatLines);
+        verify(subscribeFacade).operateParticipantWithHeatlines(participant1, heatLines1);
+        verify(subscribeFacade).operateParticipantWithHeatlines(participant2, emptyHeatLines);
     }
 
     @Test
-    void onApplicationEvent_shouldCheckConfigurationFlags() {
+    void onApplicationEvent_shouldCheckConfigurationFlagsOnlyOnce() {
         // Given
         var event = createTestSubscribeEventWithSingleParticipant();
 
@@ -276,12 +279,12 @@ class SubscriberPerformerTest {
         subscriberPerformer.onApplicationEvent(event);
 
         // Then
-        verify(notificationConfig).isLegacyEnabled();
-        verify(notificationConfig).isAggregatedEnabled();
+        verify(notificationConfig, times(SINGLE_INVOCATION)).isLegacyEnabled();
+        verify(notificationConfig, times(SINGLE_INVOCATION)).isAggregatedEnabled();
     }
 
     @Test
-    void onApplicationEvent_shouldCheckFlagsForEachParticipant() {
+    void onApplicationEvent_shouldCheckFlagsOnlyOnceEvenWithMultipleParticipants() {
         // Given
         var event = createTestSubscribeEventWithMultipleParticipants();
 
@@ -295,9 +298,9 @@ class SubscriberPerformerTest {
         var participationsSize = event.getParticipations().size();
         assertThat(participationsSize).isEqualTo(TWO_PARTICIPANTS);
 
-        // Each participant should check both flags
-        verify(notificationConfig, times(TWO_INVOCATIONS)).isLegacyEnabled();
-        verify(notificationConfig, times(TWO_INVOCATIONS)).isAggregatedEnabled();
+        // Flags should be checked only once, not for each participant (optimization)
+        verify(notificationConfig, times(SINGLE_INVOCATION)).isLegacyEnabled();
+        verify(notificationConfig, times(SINGLE_INVOCATION)).isAggregatedEnabled();
     }
 
 }
