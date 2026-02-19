@@ -37,9 +37,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.dp_ua.iksparser.bot.abilities.notification.NotificationConfigProperties;
 import com.dp_ua.iksparser.bot.abilities.notification.NotificationQueueService;
 import com.dp_ua.iksparser.bot.abilities.subscribe.SubscribeFacade;
+import com.dp_ua.iksparser.configuration.NotificationConfigProperties;
 import com.dp_ua.iksparser.dba.entity.HeatLineEntity;
 import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
 

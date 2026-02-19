@@ -6,10 +6,10 @@ import java.util.Map;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
-import com.dp_ua.iksparser.bot.abilities.notification.NotificationConfigProperties;
 import com.dp_ua.iksparser.bot.abilities.notification.NotificationQueueService;
 import com.dp_ua.iksparser.bot.abilities.subscribe.SubscribeFacade;
 import com.dp_ua.iksparser.bot.event.SubscribeEvent;
+import com.dp_ua.iksparser.configuration.NotificationConfigProperties;
 import com.dp_ua.iksparser.dba.entity.HeatLineEntity;
 import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
 
