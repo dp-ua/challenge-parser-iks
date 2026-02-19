@@ -1,5 +1,19 @@
 package com.dp_ua.iksparser.service.cron;
 
+import static com.dp_ua.iksparser.dba.entity.CompetitionStatus.C_CANCELED;
+import static com.dp_ua.iksparser.dba.entity.CompetitionStatus.C_FINISHED;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Set;
+
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.core.Ordered;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
 import com.dp_ua.iksparser.SpringApp;
 import com.dp_ua.iksparser.bot.abilities.competition.CompetitionFacade;
 import com.dp_ua.iksparser.bot.event.UpdateCompetitionEvent;
@@ -9,37 +23,22 @@ import com.dp_ua.iksparser.dba.entity.UpdateStatusEntity;
 import com.dp_ua.iksparser.dba.service.CompetitionService;
 import com.dp_ua.iksparser.dba.service.EventService;
 import com.dp_ua.iksparser.exeption.ParsingException;
+
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.core.Ordered;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
-
-import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import static com.dp_ua.iksparser.dba.entity.CompetitionStatus.C_CANCELED;
-import static com.dp_ua.iksparser.dba.entity.CompetitionStatus.C_FINISHED;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class CronCompetitionUpdater implements ApplicationListener<ContextRefreshedEvent>, Ordered {
-    @Autowired
-    EventService eventService;
-    @Autowired
-    CompetitionService competitionService;
-    @Autowired
-    CompetitionFacade competitionFacade;
-    @Autowired
-    ApplicationEventPublisher publisher;
-    private final Set<String> finishedOrCanceledStatuses = new HashSet<>(Arrays.asList(C_FINISHED.getName(), C_CANCELED.getName()));
+
+    private final EventService eventService;
+    private final CompetitionService competitionService;
+    private final CompetitionFacade competitionFacade;
+    private final ApplicationEventPublisher publisher;
+
+    private final Set<String> finishedOrCanceledStatuses = Set.of(C_FINISHED.getName(), C_CANCELED.getName());
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
@@ -140,4 +139,5 @@ public class CronCompetitionUpdater implements ApplicationListener<ContextRefres
     public int getOrder() {
         return SpringApp.ORDER_FOR_COMPETITION_UPDATER;
     }
+
 }
