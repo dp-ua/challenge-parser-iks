@@ -14,6 +14,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SubscriberEntity extends DomainElement {
+
     private String chatId;
     @ManyToOne
     @JoinColumn(name = "participant_id")
@@ -26,4 +27,5 @@ public class SubscriberEntity extends DomainElement {
                 ", participant=" + participant.getSurname() + " " + participant.getName() +
                 '}';
     }
+
 }
