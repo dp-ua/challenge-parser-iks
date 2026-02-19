@@ -7,7 +7,6 @@ import static com.dp_ua.iksparser.dba.repository.NotificationTestUtils.TEST_CHAT
 import static com.dp_ua.iksparser.dba.repository.NotificationTestUtils.TEST_CHAT_ID_2;
 import static com.dp_ua.iksparser.dba.repository.NotificationTestUtils.TEST_CHAT_ID_3;
 import static com.dp_ua.iksparser.dba.repository.NotificationTestUtils.TEST_COMPETITION_NAME_1;
-import static com.dp_ua.iksparser.dba.repository.NotificationTestUtils.TEST_COMPETITION_NAME_2;
 import static com.dp_ua.iksparser.dba.repository.NotificationTestUtils.TEST_ERROR_MESSAGE;
 import static com.dp_ua.iksparser.dba.repository.NotificationTestUtils.TEST_HEAT_LINE_BIB_1;
 import static com.dp_ua.iksparser.dba.repository.NotificationTestUtils.TEST_HEAT_LINE_BIB_2;
@@ -37,10 +36,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
 import com.dp_ua.iksparser.dba.entity.DayEntity;
 import com.dp_ua.iksparser.dba.entity.EventEntity;
-import com.dp_ua.iksparser.dba.entity.HeatEntity;
 import com.dp_ua.iksparser.dba.entity.HeatLineEntity;
 import com.dp_ua.iksparser.dba.entity.NotificationQueueEntity;
 import com.dp_ua.iksparser.dba.entity.NotificationStatus;
@@ -75,9 +72,6 @@ class NotificationQueueRepositoryTest {
 
     private ParticipantEntity participant1;
     private ParticipantEntity participant2;
-    private CompetitionEntity competition1;
-    private CompetitionEntity competition2;
-    private HeatEntity heat1;
     private HeatLineEntity heatLine1;
     private HeatLineEntity heatLine2;
 
@@ -99,14 +93,11 @@ class NotificationQueueRepositoryTest {
         participant2 = participantRepo.save(participant2);
 
         // Create test competitions
-        competition1 = createTestCompetition(TEST_COMPETITION_NAME_1);
+        var competition1 = createTestCompetition(TEST_COMPETITION_NAME_1);
         competition1 = competitionRepo.save(competition1);
 
-        competition2 = createTestCompetition(TEST_COMPETITION_NAME_2);
-        competition2 = competitionRepo.save(competition2);
-
         // Create test heat
-        heat1 = createTestHeat();
+        var heat1 = createTestHeat();
         EventEntity event1 = createTestEvent();
         DayEntity day1 = new DayEntity("2025-03-20", "day1", "День 1", "Day 1");
         day1.setCompetition(competition1);
@@ -132,17 +123,17 @@ class NotificationQueueRepositoryTest {
     void shouldFindNewNotifications() {
         // Given
         NotificationQueueEntity newNotification = createTestNotification(
-                TEST_CHAT_ID_1, participant1, heatLine1, competition1
+                TEST_CHAT_ID_1, participant1, heatLine1
         );
         notificationQueueRepository.save(newNotification);
 
         NotificationQueueEntity sentNotification = createSentNotification(
-                TEST_CHAT_ID_2, participant2, heatLine2, competition1
+                TEST_CHAT_ID_2, participant2, heatLine2
         );
         notificationQueueRepository.save(sentNotification);
 
         // When
-        List<NotificationQueueEntity> found = notificationQueueRepository.findByStatus(NotificationStatus.NEW);
+        var found = notificationQueueRepository.findByStatus(NotificationStatus.NEW);
 
         // Then
         assertThat(found).hasSize(1);
@@ -154,16 +145,16 @@ class NotificationQueueRepositoryTest {
     void shouldFindDistinctChatIdsWithNewNotifications() {
         // Given
         notificationQueueRepository.save(
-                createTestNotification(TEST_CHAT_ID_1, participant1, heatLine1, competition1)
+                createTestNotification(TEST_CHAT_ID_1, participant1, heatLine1)
         );
         notificationQueueRepository.save(
-                createTestNotification(TEST_CHAT_ID_1, participant2, heatLine2, competition1)
+                createTestNotification(TEST_CHAT_ID_1, participant2, heatLine2)
         );
         notificationQueueRepository.save(
-                createTestNotification(TEST_CHAT_ID_2, participant1, heatLine1, competition1)
+                createTestNotification(TEST_CHAT_ID_2, participant1, heatLine1)
         );
         notificationQueueRepository.save(
-                createSentNotification(TEST_CHAT_ID_3, participant2, heatLine2, competition1)
+                createSentNotification(TEST_CHAT_ID_3, participant2, heatLine2)
         );
 
         // When
@@ -179,13 +170,13 @@ class NotificationQueueRepositoryTest {
     void shouldFindByChatIdAndStatus() {
         // Given
         notificationQueueRepository.save(
-                createTestNotification(TEST_CHAT_ID_1, participant1, heatLine1, competition1)
+                createTestNotification(TEST_CHAT_ID_1, participant1, heatLine1)
         );
         notificationQueueRepository.save(
-                createTestNotification(TEST_CHAT_ID_1, participant2, heatLine2, competition1)
+                createTestNotification(TEST_CHAT_ID_1, participant2, heatLine2)
         );
         notificationQueueRepository.save(
-                createTestNotification(TEST_CHAT_ID_2, participant1, heatLine1, competition1)
+                createTestNotification(TEST_CHAT_ID_2, participant1, heatLine1)
         );
 
         // When
@@ -202,7 +193,7 @@ class NotificationQueueRepositoryTest {
     void shouldCheckIfNotificationExists() {
         // Given
         NotificationQueueEntity notification = createTestNotification(
-                TEST_CHAT_ID_1, participant1, heatLine1, competition1
+                TEST_CHAT_ID_1, participant1, heatLine1
         );
         notificationQueueRepository.save(notification);
 
@@ -230,12 +221,12 @@ class NotificationQueueRepositoryTest {
     void shouldDeleteOldNotifications() {
         // Given
         NotificationQueueEntity recentNotification = createSentNotification(
-                TEST_CHAT_ID_1, participant1, heatLine1, competition1
+                TEST_CHAT_ID_1, participant1, heatLine1
         );
         notificationQueueRepository.save(recentNotification);
 
         NotificationQueueEntity oldNotification = createSentNotification(
-                TEST_CHAT_ID_2, participant2, heatLine2, competition1
+                TEST_CHAT_ID_2, participant2, heatLine2
         );
         notificationQueueRepository.save(oldNotification);
 
@@ -256,13 +247,13 @@ class NotificationQueueRepositoryTest {
     void shouldCountByStatus() {
         // Given
         notificationQueueRepository.save(
-                createTestNotification(TEST_CHAT_ID_1, participant1, heatLine1, competition1)
+                createTestNotification(TEST_CHAT_ID_1, participant1, heatLine1)
         );
         notificationQueueRepository.save(
-                createTestNotification(TEST_CHAT_ID_2, participant2, heatLine2, competition1)
+                createTestNotification(TEST_CHAT_ID_2, participant2, heatLine2)
         );
         notificationQueueRepository.save(
-                createSentNotification(TEST_CHAT_ID_3, participant1, heatLine1, competition1)
+                createSentNotification(TEST_CHAT_ID_3, participant1, heatLine1)
         );
 
         // When
@@ -278,7 +269,7 @@ class NotificationQueueRepositoryTest {
     void shouldHandleErrorNotifications() {
         // Given
         NotificationQueueEntity errorNotification = createErrorNotification(
-                TEST_CHAT_ID_1, participant1, heatLine1, competition1, TEST_ERROR_MESSAGE
+                TEST_CHAT_ID_1, participant1, heatLine1, TEST_ERROR_MESSAGE
         );
         notificationQueueRepository.save(errorNotification);
 
@@ -299,7 +290,6 @@ class NotificationQueueRepositoryTest {
                 .chatId(TEST_CHAT_ID_1)
                 .participant(participant1)
                 .heatLine(heatLine1)
-                .competition(competition1)
                 .build();
 
         // When

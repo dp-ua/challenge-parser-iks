@@ -56,13 +56,6 @@ public class NotificationQueueEntity extends DomainElement {
     private HeatLineEntity heatLine;
 
     /**
-     * Competition for grouping
-     */
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "competition_id", nullable = false)
-    private CompetitionEntity competition;
-
-    /**
      * Status of notification processing
      */
     @Enumerated(EnumType.STRING)

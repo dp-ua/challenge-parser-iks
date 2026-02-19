@@ -61,15 +61,4 @@ public interface NotificationQueueRepository extends JpaRepository<NotificationQ
      */
     long countByStatus(NotificationStatus status);
 
-    /**
-     * Find notifications by chat ID, ordered by competition and heat
-     */
-    @Query("SELECT n FROM NotificationQueueEntity n " +
-            "WHERE n.chatId = :chatId AND n.status = :status " +
-            "ORDER BY n.competition.id, n.heatLine.heat.id")
-    List<NotificationQueueEntity> findByChatIdAndStatusOrderByCompetitionAndHeat(
-            @Param("chatId") String chatId,
-            @Param("status") NotificationStatus status
-    );
-
 }

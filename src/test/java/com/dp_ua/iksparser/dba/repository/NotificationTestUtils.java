@@ -10,7 +10,6 @@ import com.dp_ua.iksparser.dba.entity.HeatLineEntity;
 import com.dp_ua.iksparser.dba.entity.NotificationQueueEntity;
 import com.dp_ua.iksparser.dba.entity.NotificationStatus;
 import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
-import com.dp_ua.iksparser.dba.entity.SubscriberEntity;
 
 /**
  * Test utilities for creating notification-related test data.
@@ -35,7 +34,6 @@ public class NotificationTestUtils {
 
     // Test Constants - Competition data
     public static final String TEST_COMPETITION_NAME_1 = "Чемпіонат України";
-    public static final String TEST_COMPETITION_NAME_2 = "Кубок Києва";
     public static final String TEST_COMPETITION_LOCATION = "Київ";
     public static final String TEST_COMPETITION_URL = "https://example.com/competition";
 
@@ -47,7 +45,6 @@ public class NotificationTestUtils {
 
     // Test Constants - Heat data
     public static final String TEST_HEAT_DESCRIPTION = "100м вільний стиль, чоловіки";
-    public static final String TEST_HEAT_NUMBER = "12";
 
     // Test Constants - Time
     public static final int DAYS_OLD_FOR_CLEANUP = 7;
@@ -96,7 +93,7 @@ public class NotificationTestUtils {
         competition.setStatus(CompetitionStatus.C_NOT_STARTED.getName());
         return competition;
     }
-    
+
     /**
      * Creates a test CompetitionEntity with custom name
      */
@@ -108,7 +105,7 @@ public class NotificationTestUtils {
         competition.setStatus(CompetitionStatus.C_NOT_STARTED.getName());
         return competition;
     }
-    
+
     /**
      * Creates a test HeatEntity with default values
      */
@@ -117,7 +114,7 @@ public class NotificationTestUtils {
         heat.setName(TEST_HEAT_DESCRIPTION);
         return heat;
     }
-    
+
     /**
      * Creates a test EventEntity with default values
      */
@@ -167,14 +164,12 @@ public class NotificationTestUtils {
     public static NotificationQueueEntity createTestNotification(
             String chatId,
             ParticipantEntity participant,
-            HeatLineEntity heatLine,
-            CompetitionEntity competition
+            HeatLineEntity heatLine
     ) {
         return NotificationQueueEntity.builder()
                 .chatId(chatId)
                 .participant(participant)
                 .heatLine(heatLine)
-                .competition(competition)
                 .status(NotificationStatus.NEW)
                 .retryCount(DEFAULT_RETRY_COUNT)
                 .build();
@@ -187,14 +182,12 @@ public class NotificationTestUtils {
             String chatId,
             ParticipantEntity participant,
             HeatLineEntity heatLine,
-            CompetitionEntity competition,
             NotificationStatus status
     ) {
         return NotificationQueueEntity.builder()
                 .chatId(chatId)
                 .participant(participant)
                 .heatLine(heatLine)
-                .competition(competition)
                 .status(status)
                 .retryCount(DEFAULT_RETRY_COUNT)
                 .build();
@@ -206,14 +199,12 @@ public class NotificationTestUtils {
     public static NotificationQueueEntity createSentNotification(
             String chatId,
             ParticipantEntity participant,
-            HeatLineEntity heatLine,
-            CompetitionEntity competition
+            HeatLineEntity heatLine
     ) {
         return NotificationQueueEntity.builder()
                 .chatId(chatId)
                 .participant(participant)
                 .heatLine(heatLine)
-                .competition(competition)
                 .status(NotificationStatus.SENT)
                 .processedAt(LocalDateTime.now())
                 .retryCount(DEFAULT_RETRY_COUNT)
@@ -227,14 +218,12 @@ public class NotificationTestUtils {
             String chatId,
             ParticipantEntity participant,
             HeatLineEntity heatLine,
-            CompetitionEntity competition,
             String errorMessage
     ) {
         return NotificationQueueEntity.builder()
                 .chatId(chatId)
                 .participant(participant)
                 .heatLine(heatLine)
-                .competition(competition)
                 .status(NotificationStatus.ERROR)
                 .processedAt(LocalDateTime.now())
                 .errorMessage(errorMessage)
@@ -242,10 +231,4 @@ public class NotificationTestUtils {
                 .build();
     }
 
-    /**
-     * Creates a test SubscriberEntity
-     */
-    public static SubscriberEntity createTestSubscriber(String chatId, ParticipantEntity participant) {
-        return new SubscriberEntity(chatId, participant);
-    }
 }
