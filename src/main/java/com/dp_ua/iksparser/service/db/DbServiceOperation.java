@@ -1,5 +1,14 @@
 package com.dp_ua.iksparser.service.db;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Component;
+
 import com.dp_ua.iksparser.bot.controller.BotController;
 import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
 import com.dp_ua.iksparser.dba.entity.HeatLineEntity;
@@ -9,28 +18,21 @@ import com.dp_ua.iksparser.dba.service.CompetitionService;
 import com.dp_ua.iksparser.dba.service.HeatLineService;
 import com.dp_ua.iksparser.dba.service.ParticipantService;
 import com.dp_ua.iksparser.dba.service.SubscriberService;
-import jakarta.transaction.Transactional;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class DbServiceOperation {
 
-    @Autowired
-    BotController bot;
-    @Autowired
-    SubscriberService subscribeService;
-    @Autowired
-    HeatLineService heatLineService;
-    @Autowired
-    ParticipantService participantService;
-    @Autowired
-    CompetitionService competitionService;
+    private final BotController bot;
+    private final SubscriberService subscribeService;
+    private final HeatLineService heatLineService;
+    private final ParticipantService participantService;
+    private final CompetitionService competitionService;
 
     @Transactional
     public void operateCompetitionsDuplicates() {
@@ -123,7 +125,7 @@ public class DbServiceOperation {
 
             // collect all subscribers chats
             Set<String> chats = onePerson.stream()
-                    .map(p -> subscribeService.findAllByParticipant(p))
+                    .map(subscribeService::findAllByParticipant)
                     .flatMap(List::stream)
                     .map(SubscriberEntity::getChatId)
                     .collect(Collectors.toSet());
@@ -136,7 +138,7 @@ public class DbServiceOperation {
                     .findFirst();
 
             // unsubscribe all chats
-            onePerson.forEach(p -> subscribeService.unsubscribeAll(p));
+            onePerson.forEach(subscribeService::unsubscribeAll);
 
             // set all heatLines to one participant
             participant.setHeatLines(heatLines);
@@ -150,16 +152,17 @@ public class DbServiceOperation {
             // subscribe one participant to all chats
             chats.forEach(chatId -> subscribeService.subscribe(chatId, participant));
             participantService.save(participant);
-            log.info("Save participant: " + participant);
+            log.info("Save participant: {}", participant);
 
             onePerson.remove(participant);
             onePerson.forEach(p -> {
                 participantService.delete(p);
-                log.info("Delete participant: " + p);
+                log.info("Delete participant: {}", p);
                 duplicates.remove(p);
             });
             duplicates.remove(participant);
             stop++;
         }
     }
+
 }

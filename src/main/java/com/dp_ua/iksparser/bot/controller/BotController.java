@@ -1,10 +1,7 @@
 package com.dp_ua.iksparser.bot.controller;
 
-import com.dp_ua.iksparser.bot.Bot;
-import com.dp_ua.iksparser.bot.event.SendMessageEvent;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import static com.dp_ua.iksparser.service.MessageCreator.SERVICE;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
@@ -13,23 +10,27 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.BotSession;
 
-import static com.dp_ua.iksparser.service.MessageCreator.SERVICE;
+import com.dp_ua.iksparser.bot.Bot;
+import com.dp_ua.iksparser.bot.event.SendMessageEvent;
+
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class BotController implements ControllerService {
+
     @Value("${telegram.bot.reconnectTimeout}")
     private int reconnectTimeout;
     @Value("${telegram.bot.adminId}")
     @Getter
     private String adminId;
-    @Autowired
-    ApplicationEventPublisher publisher;
 
-    @Autowired
-    Bot bot;
-    @Autowired
-    TelegramBotsApi telegramBotsApi;
+    private final ApplicationEventPublisher publisher;
+    private final Bot bot;
+    private final TelegramBotsApi telegramBotsApi;
 
     public BotSession botConnect() {
         try {
@@ -38,7 +39,7 @@ public class BotController implements ControllerService {
             sendMessageToAdmin("TelegramAPI started. Look for messages");
             return botSession;
         } catch (TelegramApiException e) {
-            log.error("Cant Connect. Pause " + getTimeInSec() + "sec and I'll try again. Error: " + e.getMessage());
+            log.error("Cant Connect. Pause {}sec and I'll try again. Error: {}", getTimeInSec(), e.getMessage());
             try {
                 Thread.sleep(reconnectTimeout);
             } catch (InterruptedException e1) {
@@ -66,4 +67,5 @@ public class BotController implements ControllerService {
         SendMessageEvent event = new SendMessageEvent(this, message, SendMessageEvent.MsgType.SEND_MESSAGE);
         publisher.publishEvent(event);
     }
+
 }
