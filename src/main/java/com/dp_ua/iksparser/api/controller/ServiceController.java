@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.dp_ua.iksparser.bot.abilities.competition.CompetitionFacade;
 import com.dp_ua.iksparser.bot.event.UpdateCompetitionEvent;
-import com.dp_ua.iksparser.config.IsServiceEnable;
+import com.dp_ua.iksparser.configuration.IsServiceEnable;
 import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
 import com.dp_ua.iksparser.dba.entity.EventEntity;
 import com.dp_ua.iksparser.dba.entity.UpdateStatusEntity;
