@@ -71,4 +71,5 @@ public interface NotificationQueueRepository extends JpaRepository<NotificationQ
             @Param("chatId") String chatId,
             @Param("status") NotificationStatus status
     );
+
 }
