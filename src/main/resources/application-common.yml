@@ -10,14 +10,10 @@ view:
 # Notification settings
 notification:
   mode: BOTH  # LEGACY, AGGREGATED, or BOTH
+  processor:
+    cron-pattern: "0 15,45 6,10,14,18,22 * * *"
   aggregated:
     enabled: true
-    # How often to process notification queue (in milliseconds)
-    # 10 minutes = 600000, 30 minutes = 1800000, 1 hour = 3600000
-    schedulerInterval: 600000  # 10 minutes
-    # Maximum notifications per user in one message
-    maxNotificationsPerMessage: 50
-    # Delete old processed notifications after N days
     cleanupAfterDays: 7
 
 logging:
