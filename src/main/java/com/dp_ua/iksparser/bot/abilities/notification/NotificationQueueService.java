@@ -2,8 +2,6 @@ package com.dp_ua.iksparser.bot.abilities.notification;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,9 +16,6 @@ import com.dp_ua.iksparser.dba.service.SubscriberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * Service for working with notification queue
- */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -43,7 +38,7 @@ public class NotificationQueueService {
             var chatId = subscriber.getChatId();
 
             heatLines.forEach(heatLine -> {
-                NotificationQueueEntity notification = NotificationQueueEntity.builder()
+                var notification = NotificationQueueEntity.builder()
                         .chatId(chatId)
                         .participant(participant)
                         .heatLine(heatLine)
@@ -114,12 +109,6 @@ public class NotificationQueueService {
                 LocalDateTime.now()
         );
         log.info("Reset {} notifications to status {}", updatedCount, newStatus);
-    }
-
-    public Map<ParticipantEntity, List<NotificationQueueEntity>> groupByParticipant(
-            List<NotificationQueueEntity> notifications) {
-        return notifications.stream()
-                .collect(Collectors.groupingBy(NotificationQueueEntity::getParticipant));
     }
 
 }
