@@ -72,7 +72,7 @@ class NotificationMessageBuilderTest {
                 .getCompetition()).isEqualTo(competition);
         assertThat(message.getNotificationIds()).containsExactly(1L);
         assertThat(message.getText()).contains("Чемпіонат України");
-        assertThat(message.getText()).contains(TEST_PARTICIPANT_NAME_1 + " " + TEST_PARTICIPANT_SURNAME_1);
+        assertThat(message.getText()).contains(TEST_PARTICIPANT_SURNAME_1 + " " + TEST_PARTICIPANT_NAME_1);
         assertThat(message.getText()).contains("100м вільний стиль, чоловіки");
         assertThat(message.getText()).contains(TEST_COMPETITION_URL);
     }
