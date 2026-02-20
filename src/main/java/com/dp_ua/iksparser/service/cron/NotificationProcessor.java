@@ -24,7 +24,7 @@ public class NotificationProcessor {
     /**
      * Process pending notifications every 25 minutes
      */
-    @Scheduled(cron = "0 0/25 10-23 * * *")
+    @Scheduled(cron = "0 0/15 10-23 * * *")
     public void processPendingNotifications() {
         log.info("Scheduled notification processing triggered");
         facade.processAllPendingNotifications();
