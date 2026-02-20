@@ -33,8 +33,9 @@ public class DomainElement {
 
     @PrePersist
     protected void onCreate() {
-        created = LocalDateTime.now();
-        updated = LocalDateTime.now();
+        var now = LocalDateTime.now();
+        created = now;
+        updated = now;
         log.debug("created: {}, {}", this.getClass().getSimpleName(), this);
     }
 
