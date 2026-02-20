@@ -52,7 +52,7 @@ public interface NotificationQueueRepository extends JpaRepository<NotificationQ
      * Delete old processed notifications (cleanup)
      * Returns count of deleted records
      */
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("DELETE FROM NotificationQueueEntity n WHERE n.processedAt < :date")
     int deleteByProcessedAtBefore(@Param("date") LocalDateTime date);
 
@@ -60,5 +60,79 @@ public interface NotificationQueueRepository extends JpaRepository<NotificationQ
      * Count notifications by status
      */
     long countByStatus(NotificationStatus status);
+
+    /**
+     * Атомарно изменяет статус с NEW на PROCESSING для конкретного chatId
+     * Явно передаем updated время для совместимости с разными БД
+     */
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("UPDATE NotificationQueueEntity n " +
+            "SET n.status = :newStatus, n.updated = :updatedAt " +
+            "WHERE n.chatId = :chatId AND n.status = :oldStatus")
+    int updateStatusForChat(
+            @Param("chatId") String chatId,
+            @Param("oldStatus") NotificationStatus oldStatus,
+            @Param("newStatus") NotificationStatus newStatus,
+            @Param("updatedAt") LocalDateTime updatedAt
+    );
+
+    /**
+     * Атомарно изменяет статус для списка ID
+     */
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("UPDATE NotificationQueueEntity n " +
+            "SET n.status = :status, n.processedAt = :processedAt, n.updated = :updatedAt " +
+            "WHERE n.id IN :ids")
+    int updateStatusBatch(
+            @Param("ids") List<Long> ids,
+            @Param("status") NotificationStatus status,
+            @Param("processedAt") LocalDateTime processedAt,
+            @Param("updatedAt") LocalDateTime updatedAt
+    );
+
+    /**
+     * Обновление статуса с увеличением retry счетчика
+     */
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("UPDATE NotificationQueueEntity n " +
+            "SET n.status = :status, " +
+            "    n.processedAt = :processedAt, " +
+            "    n.errorMessage = :errorMessage, " +
+            "    n.retryCount = n.retryCount + 1, " +
+            "    n.updated = :updatedAt " +
+            "WHERE n.id IN :ids")
+    int updateStatusWithError(
+            @Param("ids") List<Long> ids,
+            @Param("status") NotificationStatus status,
+            @Param("processedAt") LocalDateTime processedAt,
+            @Param("errorMessage") String errorMessage,
+            @Param("updatedAt") LocalDateTime updatedAt
+    );
+
+    /**
+     * Найти все уведомления для chatId со статусом PROCESSING
+     * Eager fetch для избежания N+1 проблемы
+     */
+    @Query("SELECT n FROM NotificationQueueEntity n " +
+            "JOIN FETCH n.participant p " +
+            "JOIN FETCH n.heatLine hl " +
+            "WHERE n.chatId = :chatId AND n.status = :status")
+    List<NotificationQueueEntity> findByChatIdAndStatusWithDetails(
+            @Param("chatId") String chatId,
+            @Param("status") NotificationStatus status
+    );
+
+    /**
+     * Сброс статуса для "застрявших" PROCESSING уведомлений
+     */
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("UPDATE NotificationQueueEntity n " +
+            "SET n.status = :newStatus, n.updated = :updatedAt " +
+            "WHERE n.id IN :ids")
+    int resetStatusBatch(
+            @Param("ids") List<Long> ids,
+            @Param("newStatus") NotificationStatus newStatus,
+            @Param("updatedAt") LocalDateTime updatedAt
+    );
 
 }

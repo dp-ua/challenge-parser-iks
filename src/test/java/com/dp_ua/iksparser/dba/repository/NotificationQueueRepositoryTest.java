@@ -24,6 +24,7 @@ import static com.dp_ua.iksparser.dba.repository.NotificationTestUtils.createTes
 import static com.dp_ua.iksparser.dba.repository.NotificationTestUtils.createTestHeatLine;
 import static com.dp_ua.iksparser.dba.repository.NotificationTestUtils.createTestNotification;
 import static com.dp_ua.iksparser.dba.repository.NotificationTestUtils.createTestParticipant;
+import static java.time.temporal.ChronoUnit.MICROS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -49,6 +50,9 @@ import com.dp_ua.iksparser.dba.repo.HeatRepo;
 import com.dp_ua.iksparser.dba.repo.NotificationQueueRepository;
 import com.dp_ua.iksparser.dba.repo.ParticipantRepo;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @DataJpaTest
 class NotificationQueueRepositoryTest {
 
@@ -299,6 +303,347 @@ class NotificationQueueRepositoryTest {
         assertThat(saved.getStatus()).isEqualTo(NotificationStatus.NEW);
         assertThat(saved.getRetryCount()).isEqualTo(DEFAULT_RETRY_COUNT);
         assertThat(saved.getCreated()).isNotNull();
+    }
+
+    @Test
+    void shouldUpdateStatusForChatAtomically() {
+        // Given
+        notificationQueueRepository.save(
+                createTestNotification(TEST_CHAT_ID_1, participant1, heatLine1)
+        );
+        notificationQueueRepository.save(
+                createTestNotification(TEST_CHAT_ID_1, participant2, heatLine2)
+        );
+        notificationQueueRepository.save(
+                createTestNotification(TEST_CHAT_ID_2, participant1, heatLine1)
+        );
+
+        // When
+        LocalDateTime updateTime = LocalDateTime.now();
+        int updated = notificationQueueRepository.updateStatusForChat(
+                TEST_CHAT_ID_1,
+                NotificationStatus.NEW,
+                NotificationStatus.PROCESSING,
+                updateTime
+        );
+        log.info("Update time: {}", updateTime);
+        // Then
+        assertThat(updated).isEqualTo(2);
+
+        // Verify status changed for chat1
+        List<NotificationQueueEntity> chat1Notifications =
+                notificationQueueRepository.findByChatIdAndStatus(TEST_CHAT_ID_1, NotificationStatus.PROCESSING);
+        assertThat(chat1Notifications)
+                .hasSize(2)
+                .allMatch(n -> n.getStatus() == NotificationStatus.PROCESSING)
+                .allMatch(n -> n.getUpdated() != null
+                        && n.getUpdated().truncatedTo(MICROS).isEqual(updateTime.truncatedTo(MICROS))
+                )
+        ;
+
+        // Verify chat2 still has NEW status
+        List<NotificationQueueEntity> chat2Notifications =
+                notificationQueueRepository.findByChatIdAndStatus(TEST_CHAT_ID_2, NotificationStatus.NEW);
+        assertThat(chat2Notifications).hasSize(1);
+    }
+
+    @Test
+    void shouldNotUpdateIfStatusDoesNotMatch() {
+        // Given
+        notificationQueueRepository.save(
+                createTestNotification(TEST_CHAT_ID_1, participant1, heatLine1)
+        );
+
+        // When - trying to update from PROCESSING to SENT, but current status is NEW
+        int updated = notificationQueueRepository.updateStatusForChat(
+                TEST_CHAT_ID_1,
+                NotificationStatus.PROCESSING,
+                NotificationStatus.SENT,
+                LocalDateTime.now()
+        );
+
+        // Then
+        assertThat(updated).isZero();
+
+        // Verify status is still NEW
+        List<NotificationQueueEntity> notifications =
+                notificationQueueRepository.findByChatIdAndStatus(TEST_CHAT_ID_1, NotificationStatus.NEW);
+        assertThat(notifications).hasSize(1);
+    }
+
+    @Test
+    void shouldUpdateStatusBatch() {
+        // Given
+        NotificationQueueEntity notif1 = notificationQueueRepository.save(
+                createTestNotification(TEST_CHAT_ID_1, participant1, heatLine1)
+        );
+        NotificationQueueEntity notif2 = notificationQueueRepository.save(
+                createTestNotification(TEST_CHAT_ID_1, participant2, heatLine2)
+        );
+        NotificationQueueEntity notif3 = notificationQueueRepository.save(
+                createTestNotification(TEST_CHAT_ID_2, participant1, heatLine1)
+        );
+
+        List<Long> idsToUpdate = List.of(notif1.getId(), notif2.getId());
+
+        // When
+        LocalDateTime processedTime = LocalDateTime.now();
+        int updated = notificationQueueRepository.updateStatusBatch(
+                idsToUpdate,
+                NotificationStatus.SENT,
+                processedTime,
+                processedTime
+        );
+
+        // Then
+        assertThat(updated).isEqualTo(2);
+
+        // Verify updated notifications
+        List<NotificationQueueEntity> sentNotifications =
+                notificationQueueRepository.findByStatus(NotificationStatus.SENT);
+        assertThat(sentNotifications)
+                .hasSize(2)
+                .extracting(NotificationQueueEntity::getId)
+                .containsExactlyInAnyOrder(notif1.getId(), notif2.getId());
+
+        assertThat(sentNotifications)
+                .allMatch(n -> n.getProcessedAt() != null)
+                .allMatch(n -> n.getUpdated() != null);
+
+        // Verify notif3 is still NEW
+        NotificationQueueEntity notif3After = notificationQueueRepository.findById(notif3.getId()).orElseThrow();
+        assertThat(notif3After.getStatus()).isEqualTo(NotificationStatus.NEW);
+    }
+
+    @Test
+    void shouldUpdateStatusWithError() {
+        // Given
+        NotificationQueueEntity notif1 = notificationQueueRepository.save(
+                createTestNotification(TEST_CHAT_ID_1, participant1, heatLine1)
+        );
+        NotificationQueueEntity notif2 = notificationQueueRepository.save(
+                createTestNotification(TEST_CHAT_ID_1, participant2, heatLine2)
+        );
+
+        List<Long> idsToUpdate = List.of(notif1.getId(), notif2.getId());
+        String errorMsg = "Connection timeout";
+
+        // When
+        LocalDateTime errorTime = LocalDateTime.now();
+        int updated = notificationQueueRepository.updateStatusWithError(
+                idsToUpdate,
+                NotificationStatus.ERROR,
+                errorTime,
+                errorMsg,
+                errorTime
+        );
+
+        // Then
+        assertThat(updated).isEqualTo(2);
+
+        // Verify error notifications
+        List<NotificationQueueEntity> errorNotifications =
+                notificationQueueRepository.findByStatus(NotificationStatus.ERROR);
+        assertThat(errorNotifications).hasSize(2);
+
+        errorNotifications.forEach(notification -> {
+            assertThat(notification.getErrorMessage()).isEqualTo(errorMsg);
+            assertThat(notification.getRetryCount()).isEqualTo(1); // incremented from 0
+            assertThat(notification.getProcessedAt()).isNotNull();
+            assertThat(notification.getUpdated()).isNotNull();
+        });
+    }
+
+    @Test
+    void shouldIncrementRetryCountOnMultipleErrors() {
+        // Given
+        NotificationQueueEntity notif = notificationQueueRepository.save(
+                createTestNotification(TEST_CHAT_ID_1, participant1, heatLine1)
+        );
+
+        // When - first error
+        notificationQueueRepository.updateStatusWithError(
+                List.of(notif.getId()),
+                NotificationStatus.ERROR,
+                LocalDateTime.now(),
+                "Error 1",
+                LocalDateTime.now()
+        );
+
+        NotificationQueueEntity afterFirstError = notificationQueueRepository.findById(notif.getId()).orElseThrow();
+        assertThat(afterFirstError.getRetryCount()).isEqualTo(1);
+
+        // When - second error (retry)
+        notificationQueueRepository.updateStatusWithError(
+                List.of(notif.getId()),
+                NotificationStatus.ERROR,
+                LocalDateTime.now(),
+                "Error 2",
+                LocalDateTime.now()
+        );
+
+        // Then
+        NotificationQueueEntity afterSecondError = notificationQueueRepository.findById(notif.getId()).orElseThrow();
+        assertThat(afterSecondError.getRetryCount()).isEqualTo(2);
+        assertThat(afterSecondError.getErrorMessage()).isEqualTo("Error 2");
+    }
+
+    @Test
+    void shouldFindByChatIdAndStatusWithDetails() {
+        // Given
+        NotificationQueueEntity notif1 = createTestNotification(TEST_CHAT_ID_1, participant1, heatLine1);
+        notif1.setStatus(NotificationStatus.PROCESSING);
+        notificationQueueRepository.save(notif1);
+
+        NotificationQueueEntity notif2 = createTestNotification(TEST_CHAT_ID_1, participant2, heatLine2);
+        notif2.setStatus(NotificationStatus.PROCESSING);
+        notificationQueueRepository.save(notif2);
+
+        NotificationQueueEntity notif3 = createTestNotification(TEST_CHAT_ID_2, participant1, heatLine1);
+        notif3.setStatus(NotificationStatus.PROCESSING);
+        notificationQueueRepository.save(notif3);
+
+        // When
+        List<NotificationQueueEntity> found = notificationQueueRepository
+                .findByChatIdAndStatusWithDetails(TEST_CHAT_ID_1, NotificationStatus.PROCESSING);
+
+        // Then
+        assertThat(found).hasSize(2);
+
+        // Verify eager loading worked (no lazy initialization exception)
+        found.forEach(notification -> {
+            assertThat(notification.getParticipant()).isNotNull();
+            assertThat(notification.getParticipant().getName()).isNotNull();
+            assertThat(notification.getHeatLine()).isNotNull();
+            assertThat(notification.getHeatLine().getBib()).isNotNull();
+        });
+    }
+
+    @Test
+    void shouldResetStatusBatch() {
+        // Given
+        NotificationQueueEntity notif1 = createTestNotification(TEST_CHAT_ID_1, participant1, heatLine1);
+        notif1.setStatus(NotificationStatus.PROCESSING);
+        notif1 = notificationQueueRepository.save(notif1);
+
+        NotificationQueueEntity notif2 = createTestNotification(TEST_CHAT_ID_1, participant2, heatLine2);
+        notif2.setStatus(NotificationStatus.PROCESSING);
+        notif2 = notificationQueueRepository.save(notif2);
+
+        List<Long> idsToReset = List.of(notif1.getId(), notif2.getId());
+
+        // When
+        LocalDateTime resetTime = LocalDateTime.now();
+        int updated = notificationQueueRepository.resetStatusBatch(
+                idsToReset,
+                NotificationStatus.NEW,
+                resetTime
+        );
+
+        // Then
+        assertThat(updated).isEqualTo(2);
+
+        // Verify status reset to NEW
+        List<NotificationQueueEntity> resetNotifications =
+                notificationQueueRepository.findByStatus(NotificationStatus.NEW);
+        assertThat(resetNotifications)
+                .hasSize(2)
+                .extracting(NotificationQueueEntity::getId)
+                .containsExactlyInAnyOrder(notif1.getId(), notif2.getId());
+    }
+
+    @Test
+    void shouldHandleEmptyListInBatchOperations() {
+        // Given
+        List<Long> emptyList = List.of();
+
+        // When
+        int updatedBatch = notificationQueueRepository.updateStatusBatch(
+                emptyList,
+                NotificationStatus.SENT,
+                LocalDateTime.now(),
+                LocalDateTime.now()
+        );
+
+        int updatedError = notificationQueueRepository.updateStatusWithError(
+                emptyList,
+                NotificationStatus.ERROR,
+                LocalDateTime.now(),
+                "error",
+                LocalDateTime.now()
+        );
+
+        int updatedReset = notificationQueueRepository.resetStatusBatch(
+                emptyList,
+                NotificationStatus.NEW,
+                LocalDateTime.now()
+        );
+
+        // Then
+        assertThat(updatedBatch).isZero();
+        assertThat(updatedError).isZero();
+        assertThat(updatedReset).isZero();
+    }
+
+    @Test
+    void shouldDeleteOldProcessedNotifications_RealScenario() {
+        // Given - create old notification manually setting processedAt
+        NotificationQueueEntity oldNotif = NotificationQueueEntity.builder()
+                .chatId(TEST_CHAT_ID_1)
+                .participant(participant1)
+                .heatLine(heatLine1)
+                .status(NotificationStatus.SENT)
+                .processedAt(LocalDateTime.now().minusDays(10))
+                .build();
+        notificationQueueRepository.save(oldNotif);
+
+        NotificationQueueEntity recentNotif = createSentNotification(
+                TEST_CHAT_ID_2, participant2, heatLine2
+        );
+        notificationQueueRepository.save(recentNotif);
+
+        // When
+        LocalDateTime cutoffDate = LocalDateTime.now().minusDays(7);
+        int deleted = notificationQueueRepository.deleteByProcessedAtBefore(cutoffDate);
+
+        // Then
+        assertThat(deleted).isEqualTo(1);
+
+        List<NotificationQueueEntity> remaining = notificationQueueRepository.findAll();
+        assertThat(remaining).hasSize(1);
+        assertThat(remaining.get(0).getChatId()).isEqualTo(TEST_CHAT_ID_2);
+    }
+
+    @Test
+    void shouldHandleConcurrentUpdateScenario() {
+        // Given - simulate scenario where two processes try to update same chat
+        NotificationQueueEntity notif = notificationQueueRepository.save(
+                createTestNotification(TEST_CHAT_ID_1, participant1, heatLine1)
+        );
+
+        // When - first process updates successfully
+        int firstUpdate = notificationQueueRepository.updateStatusForChat(
+                TEST_CHAT_ID_1,
+                NotificationStatus.NEW,
+                NotificationStatus.PROCESSING,
+                LocalDateTime.now()
+        );
+
+        // Second process tries to update same notification (should fail - already PROCESSING)
+        int secondUpdate = notificationQueueRepository.updateStatusForChat(
+                TEST_CHAT_ID_1,
+                NotificationStatus.NEW,
+                NotificationStatus.PROCESSING,
+                LocalDateTime.now()
+        );
+
+        // Then
+        assertThat(firstUpdate).isEqualTo(1);
+        assertThat(secondUpdate).isZero(); // No update because status is already PROCESSING
+
+        // Verify final state
+        NotificationQueueEntity finalState = notificationQueueRepository.findById(notif.getId()).orElseThrow();
+        assertThat(finalState.getStatus()).isEqualTo(NotificationStatus.PROCESSING);
     }
 
 }
