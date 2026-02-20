@@ -1,8 +1,8 @@
 package com.dp_ua.iksparser.dba.service;
 
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -179,7 +179,7 @@ class CompetitionServiceUrlChangeTest {
         assertAll("URL change from non-null to null should clear days",
                 () -> verify(repo).save(existingCompetition),
                 () -> assertTrue(result.getDays().isEmpty(), "Days should be cleared when URL changes from non-null to null"),
-                () -> assertNull(result.getUrl(), "URL should be updated to null")
+                () -> assertEquals(EMPTY, result.getUrl(), "URL should be updated to null and returned as EMPTY")
         );
     }
 
@@ -201,7 +201,7 @@ class CompetitionServiceUrlChangeTest {
         assertAll("Both URLs null should not clear days",
                 () -> verify(repo).save(existingCompetition),
                 () -> assertEquals(2, result.getDays().size(), "Days should not be cleared when both URLs are null"),
-                () -> assertNull(result.getUrl(), "URL should remain null")
+                () -> assertEquals(EMPTY, result.getUrl(), "URL should remain null and  returned as EMPTY")
         );
     }
 
@@ -223,7 +223,7 @@ class CompetitionServiceUrlChangeTest {
         assertAll("Both URLs empty should not clear days",
                 () -> verify(repo).save(existingCompetition),
                 () -> assertEquals(2, result.getDays().size(), "Days should not be cleared when both URLs are empty"),
-                () -> assertNull(result.getUrl(), "URL should be null (empty strings are converted to null)")  // ✅ Изменено
+                () -> assertEquals(EMPTY, result.getUrl(), "URL should be EMPTY (empty strings are converted to EMPTY)")  // ✅ Изменено
         );
     }
 
