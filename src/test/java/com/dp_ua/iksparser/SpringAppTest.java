@@ -1,20 +1,21 @@
 package com.dp_ua.iksparser;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import static java.lang.Boolean.TRUE;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
-public class SpringAppTest {
+class SpringAppTest {
+
     @MockBean
     App app;
 
     @Test
-    public void shouldStartContext() {
-        Assert.assertTrue(true);
+    void shouldStartContext() {
+        assertTrue(TRUE);
     }
+
 }
