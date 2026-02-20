@@ -1,19 +1,22 @@
 package com.dp_ua.iksparser.dba.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+import com.dp_ua.iksparser.service.UrlUtils;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
 @Getter
 @Setter
 @Entity
 public class ParticipantEntity extends DomainElement {
+
     private String surname;
     private String name;
     private String team;
@@ -24,7 +27,7 @@ public class ParticipantEntity extends DomainElement {
     private List<HeatLineEntity> heatLines;
 
     public String getUrl() {
-        return codeURL(url);
+        return UrlUtils.encodeUrl(url);
     }
 
     @Override
@@ -53,11 +56,13 @@ public class ParticipantEntity extends DomainElement {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ParticipantEntity that = (ParticipantEntity) o;
-        return Objects.equals(surname, that.surname) && Objects.equals(name, that.name) && Objects.equals(team, that.team) && Objects.equals(region, that.region) && Objects.equals(born, that.born) && Objects.equals(url, that.url);
+        return Objects.equals(surname, that.surname) && Objects.equals(name, that.name) && Objects.equals(team, that.team) && Objects.equals(region,
+                that.region) && Objects.equals(born, that.born) && Objects.equals(url, that.url);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(surname, name, team, region, born, url);
     }
+
 }

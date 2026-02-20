@@ -1,5 +1,6 @@
 package com.dp_ua.iksparser.dba.entity;
 
+import static com.dp_ua.iksparser.service.UrlUtils.encodeUrl;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 import java.util.ArrayList;
@@ -54,7 +55,7 @@ public class CompetitionEntity extends DomainElement {
 
     public String getUrl() {
         return StringUtils.isNotEmpty(url)
-                ? codeURL(url)
+                ? encodeUrl(url)
                 : EMPTY;
     }
 

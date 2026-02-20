@@ -1,13 +1,21 @@
 package com.dp_ua.iksparser.dba.entity;
 
-import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+
+import com.dp_ua.iksparser.service.UrlUtils;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @Setter
@@ -15,6 +23,7 @@ import java.util.List;
 @Slf4j
 @NoArgsConstructor
 public class EventEntity extends DomainElement {
+
     private String time;
     private String eventName;
     private String category;
@@ -34,11 +43,11 @@ public class EventEntity extends DomainElement {
     }
 
     public String getStartListUrl() {
-        return codeURL(startListUrl);
+        return UrlUtils.encodeUrl(startListUrl);
     }
 
     public String getResultUrl() {
-        return codeURL(resultUrl);
+        return UrlUtils.encodeUrl(resultUrl);
     }
 
     public void updateEventDetails(EventEntity event) {
@@ -84,10 +93,13 @@ public class EventEntity extends DomainElement {
         }
         return isNotFilled();
     }
+
     public boolean hasStartListUrl() {
-        return !startListUrl.isEmpty();
+        return StringUtils.isNotEmpty(startListUrl);
     }
+
     public boolean hasResultUrl() {
-        return !resultUrl.isEmpty();
+        return StringUtils.isNotEmpty(resultUrl);
     }
+
 }
