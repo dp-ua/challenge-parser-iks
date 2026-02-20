@@ -1,26 +1,29 @@
 package com.dp_ua.iksparser.service.parser;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.lenient;
 
 import java.util.List;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.dp_ua.iksparser.dba.entity.DayEntity;
 import com.dp_ua.iksparser.dba.entity.EventEntity;
 import com.dp_ua.iksparser.exeption.ParsingException;
 
-public class CompetitionPageParserTest {
+@ExtendWith(MockitoExtension.class)
+class CompetitionPageParserTest {
 
     @Mock
     private ServiceParser serviceParser;
@@ -30,10 +33,8 @@ public class CompetitionPageParserTest {
 
     private Document sampleDocument;
 
-    @Before
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
-
+    @BeforeEach
+    void setUp() {
         // Создаем образец HTML документа для тестирования
         String html = "<html><body>" +
                 "<ul id='timetable'>" +
@@ -83,7 +84,7 @@ public class CompetitionPageParserTest {
         sampleDocument = Jsoup.parse(html);
 
         // Настраиваем мок для ServiceParser
-        when(serviceParser.parseDay(anyString())).thenAnswer(invocation -> {
+        lenient().when(serviceParser.parseDay(anyString())).thenAnswer(invocation -> {
             String input = invocation.getArgument(0);
             if (input.contains("151223")) {
                 return new DayEntity("15.12.23", "151223", "День 1", "Day 1");
@@ -94,7 +95,7 @@ public class CompetitionPageParserTest {
     }
 
     @Test
-    public void testGetUnsavedEvents_Success() {
+    void testGetUnsavedEvents_Success() {
         // Arrange
         DayEntity day = new DayEntity("15.12.23", "151223", "День 1", "Day 1");
 
@@ -123,7 +124,7 @@ public class CompetitionPageParserTest {
     }
 
     @Test
-    public void testGetUnsavedUnfilledDays_Success() throws ParsingException {
+    void testGetUnsavedUnfilledDays_Success() throws ParsingException {
         // Act
         List<DayEntity> days = competitionPageParser.getUnsavedUnfilledDays(sampleDocument);
 
@@ -146,27 +147,27 @@ public class CompetitionPageParserTest {
         assertEquals("Day 2", secondDay.getDayNameEn());
     }
 
-    @Test(expected = ParsingException.class)
-    public void testGetUnsavedUnfilledDays_EmptyDays() throws ParsingException {
+    @Test
+    void testGetUnsavedUnfilledDays_EmptyDays() {
         // Arrange
         Document emptyDocument = Jsoup.parse("<html><body></body></html>");
 
         // Act & Assert (ожидаем исключение)
-        competitionPageParser.getUnsavedUnfilledDays(emptyDocument);
+        assertThrows(ParsingException.class, () -> competitionPageParser.getUnsavedUnfilledDays(emptyDocument));
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void testGetUnsavedEvents_EmptyEvents() {
+    @Test
+    void testGetUnsavedEvents_EmptyEvents() {
         // Arrange
         Document emptyDocument = Jsoup.parse("<html><body><div id='timetable-151223'><table><tbody></tbody></table></div></body></html>");
         DayEntity day = new DayEntity("15.12.23", "151223", "День 1", "Day 1");
 
         // Act & Assert (ожидаем исключение)
-        competitionPageParser.getUnsavedEvents(emptyDocument, day);
+        assertThrows(IllegalStateException.class, () -> competitionPageParser.getUnsavedEvents(emptyDocument, day));
     }
 
     @Test
-    public void testParseEvent_CompleteData() {
+    void testParseEvent_CompleteData() {
         // Arrange
         Element row = sampleDocument.select("div#timetable-151223 table tbody tr").first();
 
@@ -183,7 +184,7 @@ public class CompetitionPageParserTest {
     }
 
     @Test
-    public void testParseEvent_MissingResultUrl() {
+    void testParseEvent_MissingResultUrl() {
         // Arrange - используем второй ряд, где нет кнопки результатов
         Element row = sampleDocument.select("div#timetable-151223 table tbody tr").get(1);
 
@@ -200,7 +201,7 @@ public class CompetitionPageParserTest {
     }
 
     @Test
-    public void testParseEvent_MalformedHTML() {
+    void testParseEvent_MalformedHTML() {
         // Arrange - создаем элемент с неполными данными
         Document malformedDoc = Jsoup.parse("<html><body><table><tbody><tr><td>09:00</td></tr></tbody></table></body></html>");
         Element malformedRow = malformedDoc.select("tr").first();

@@ -1,28 +1,30 @@
 package com.dp_ua.iksparser.dba.repo;
 
-import com.dp_ua.iksparser.App;
-import com.dp_ua.iksparser.dba.entity.UpdateStatusEntity;
-import lombok.extern.slf4j.Slf4j;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+
+import com.dp_ua.iksparser.App;
+import com.dp_ua.iksparser.dba.entity.UpdateStatusEntity;
+
+import lombok.extern.slf4j.Slf4j;
+
 @Slf4j
-@RunWith(SpringRunner.class)
 @SpringBootTest
 class UpdateStatusRepoTest {
+
     @Autowired
     private UpdateStatusRepo repo;
     @MockBean
     App app;
 
     @Test
-    public void shouldSaveAndRetrieveUpdateStatus() {
+    void shouldSaveAndRetrieveUpdateStatus() {
         // given
         String expectedStatus = "Test status";
         long expectedCompetitionId = 1L;
@@ -35,9 +37,10 @@ class UpdateStatusRepoTest {
 
         // then
         List<UpdateStatusEntity> allByCompetitionIdAndStatus = repo.findAllByCompetitionIdAndStatus(expectedCompetitionId, expectedStatus);
-        assert allByCompetitionIdAndStatus.size() == 1;
+        assertEquals(1, allByCompetitionIdAndStatus.size());
         UpdateStatusEntity updateStatusFromDb = allByCompetitionIdAndStatus.get(0);
-        assert updateStatusFromDb.getStatus().equals(expectedStatus);
-        assert updateStatusFromDb.getCompetitionId() == expectedCompetitionId;
+        assertEquals(expectedStatus, updateStatusFromDb.getStatus());
+        assertEquals(expectedCompetitionId, updateStatusFromDb.getCompetitionId());
     }
+
 }

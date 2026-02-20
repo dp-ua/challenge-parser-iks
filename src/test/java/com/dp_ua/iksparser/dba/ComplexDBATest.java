@@ -1,20 +1,17 @@
 package com.dp_ua.iksparser.dba;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.util.List;
-import java.util.Optional;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
 import com.dp_ua.iksparser.App;
@@ -42,9 +39,9 @@ import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@RunWith(SpringRunner.class)
 @SpringBootTest
-public class ComplexDBATest {
+class ComplexDBATest {
+
     @MockBean
     App app;
     @MockBean
@@ -72,17 +69,18 @@ public class ComplexDBATest {
     SubscribeFacade subscribeFacade;
 
     @Test
-    public void shouldInformAboutNewEvents() {
+    void shouldInformAboutNewEvents() {
         fillDB();
-        HeatLineEntity heatLine = heatLineService.findAll().iterator().next();
-        ParticipantEntity participant = heatLine.getParticipant();
+        var heatLine = heatLineService.findAll().iterator().next();
+        var participant = heatLine.getParticipant();
 
         subscribeFacade.operateParticipantWithHeatlines(participant, List.of(heatLine));
-        ArgumentCaptor<SendMessageEvent> captor = ArgumentCaptor.forClass(SendMessageEvent.class);
+        var captor = ArgumentCaptor.forClass(SendMessageEvent.class);
 
         verify(sendMessagePerformer, times(1)).onApplicationEvent(captor.capture());
-        SendMessage message = (SendMessage) captor.getValue().getMessage();
-        Assert.assertEquals("""
+
+        var message = (SendMessage) captor.getValue().getMessage();
+        assertEquals("""
                 \uD83D\uDD14Ви підписані на учасника:\s
                 
                 [\uD83C\uDFC3surname firstName ](url) born\uD83C\uDF82
@@ -98,28 +96,21 @@ public class ComplexDBATest {
     }
 
     @Test
-    public void shouldGetCompetitionByHeatLine() {
-
+    void shouldGetCompetitionByHeatLine() {
         fillDB();
-        // given
-        HeatLineEntity heatLine = heatLineService.findAll().iterator().next();
+        var heatLine = heatLineService.findAll().iterator().next();
+        var competition = competitionService.getCompetitionByHeatLine(heatLine);
 
-        // when
-        Optional<CompetitionEntity> competition = competitionService.getCompetitionByHeatLine(heatLine);
-
-        // then
         assertThat(competition).isPresent();
         assertThat(competition.get().getBeginDate()).isEqualTo("beginDate");
     }
 
     @Test
     @Transactional
-    public void shouldSaveAndLoadFullCompetition_withEntities() {
+    void shouldSaveAndLoadFullCompetition_withEntities() {
         fillDB();
-        // when load competition by name
-        CompetitionEntity competitionFromDb = competitionService.findByName("name");
+        var competitionFromDb = competitionService.findByName("name");
 
-        // then
         assertThat(competitionFromDb).isNotNull();
         assertThat(competitionFromDb.getName()).isEqualTo("name");
         assertThat(competitionFromDb.getBeginDate()).isEqualTo("beginDate");
@@ -128,20 +119,20 @@ public class ComplexDBATest {
         assertThat(competitionFromDb.getCity()).isEqualTo("city");
         assertThat(competitionFromDb.getUrl()).isEqualTo("url");
 
-        List<DayEntity> daysFromDb = competitionFromDb.getDays();
+        var daysFromDb = competitionFromDb.getDays();
         assertThat(daysFromDb).hasSize(1);
 
-        DayEntity dayFromDb = daysFromDb.get(0);
+        var dayFromDb = daysFromDb.get(0);
         assertThat(dayFromDb.getDate()).isEqualTo("date");
         assertThat(dayFromDb.getDateId()).isEqualTo("dateId");
         assertThat(dayFromDb.getDayName()).isEqualTo("dayName");
         assertThat(dayFromDb.getDayNameEn()).isEqualTo("dayNameEn");
         assertThat(dayFromDb.getCompetition().getName()).isEqualTo("name");
 
-        List<EventEntity> eventsFromDb = dayFromDb.getEvents();
+        var eventsFromDb = dayFromDb.getEvents();
         assertThat(eventsFromDb).hasSize(1);
 
-        EventEntity eventFromDb = eventsFromDb.get(0);
+        var eventFromDb = eventsFromDb.get(0);
         assertThat(eventFromDb.getTime()).isEqualTo("time");
         assertThat(eventFromDb.getEventName()).isEqualTo("eventName");
         assertThat(eventFromDb.getCategory()).isEqualTo("category");
@@ -149,22 +140,23 @@ public class ComplexDBATest {
         assertThat(eventFromDb.getStartListUrl()).isEqualTo("startListUrl");
         assertThat(eventFromDb.getDay().getDayName()).isEqualTo("dayName");
 
-        List<HeatEntity> heatsFromDb = eventFromDb.getHeats();
+        var heatsFromDb = eventFromDb.getHeats();
         assertThat(heatsFromDb).hasSize(1);
 
-        HeatEntity heatFromDb = heatsFromDb.get(0);
+        var heatFromDb = heatsFromDb.get(0);
         assertThat(heatFromDb.getName()).isEqualTo("heatName");
         assertThat(heatFromDb.getEvent().getEventName()).isEqualTo("eventName");
 
-        List<HeatLineEntity> heatLinesFromDb = heatFromDb.getHeatLines();
+        var heatLinesFromDb = heatFromDb.getHeatLines();
         assertThat(heatLinesFromDb).hasSize(1);
 
-        HeatLineEntity heatLineFromDb = heatLinesFromDb.get(0);
+        var heatLineFromDb = heatLinesFromDb.get(0);
         assertThat(heatLineFromDb.getLane()).isEqualTo("1");
         assertThat(heatLineFromDb.getBib()).isEqualTo("bib");
         assertThat(heatLineFromDb.getHeat().getName()).isEqualTo("heatName");
 
-        ParticipantEntity participantFromDb = heatLineFromDb.getParticipant();
+        var participantFromDb = heatLineFromDb.getParticipant();
+
         assertThat(participantFromDb.getSurname()).isEqualTo("surname");
         assertThat(participantFromDb.getName()).isEqualTo("firstName");
         assertThat(participantFromDb.getTeam()).isEqualTo("team");
@@ -178,9 +170,9 @@ public class ComplexDBATest {
             assertThat(heatLineEntity.getBib()).isEqualTo("bib");
         });
 
-        List<CoachEntity> coaches = heatLineFromDb.getCoaches();
+        var coaches = heatLineFromDb.getCoaches();
         assertThat(coaches).hasSize(1);
-        CoachEntity coachFromDb = coaches.get(0);
+        var coachFromDb = coaches.get(0);
 
         assertThat(coachFromDb.getName()).isEqualTo("coachName");
         assertThat(coachFromDb.getHeatLines()).hasSize(1);
@@ -191,29 +183,29 @@ public class ComplexDBATest {
     }
 
     private void fillDB() {
-        CompetitionEntity competition = getCompetition();
-        DayEntity day = getDay();
+        var competition = getCompetition();
+        var day = getDay();
         competition.addDay(day);
         day.setCompetition(competition);
 
-        EventEntity event = getEvent();
+        var event = getEvent();
         day.addEvent(event);
         event.setDay(day);
 
-        HeatEntity heat = getHeatEntity();
+        var heat = getHeatEntity();
         event.addHeat(heat);
         heat.setEvent(event);
 
-        HeatLineEntity heatLine = getHeatLineEntity(heat);
+        var heatLine = getHeatLineEntity(heat);
         log.warn("heatLine: {}", heatLine.getId());
         heat.addHeatLine(heatLine);
         heatLine.setHeat(heat);
 
-        ParticipantEntity participant = getParticipantEntity();
+        var participant = getParticipantEntity();
         heatLine.setParticipant(participant);
         participant.addHeatLine(heatLine);
 
-        CoachEntity coach = getCoachEntity();
+        var coach = getCoachEntity();
         heatLine.addCoach(coach);
         coach.addHeatLine(heatLine);
 
@@ -224,13 +216,13 @@ public class ComplexDBATest {
     }
 
     private CoachEntity getCoachEntity() {
-        CoachEntity coach = new CoachEntity();
+        var coach = new CoachEntity();
         coach.setName("coachName");
         return coachService.save(coach);
     }
 
     private HeatLineEntity getHeatLineEntity(HeatEntity heat) {
-        HeatLineEntity heatLine = new HeatLineEntity();
+        var heatLine = new HeatLineEntity();
         heatLine.setHeat(heat);
         heatLine.setLane("1");
         heatLine.setBib("bib");
@@ -238,7 +230,7 @@ public class ComplexDBATest {
     }
 
     private ParticipantEntity getParticipantEntity() {
-        ParticipantEntity participant = new ParticipantEntity();
+        var participant = new ParticipantEntity();
         participant.setSurname("surname");
         participant.setName("firstName");
         participant.setRegion("region");
@@ -249,23 +241,23 @@ public class ComplexDBATest {
     }
 
     private HeatEntity getHeatEntity() {
-        HeatEntity heat = new HeatEntity();
+        var heat = new HeatEntity();
         heat.setName("heatName");
         return heatService.save(heat);
     }
 
     private EventEntity getEvent() {
-        EventEntity event = new EventEntity("time", "eventName", "category", "round", "startListUrl", "resultUrl");
+        var event = new EventEntity("time", "eventName", "category", "round", "startListUrl", "resultUrl");
         return eventService.save(event);
     }
 
     private DayEntity getDay() {
-        DayEntity day = new DayEntity("date", "dateId", "dayName", "dayNameEn");
+        var day = new DayEntity("date", "dateId", "dayName", "dayNameEn");
         return dayService.save(day);
     }
 
     private CompetitionEntity getCompetition() {
-        CompetitionEntity competition = new CompetitionEntity();
+        var competition = new CompetitionEntity();
         competition.setName("name");
         competition.setBeginDate("beginDate");
         competition.setEndDate("endDate");

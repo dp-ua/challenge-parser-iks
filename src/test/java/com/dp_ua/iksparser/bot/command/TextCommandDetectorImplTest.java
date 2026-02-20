@@ -1,26 +1,30 @@
 package com.dp_ua.iksparser.bot.command;
 
-import com.dp_ua.iksparser.App;
-import com.dp_ua.iksparser.bot.Bot;
-import com.dp_ua.iksparser.exeption.NotForMeException;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.mockito.Mockito.when;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+
+import com.dp_ua.iksparser.App;
+import com.dp_ua.iksparser.bot.Bot;
+import com.dp_ua.iksparser.exeption.NotForMeException;
+
+import lombok.SneakyThrows;
 
 @SpringBootTest
-@RunWith(SpringRunner.class)
-public class TextCommandDetectorImplTest {
+class TextCommandDetectorImplTest {
+
     @MockBean
     CommandProvider commandProvider;
     @MockBean
@@ -30,82 +34,45 @@ public class TextCommandDetectorImplTest {
     @MockBean
     Bot bot;
 
-    @Before
-    public void additionalSetUp() {
+    @BeforeEach
+    void additionalSetUp() {
         when(commandProvider.getCommands()).thenReturn(new ArrayList<>() {{
             add(new TestCommand());
         }});
         when(bot.getBotUsername()).thenReturn("testBot");
     }
 
-    @Test
-    public void shouldParseCommand_Case1() throws NotForMeException {
-        String text = "/test";
+    @ParameterizedTest
+    @ValueSource(strings = {"/test", "/test@testBot", "/TEST", "/test some text"})
+    @SneakyThrows
+    void shouldParseCommand_VariousCases(String text) {
         String expected = "[TestCommand]:{test},alt{[]}";
-
         List<CommandInterface> result = textCmdDetector.getParsedCommands(text);
         String actual = getJoin(result);
-        Assert.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
     @Test
-    public void shouldParseCommand_Case2() throws NotForMeException {
-        String text = "/test@testBot";
-        String expected = "[TestCommand]:{test},alt{[]}";
-
-        List<CommandInterface> result = textCmdDetector.getParsedCommands(text);
-        String actual = getJoin(result);
-
-        Assert.assertEquals(expected, actual);
-    }
-
-    @Test
-    public void shouldParseCommand_CapitalLetters() throws NotForMeException {
-        String text = "/TEST";
-        String expected = "[TestCommand]:{test},alt{[]}";
-
-        List<CommandInterface> result = textCmdDetector.getParsedCommands(text);
-        String actual = getJoin(result);
-
-        Assert.assertEquals(expected, actual);
-    }
-
-    @Test
-    public void shouldParseCommand_Case4() throws NotForMeException {
-        String text = "/test some text";
-        String expected = "[TestCommand]:{test},alt{[]}";
-
-        List<CommandInterface> result = textCmdDetector.getParsedCommands(text);
-        String actual = getJoin(result);
-
-        Assert.assertEquals(expected, actual);
-    }
-
-
-    @Test
-    public void shouldNotParseCommand_Case1() throws NotForMeException {
+    @SneakyThrows
+    void shouldNotParseCommand_Case1() {
         String text = "/tweets";
         String actual = textCmdDetector.getParsedCommands(text).toString();
         String expected = "[]";
-        Assert.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
-    @Test(expected = NotForMeException.class)
-    public void shouldGetException_whenWrongBotName() throws NotForMeException {
-        // given
+    @Test
+    void shouldGetException_whenWrongBotName() {
         String text = "/test@otherBot";
-
-        // when call method
-        textCmdDetector.getParsedCommands(text);
-
-        // then never happens
-        Assert.fail();
+        assertThrows(NotForMeException.class, () -> textCmdDetector.getParsedCommands(text));
     }
 
     private String getJoin(List<CommandInterface> list) {
         return list
                 .stream()
                 .map(CommandInterface::logString)
-                .collect(Collectors.joining(";"));
+                .collect(Collectors.joining
+                        (";"));
     }
+
 }

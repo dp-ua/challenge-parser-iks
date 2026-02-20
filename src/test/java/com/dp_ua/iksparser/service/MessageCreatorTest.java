@@ -1,24 +1,24 @@
 package com.dp_ua.iksparser.service;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class MessageCreatorTest {
+class MessageCreatorTest {
+
     MessageCreator service;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         service = MessageCreator.SERVICE;
     }
 
-
     @Test
-    public void shouldRemoveDuplicates() {
+    void shouldRemoveDuplicates() {
         List<String> inputList = new ArrayList<>();
         inputList.add("apple");
         inputList.add("banana");

@@ -10,11 +10,13 @@ view:
 # Notification settings
 notification:
   mode: BOTH  # LEGACY, AGGREGATED, or BOTH
+  onlyForAdmin: true
   processor:
     cron-pattern: "0 15,45 6,10,14,18,22 * * *"
   aggregated:
     enabled: true
     cleanupAfterDays: 7
+    minutesThreshold: 60
 
 logging:
   file:

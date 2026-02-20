@@ -1,10 +1,5 @@
 package com.dp_ua.iksparser.bot.performer;
 
-import com.dp_ua.iksparser.bot.Bot;
-import com.dp_ua.iksparser.bot.abilities.subscribe.SubscribeFacade;
-import com.dp_ua.iksparser.bot.event.SendMessageEvent;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -17,20 +12,27 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageTe
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import com.dp_ua.iksparser.bot.Bot;
+import com.dp_ua.iksparser.bot.abilities.subscribe.SubscribeFacade;
+import com.dp_ua.iksparser.bot.event.SendMessageEvent;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class SendMessagePerformer implements ApplicationListener<SendMessageEvent> {
-    @Autowired
-    Bot bot;
-    @Autowired
-    SubscribeFacade subscriptions;
+
+    private final Bot bot;
+    private final SubscribeFacade subscriptions;
 
     @Override
     @Async
     public void onApplicationEvent(SendMessageEvent event) {
         log.info("SendMessageEvent. Type: {}, Message:{}",
                 event.getMsgType(),
-                event.getMessage().toString().replaceAll("\n", " "));
+                event.getMessage().toString().replace("\n", " "));
         Message result = null;
         String chatId = null;
         try {
@@ -67,10 +69,11 @@ public class SendMessagePerformer implements ApplicationListener<SendMessageEven
             throw new RuntimeException(e);
         }
         if (result != null) {
-            log.info("Message sent. id:{},chatId:{},text:{}", result.getMessageId(), chatId, result.getText().replaceAll("\n", " "));
+            log.info("Message sent. id:{},chatId:{},text:{}", result.getMessageId(), chatId, result.getText().replace("\n", " "));
             // todo тут можно фиксировать результаты отправки сообщений
             /*   возможно необходимо будет сохранять айди сообщений для последующего удаления/редактирования
              */
         }
     }
+
 }

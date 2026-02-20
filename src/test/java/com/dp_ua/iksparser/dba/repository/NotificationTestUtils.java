@@ -53,6 +53,7 @@ public class NotificationTestUtils {
     public static final int DEFAULT_RETRY_COUNT = 0;
     public static final int MAX_RETRY_COUNT = 3;
     public static final String TEST_ERROR_MESSAGE = "Test error message";
+    public static final long COMPETITION_ID = 1L;
 
     /**
      * Creates a test ParticipantEntity with default values
@@ -87,6 +88,7 @@ public class NotificationTestUtils {
      */
     public static CompetitionEntity createTestCompetition() {
         CompetitionEntity competition = new CompetitionEntity();
+        competition.setId(COMPETITION_ID);
         competition.setName(TEST_COMPETITION_NAME_1);
         competition.setCity(TEST_COMPETITION_LOCATION);
         competition.setUrl(TEST_COMPETITION_URL);
