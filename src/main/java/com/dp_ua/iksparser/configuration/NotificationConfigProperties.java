@@ -15,6 +15,8 @@ public class NotificationConfigProperties {
 
     private NotificationMode mode = NotificationMode.BOTH;
 
+    private Boolean onlyForAdmin = true;
+
     private AggregatedConfig aggregated = new AggregatedConfig();
 
     private ProcessorConfig processor = new ProcessorConfig();
@@ -25,6 +27,8 @@ public class NotificationConfigProperties {
         private boolean enabled = true;
 
         private int cleanupAfterDays = 7;
+
+        private int minutesThreshold = 30;
 
     }
 
