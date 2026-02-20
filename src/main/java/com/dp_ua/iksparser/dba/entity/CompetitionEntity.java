@@ -1,5 +1,7 @@
 package com.dp_ua.iksparser.dba.entity;
 
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -53,7 +55,7 @@ public class CompetitionEntity extends DomainElement {
     public String getUrl() {
         return StringUtils.isNotEmpty(url)
                 ? codeURL(url)
-                : null;
+                : EMPTY;
     }
 
     public CompetitionEntity() {

@@ -1,4 +1,4 @@
-package com.dp_ua.iksparser.config;
+package com.dp_ua.iksparser.configuration;
 
 import java.util.List;
 import java.util.Map;

@@ -6,6 +6,10 @@ management:
     web:
       exposure:
         include: health
+app:
+  enable:
+    service: true
+
 
 spring:
   config:

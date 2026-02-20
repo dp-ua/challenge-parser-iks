@@ -1,6 +1,6 @@
 package com.dp_ua.iksparser.dba.service;
 
-import static com.dp_ua.iksparser.config.Constants.FORMATTER;
+import static com.dp_ua.iksparser.configuration.Constants.FORMATTER;
 import static org.apache.commons.lang3.StringUtils.SPACE;
 
 import java.time.LocalDate;

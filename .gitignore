@@ -8,6 +8,7 @@ target/
 *.ear
 .DS_Store
 .idea/
+.run/*
 
 #logs
 logs/

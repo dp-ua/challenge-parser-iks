@@ -1,4 +1,4 @@
-package com.dp_ua.iksparser.config;
+package com.dp_ua.iksparser.configuration;
 
 import java.time.format.DateTimeFormatter;
 

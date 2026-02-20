@@ -7,6 +7,15 @@ view:
     detailed:
       pageSize: 3
 
+# Notification settings
+notification:
+  mode: BOTH  # LEGACY, AGGREGATED, or BOTH
+  processor:
+    cron-pattern: "0 15,45 6,10,14,18,22 * * *"
+  aggregated:
+    enabled: true
+    cleanupAfterDays: 7
+
 logging:
   file:
     name: ./logs/file.log
