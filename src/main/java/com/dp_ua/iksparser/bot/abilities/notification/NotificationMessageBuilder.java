@@ -1,6 +1,5 @@
 package com.dp_ua.iksparser.bot.abilities.notification;
 
-import static com.dp_ua.iksparser.bot.Icon.ATHLETE;
 import static com.dp_ua.iksparser.bot.Icon.MENU;
 import static com.dp_ua.iksparser.bot.Icon.RESULT;
 import static com.dp_ua.iksparser.bot.Icon.START;
@@ -117,6 +116,9 @@ public class NotificationMessageBuilder {
     /**
      * Группирует уведомления по событиям и формирует блоки текста
      */
+    /**
+     * Группирует уведомления по событиям и формирует блоки текста
+     */
     private List<EventBlock> groupByEvents(List<NotificationQueueEntity> notifications,
                                            boolean hasResults) {
         if (notifications.isEmpty()) {
@@ -135,10 +137,100 @@ public class NotificationMessageBuilder {
             var notificationIds = eventNotifications.stream()
                     .map(NotificationQueueEntity::getId)
                     .toList();
-            blocks.add(new EventBlock(eventText, notificationIds));
+            blocks.add(new EventBlock(eventText, notificationIds, event));
+        });
+
+        // Сортировка блоков по дню и времени
+        blocks.sort((b1, b2) -> {
+            var event1 = b1.event();
+            var event2 = b2.event();
+
+            // Сначала по дню
+            int dayCompare = compareDays(event1.getDay().getDayName(), event2.getDay().getDayName());
+            if (dayCompare != 0) {
+                return dayCompare;
+            }
+
+            // Потом по времени
+            return compareTime(event1.getTime(), event2.getTime());
         });
 
         return blocks;
+    }
+
+    /**
+     * Сравнение дней (День 1, День 2, ...)
+     */
+    private int compareDays(String day1, String day2) {
+        if (day1 == null && day2 == null) return 0;
+        if (day1 == null) return 1;
+        if (day2 == null) return -1;
+
+        try {
+            // Извлекаем номер дня из строки типа "День 1"
+            int num1 = extractDayNumber(day1);
+            int num2 = extractDayNumber(day2);
+            return Integer.compare(num1, num2);
+        } catch (Exception e) {
+            // Если не удалось распарсить, сортируем лексикографически
+            return day1.compareTo(day2);
+        }
+    }
+
+    /**
+     * Извлекает номер дня из строки "День 1", "День 2" и т.д.
+     */
+    private int extractDayNumber(String dayName) {
+        if (isEmpty(dayName)) {
+            return 0;
+        }
+
+        // Ищем число в строке
+        String[] parts = dayName.split("\\s+");
+        for (String part : parts) {
+            try {
+                return Integer.parseInt(part.trim());
+            } catch (NumberFormatException e) {
+                // Продолжаем поиск
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * Сравнение времени (11:00, 12:30, ...)
+     */
+    private int compareTime(String time1, String time2) {
+        if (time1 == null && time2 == null) return 0;
+        if (time1 == null) return 1;
+        if (time2 == null) return -1;
+
+        try {
+            // Преобразуем время в минуты для сравнения
+            int minutes1 = timeToMinutes(time1);
+            int minutes2 = timeToMinutes(time2);
+            return Integer.compare(minutes1, minutes2);
+        } catch (Exception e) {
+            // Если не удалось распарсить, сортируем лексикографически
+            return time1.compareTo(time2);
+        }
+    }
+
+    /**
+     * Преобразует время "11:00" в минуты от начала дня
+     */
+    private int timeToMinutes(String time) {
+        if (isEmpty(time)) {
+            return 0;
+        }
+
+        String[] parts = time.split(":");
+        if (parts.length >= 2) {
+            int hours = Integer.parseInt(parts[0].trim());
+            int minutes = Integer.parseInt(parts[1].trim());
+            return hours * 60 + minutes;
+        }
+        return 0;
     }
 
     /**
@@ -164,7 +256,7 @@ public class NotificationMessageBuilder {
                 .append(event.getDay().getDayName())
                 .append(", ")
                 .append(event.getTime())
-                .append(", ")
+                .append(END_LINE)
         ;
 
         // Ссылка на событие (стартовый протокол или результаты)
@@ -184,9 +276,7 @@ public class NotificationMessageBuilder {
 
         if (!eventDetails.isEmpty()) {
             eventName.append(", ")
-                    .append(ITALIC)
-                    .append(String.join(" - ", eventDetails))
-                    .append(ITALIC);
+                    .append(String.join(" - ", eventDetails));
         }
 
         if (isNotEmpty(eventUrl)) {
@@ -263,10 +353,6 @@ public class NotificationMessageBuilder {
                     .append(ITALIC);
         }
 
-        line.append("  ")
-                .append(ATHLETE)
-                .append(" ");
-
         line.append(END_LINE);
         return line.toString();
     }
@@ -295,7 +381,7 @@ public class NotificationMessageBuilder {
     /**
      * Внутренний класс для хранения блока события с текстом и ID уведомлений
      */
-    private record EventBlock(String text, List<Long> notificationIds) {
+    private record EventBlock(String text, List<Long> notificationIds, EventEntity event) {
 
     }
 
