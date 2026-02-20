@@ -1,15 +1,18 @@
 package com.dp_ua.iksparser.bot.command;
 
-import com.dp_ua.iksparser.bot.Icon;
-import com.dp_ua.iksparser.bot.controller.BotController;
-import com.dp_ua.iksparser.bot.message.Message;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import com.dp_ua.iksparser.bot.Icon;
+import com.dp_ua.iksparser.bot.message.Message;
+import com.dp_ua.iksparser.configuration.TelegramBotProperties;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public abstract class AdminAccessCommand extends BaseCommand {
+
     @Autowired
-    BotController bot;
+    TelegramBotProperties botProperties;
 
     @Override
     public void execute(Message message) {
@@ -23,11 +26,8 @@ public abstract class AdminAccessCommand extends BaseCommand {
     }
 
     private boolean isAdmin(String chatId) {
-        log.debug("check admin access for chatId: {}", chatId);
-        if (chatId == null) return false;
-        if (bot.getAdminId() != null) {
-            return chatId.equals(bot.getAdminId());
-        }
-        return false;
+        log.debug("Checking admin access for chatId: {}", chatId);
+        return chatId != null && botProperties.isAdmin(chatId);
     }
+
 }

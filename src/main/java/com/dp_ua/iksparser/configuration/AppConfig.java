@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
@@ -30,15 +29,13 @@ import lombok.extern.slf4j.Slf4j;
 @EnableAsync
 @EnableScheduling
 public class AppConfig {
-    @Value("${telegram.bot.token}")
-    private String botToken;
-    @Value("${telegram.bot.name}")
-    private String botUserName;
 
     @Bean
-    public Bot bot() {
-        log.info("Bot name:[{}] Bot token:[{}...]", botUserName, botToken.substring(0, 10));
-        return new Bot(botToken, botUserName);
+    public Bot bot(TelegramBotProperties properties) {
+        var name = properties.getName();
+        var token = properties.getToken();
+        log.info("Bot name:[{}] Bot token:[{}...]", name, token.substring(0, 10));
+        return new Bot(token, name);
     }
 
     @Bean
@@ -82,4 +79,5 @@ public class AppConfig {
                         }
                 ));
     }
+
 }

@@ -1,30 +1,30 @@
 package com.dp_ua.iksparser.bot.abilities.response.content.basic;
 
-import com.dp_ua.iksparser.bot.abilities.infoview.MenuView;
-import com.dp_ua.iksparser.bot.abilities.response.ResponseContentGenerator;
-import com.dp_ua.iksparser.bot.abilities.response.ResponseTypeMarker;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import static com.dp_ua.iksparser.bot.abilities.response.ResponseType.START;
+
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 
-import static com.dp_ua.iksparser.bot.abilities.response.ResponseType.START;
+import com.dp_ua.iksparser.bot.abilities.infoview.MenuView;
+import com.dp_ua.iksparser.bot.abilities.response.ResponseContentGenerator;
+import com.dp_ua.iksparser.bot.abilities.response.ResponseTypeMarker;
+import com.dp_ua.iksparser.configuration.TelegramBotProperties;
+
+import lombok.RequiredArgsConstructor;
 
 @Component
 @Scope("prototype")
 @ResponseTypeMarker(START)
+@RequiredArgsConstructor
 public class ResponseStart implements ResponseContentGenerator {
-    @Autowired
-    MenuView menuView;
-    @Value("${telegram.bot.visibleName}")
-    private String visibleName;
-    @Value("${telegram.bot.name}")
-    private String name;
+
+    private final MenuView menuView;
+    private final TelegramBotProperties properties;
 
     @Override
     public String messageText(Object... args) {
-        return menuView.startText(visibleName, botURL());
+        return menuView.startText(properties.getVisibleName(), botURL());
     }
 
     @Override
@@ -33,6 +33,7 @@ public class ResponseStart implements ResponseContentGenerator {
     }
 
     private String botURL() {
-        return "https://t.me/" + name;
+        return "https://t.me/" + properties.getName();
     }
+
 }
