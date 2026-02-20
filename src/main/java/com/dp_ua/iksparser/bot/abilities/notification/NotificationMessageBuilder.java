@@ -116,9 +116,6 @@ public class NotificationMessageBuilder {
     /**
      * Группирует уведомления по событиям и формирует блоки текста
      */
-    /**
-     * Группирует уведомления по событиям и формирует блоки текста
-     */
     private List<EventBlock> groupByEvents(List<NotificationQueueEntity> notifications,
                                            boolean hasResults) {
         if (notifications.isEmpty()) {
