@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
 import com.dp_ua.iksparser.dba.entity.CompetitionStatus;
+import com.dp_ua.iksparser.dba.entity.DayEntity;
 import com.dp_ua.iksparser.dba.entity.EventEntity;
 import com.dp_ua.iksparser.dba.entity.HeatEntity;
 import com.dp_ua.iksparser.dba.entity.HeatLineEntity;
@@ -115,6 +116,12 @@ public class NotificationTestUtils {
         HeatEntity heat = new HeatEntity();
         heat.setName(TEST_HEAT_DESCRIPTION);
         return heat;
+    }
+
+    public static DayEntity createDay() {
+        var day = new DayEntity();
+        day.setDayName("День 1");
+        return day;
     }
 
     /**

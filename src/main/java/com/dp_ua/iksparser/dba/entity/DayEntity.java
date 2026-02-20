@@ -1,20 +1,23 @@
 package com.dp_ua.iksparser.dba.entity;
 
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 @Getter
 @Setter
 @Slf4j
 @Entity
-@NoArgsConstructor
 public class DayEntity extends DomainElement {
+
     private String date;
     private String dateId;
     private String dayName;
@@ -24,6 +27,10 @@ public class DayEntity extends DomainElement {
     private CompetitionEntity competition;
     @OneToMany(mappedBy = "day", cascade = CascadeType.ALL)
     private List<EventEntity> events;
+
+    public DayEntity() {
+        events = new ArrayList<>();
+    }
 
     public DayEntity(String date, String dateId, String dayName, String dayNameEn) {
         this.date = date;
@@ -60,4 +67,5 @@ public class DayEntity extends DomainElement {
         }
         return events.stream().anyMatch(EventEntity::isNeedToUpdate);
     }
+
 }

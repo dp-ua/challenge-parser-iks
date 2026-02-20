@@ -4,6 +4,7 @@ import static com.dp_ua.iksparser.dba.repository.NotificationTestUtils.TEST_CHAT
 import static com.dp_ua.iksparser.dba.repository.NotificationTestUtils.TEST_COMPETITION_URL;
 import static com.dp_ua.iksparser.dba.repository.NotificationTestUtils.TEST_PARTICIPANT_NAME_1;
 import static com.dp_ua.iksparser.dba.repository.NotificationTestUtils.TEST_PARTICIPANT_SURNAME_1;
+import static com.dp_ua.iksparser.dba.repository.NotificationTestUtils.createDay;
 import static com.dp_ua.iksparser.dba.repository.NotificationTestUtils.createTestCompetition;
 import static com.dp_ua.iksparser.dba.repository.NotificationTestUtils.createTestEvent;
 import static com.dp_ua.iksparser.dba.repository.NotificationTestUtils.createTestHeat;
@@ -43,9 +44,12 @@ class NotificationMessageBuilderTest {
         // Arrange: создаём реальные сущности через NotificationTestUtils
         CompetitionEntity competition = createTestCompetition();
         EventEntity event = createTestEvent();
+        var day = createDay();
+        day.addEvent(event);
+        competition.addDay(day);
+        event.setDay(day);
         HeatEntity heat = createTestHeat();
         heat.setEvent(event);
-        event.setDay(null); // если нужно, можно создать DayEntity и установить
 
         var participant = createTestParticipant();
         var heatLine = createTestHeatLine(participant, heat);
