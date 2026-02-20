@@ -113,10 +113,16 @@ public interface NotificationQueueRepository extends JpaRepository<NotificationQ
      * Найти все уведомления для chatId со статусом PROCESSING
      * Eager fetch для избежания N+1 проблемы
      */
-    @Query("SELECT n FROM NotificationQueueEntity n " +
-            "JOIN FETCH n.participant p " +
-            "JOIN FETCH n.heatLine hl " +
-            "WHERE n.chatId = :chatId AND n.status = :status")
+    @Query("""
+                SELECT n FROM NotificationQueueEntity n
+                JOIN FETCH n.participant p
+                JOIN FETCH n.heatLine hl
+                JOIN FETCH hl.heat h
+                JOIN FETCH h.event e
+                JOIN FETCH e.day d
+                JOIN FETCH d.competition c
+                WHERE n.chatId = :chatId AND n.status = :status
+            """)
     List<NotificationQueueEntity> findByChatIdAndStatusWithDetails(
             @Param("chatId") String chatId,
             @Param("status") NotificationStatus status
