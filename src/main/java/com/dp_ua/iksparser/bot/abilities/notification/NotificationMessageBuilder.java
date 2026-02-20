@@ -160,11 +160,34 @@ public class NotificationMessageBuilder {
 
         // Заголовок события со ссылкой
         block.append(START)
-                .append(" ");
+                .append(" ")
+                .append(event.getDay().getDayName())
+                .append(", ")
+                .append(event.getTime())
+                .append(", ")
+        ;
 
         // Ссылка на событие (стартовый протокол или результаты)
         var eventUrl = hasResults ? event.getResultUrl() : event.getStartListUrl();
-        var eventName = cleanMarkdown(event.getEventName());
+
+        // Добавляем категорию и раунд
+        var eventDetails = new ArrayList<String>();
+
+        if (isNotEmpty(event.getCategory())) {
+            eventDetails.add(cleanMarkdown(event.getCategory()));
+        }
+        if (isNotEmpty(event.getRound())) {
+            eventDetails.add(cleanMarkdown(event.getRound()));
+        }
+
+        var eventName = new StringBuilder(cleanMarkdown(event.getEventName()));
+
+        if (!eventDetails.isEmpty()) {
+            eventName.append(", ")
+                    .append(ITALIC)
+                    .append(String.join(" - ", eventDetails))
+                    .append(ITALIC);
+        }
 
         if (isNotEmpty(eventUrl)) {
             block
@@ -180,22 +203,6 @@ public class NotificationMessageBuilder {
                     .append(BOLD);
         }
 
-        // Добавляем категорию и раунд
-        var eventDetails = new ArrayList<String>();
-
-        if (isNotEmpty(event.getCategory())) {
-            eventDetails.add(cleanMarkdown(event.getCategory()));
-        }
-        if (isNotEmpty(event.getRound())) {
-            eventDetails.add(cleanMarkdown(event.getRound()));
-        }
-
-        if (!eventDetails.isEmpty()) {
-            block.append(", ")
-                    .append(ITALIC)
-                    .append(String.join(" - ", eventDetails))
-                    .append(ITALIC);
-        }
 
         block.append(END_LINE);
 
@@ -215,6 +222,21 @@ public class NotificationMessageBuilder {
         var participant = notification.getParticipant();
         var heatLine = notification.getHeatLine();
         var heat = heatLine.getHeat();
+
+        // Имя участника
+        var participantName = getShortName(participant);
+
+        if (isNotEmpty(participant.getUrl())) {
+            line.append(LINK)
+                    .append(participantName)
+                    .append(Icon.URL)
+                    .append(LINK_END)
+                    .append(LINK_SEPARATOR)
+                    .append(participant.getUrl())
+                    .append(LINK_SEPARATOR_END);
+        } else {
+            line.append(participantName);
+        }
 
         // Дополнительная информация: (забег X, доріжка Y, №Z)
         var details = new ArrayList<String>();
@@ -244,19 +266,6 @@ public class NotificationMessageBuilder {
         line.append("  ")
                 .append(ATHLETE)
                 .append(" ");
-
-        // Имя участника
-        line.append(getShortName(participant));
-
-        if (isNotEmpty(participant.getUrl())) {
-            line.append(LINK)
-                    .append(" link ")
-                    .append(Icon.URL)
-                    .append(LINK_END)
-                    .append(LINK_SEPARATOR)
-                    .append(participant.getUrl())
-                    .append(LINK_SEPARATOR_END);
-        }
 
         line.append(END_LINE);
         return line.toString();
