@@ -1,51 +1,34 @@
 package com.dp_ua.iksparser.bot.command;
 
-import com.dp_ua.iksparser.SpringApp;
-import com.dp_ua.iksparser.exeption.DuplicateCommandException;
-import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.core.Ordered;
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import com.dp_ua.iksparser.exeption.DuplicateCommandException;
 
-@Component
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+
 @Slf4j
-public class CommandProvider implements ApplicationListener<ContextRefreshedEvent>, Ordered {
-    @Override
-    public int getOrder() {
-        return SpringApp.ORDER_FOR_COMMAND_PROVIDER;
-    }
+@Getter
+@Component
+public class CommandProvider {
 
-    @Autowired
-    ApplicationContext context;
+    private final List<CommandInterface> commands;
 
-    @Getter
-    private List<CommandInterface> commands = new ArrayList<>();
-
-    @Override
-    public void onApplicationEvent(@NotNull ContextRefreshedEvent event) {
+    public CommandProvider(List<CommandInterface> commands) {
+        this.commands = commands;
         init();
     }
 
     private void init() {
         log.info("Initializing CommandProvider");
-        commands = context.getBeansOfType(CommandInterface.class).values().stream()
-                .peek(this::preRegisterCheck)
-                .collect(Collectors.toList());
+        commands.forEach(this::preRegisterCheck);
     }
 
     public List<BotCommand> menuCommands() {
-        return getCommands()
-                .stream()
+        return commands.stream()
                 .filter(CommandInterface::isNeedToAddToMenu)
                 .map(c -> new BotCommand(c.command(), c.description()))
                 .toList();
@@ -60,15 +43,15 @@ public class CommandProvider implements ApplicationListener<ContextRefreshedEven
         checkSimpleCommands(command);
         checkPartOfStringCommands(command);
         command.fullStringCommands().forEach(cmd -> commands.forEach(c -> {
-            if (c.fullStringCommands().contains(cmd)) {
+            if (c != command && c.fullStringCommands().contains(cmd)) {
                 throw new DuplicateCommandException("Command already exists [" + cmd + "] in "
                         + c.getClass().getSimpleName() + " and "
                         + command.getClass().getSimpleName());
             }
+
         }));
     }
 
-    // TODO test this method
     private void checkPartOfStringCommands(CommandInterface command) {
         command.partOfStringCommands().forEach(partOfStringCmd -> {
             command.fullStringCommands().forEach(fullCmd -> {
@@ -78,7 +61,7 @@ public class CommandProvider implements ApplicationListener<ContextRefreshedEven
                 }
             });
             commands.forEach(c -> {
-                if (c.partOfStringCommands().contains(partOfStringCmd)) {
+                if (c != command && c.partOfStringCommands().contains(partOfStringCmd)) {
                     throw new DuplicateCommandException("Command already exists [" + partOfStringCmd + "] in "
                             + c.getClass().getSimpleName() + " and "
                             + command.getClass().getSimpleName());
@@ -96,11 +79,12 @@ public class CommandProvider implements ApplicationListener<ContextRefreshedEven
 
     private void checkSimpleCommands(CommandInterface command) {
         command.allSimpleCommands().forEach(cmd -> commands.forEach(c -> {
-            if (c.allSimpleCommands().contains(cmd)) {
+            if (c != command && c.allSimpleCommands().contains(cmd)) {
                 throw new DuplicateCommandException("Command already exists [" + cmd + "] in "
                         + c.getClass().getSimpleName() + " and "
                         + command.getClass().getSimpleName());
             }
         }));
     }
+
 }
