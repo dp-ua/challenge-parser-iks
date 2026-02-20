@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
-import com.dp_ua.iksparser.bot.Icon;
 import com.dp_ua.iksparser.bot.abilities.infoview.CompetitionView;
 import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
 import com.dp_ua.iksparser.dba.entity.EventEntity;
@@ -316,7 +315,6 @@ public class NotificationMessageBuilder {
         if (isNotEmpty(participant.getUrl())) {
             line.append(LINK)
                     .append(participantName)
-                    .append(Icon.URL)
                     .append(LINK_END)
                     .append(LINK_SEPARATOR)
                     .append(participant.getUrl())
@@ -362,7 +360,7 @@ public class NotificationMessageBuilder {
     private String getShortName(ParticipantEntity participant) {
         var name = cleanMarkdown(participant.getName());
         var surname = cleanMarkdown(participant.getSurname());
-        return name + " " + surname;
+        return surname + " " + name;
     }
 
     /**
