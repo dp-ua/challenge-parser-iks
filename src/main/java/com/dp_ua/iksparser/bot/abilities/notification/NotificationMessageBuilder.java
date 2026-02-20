@@ -13,6 +13,8 @@ import static com.dp_ua.iksparser.service.MessageCreator.LINK_END;
 import static com.dp_ua.iksparser.service.MessageCreator.LINK_SEPARATOR;
 import static com.dp_ua.iksparser.service.MessageCreator.LINK_SEPARATOR_END;
 import static com.dp_ua.iksparser.service.MessageCreator.SERVICE;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,6 +24,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
+import com.dp_ua.iksparser.bot.Icon;
 import com.dp_ua.iksparser.bot.abilities.infoview.CompetitionView;
 import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
 import com.dp_ua.iksparser.dba.entity.EventEntity;
@@ -36,9 +39,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class NotificationMessageBuilder {
 
-    public static final String NEW_ATTENDS_TEXT = MENU + " НОВІ ЗАЯВКИ:";
+    public static final String NEW_ATTENDS_TEXT = MENU + " Нові заявки:";
     private static final int MAX_CHUNK_SIZE = 4000;
-    public static final String RESULTS_TEXT = RESULT + " РЕЗУЛЬТАТИ:";
+    public static final String RESULTS_TEXT = RESULT + " Є результати:";
 
     private final CompetitionView competitionView;
 
@@ -163,11 +166,10 @@ public class NotificationMessageBuilder {
         var eventUrl = hasResults ? event.getResultUrl() : event.getStartListUrl();
         var eventName = cleanMarkdown(event.getEventName());
 
-        if (eventUrl != null && !eventUrl.isEmpty()) {
-            block.append(LINK)
-                    .append(BOLD)
+        if (isNotEmpty(eventUrl)) {
+            block
+                    .append(LINK)
                     .append(eventName)
-                    .append(BOLD)
                     .append(LINK_END)
                     .append(LINK_SEPARATOR)
                     .append(eventUrl)
@@ -181,10 +183,10 @@ public class NotificationMessageBuilder {
         // Добавляем категорию и раунд
         var eventDetails = new ArrayList<String>();
 
-        if (event.getCategory() != null && !event.getCategory().isEmpty()) {
+        if (isNotEmpty(event.getCategory())) {
             eventDetails.add(cleanMarkdown(event.getCategory()));
         }
-        if (event.getRound() != null && !event.getRound().isEmpty()) {
+        if (isNotEmpty(event.getRound())) {
             eventDetails.add(cleanMarkdown(event.getRound()));
         }
 
@@ -214,38 +216,20 @@ public class NotificationMessageBuilder {
         var heatLine = notification.getHeatLine();
         var heat = heatLine.getHeat();
 
-        line.append("  ")
-                .append(ATHLETE)
-                .append(" ");
-
-        // Имя участника со ссылкой
-        var participantName = getShortName(participant);
-
-        if (participant.getUrl() != null && !participant.getUrl().isEmpty()) {
-            line.append(LINK)
-                    .append(participantName)
-                    .append(LINK_END)
-                    .append(LINK_SEPARATOR)
-                    .append(participant.getUrl())
-                    .append(LINK_SEPARATOR_END);
-        } else {
-            line.append(participantName);
-        }
-
         // Дополнительная информация: (забег X, доріжка Y, №Z)
         var details = new ArrayList<String>();
 
-        if (heat.getName() != null && !heat.getName().isEmpty()) {
+        if (isNotEmpty(heat.getName())) {
             var heatName = cleanMarkdown(heat.getName());
-            details.add("забіг: " + heatName);
+            details.add(heatName);
         }
 
-        if (heatLine.getLane() != null && !heatLine.getLane().isEmpty()) {
-            details.add("доріжка " + heatLine.getLane());
+        if (isNotEmpty(heatLine.getLane())) {
+            details.add("д." + heatLine.getLane());
         }
 
-        if (heatLine.getBib() != null && !heatLine.getBib().isEmpty()) {
-            details.add("№" + heatLine.getBib());
+        if (isNotEmpty(heatLine.getBib())) {
+            details.add("bib." + heatLine.getBib());
         }
 
         if (!details.isEmpty()) {
@@ -257,21 +241,32 @@ public class NotificationMessageBuilder {
                     .append(ITALIC);
         }
 
+        line.append("  ")
+                .append(ATHLETE)
+                .append(" ");
+
+        // Имя участника
+        line.append(getShortName(participant));
+
+        if (isNotEmpty(participant.getUrl())) {
+            line.append(LINK)
+                    .append(" link ")
+                    .append(Icon.URL)
+                    .append(LINK_END)
+                    .append(LINK_SEPARATOR)
+                    .append(participant.getUrl())
+                    .append(LINK_SEPARATOR_END);
+        }
+
         line.append(END_LINE);
         return line.toString();
     }
 
-    /**
-     * Проверяет есть ли результат (через наличие resultUrl в событии)
-     */
     private boolean hasResult(NotificationQueueEntity notification) {
         var event = notification.getHeatLine().getHeat().getEvent();
         return event.hasResultUrl();
     }
 
-    /**
-     * Получить короткое имя участника
-     */
     private String getShortName(ParticipantEntity participant) {
         var name = cleanMarkdown(participant.getName());
         var surname = cleanMarkdown(participant.getSurname());
@@ -282,16 +277,16 @@ public class NotificationMessageBuilder {
      * Очистка markdown символов
      */
     private String cleanMarkdown(String text) {
-        if (text == null || text.isEmpty()) {
+        if (isEmpty(text)) {
             return "";
         }
         return SERVICE.cleanMarkdown(text);
     }
 
     /**
-         * Внутренний класс для хранения блока события с текстом и ID уведомлений
-         */
-        private record EventBlock(String text, List<Long> notificationIds) {
+     * Внутренний класс для хранения блока события с текстом и ID уведомлений
+     */
+    private record EventBlock(String text, List<Long> notificationIds) {
 
     }
 
@@ -319,7 +314,7 @@ public class NotificationMessageBuilder {
             header.append(SUBSCRIBE)
                     .append(" ")
                     .append(BOLD)
-                    .append("Нові оновлення")
+                    .append("Підписка")
                     .append(BOLD)
                     .append(END_LINE)
                     .append(END_LINE)
@@ -341,9 +336,7 @@ public class NotificationMessageBuilder {
         void addSection(String sectionTitle) {
             if (currentSection == null) {
                 content.append(END_LINE)
-                        .append(BOLD)
                         .append(sectionTitle)
-                        .append(BOLD)
                         .append(END_LINE)
                         .append(END_LINE);
                 currentSection = sectionTitle;
@@ -362,7 +355,6 @@ public class NotificationMessageBuilder {
         NotificationMessage build(String continueSection) {
             var finalText = new StringBuilder(content);
 
-            // Если это не последний chunk, добавляем индикатор продолжения
             if (continueSection != null) {
                 finalText.append(END_LINE)
                         .append(ITALIC)
