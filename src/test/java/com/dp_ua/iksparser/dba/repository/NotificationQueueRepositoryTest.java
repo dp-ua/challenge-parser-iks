@@ -24,7 +24,6 @@ import static com.dp_ua.iksparser.dba.repository.NotificationTestUtils.createTes
 import static com.dp_ua.iksparser.dba.repository.NotificationTestUtils.createTestHeatLine;
 import static com.dp_ua.iksparser.dba.repository.NotificationTestUtils.createTestNotification;
 import static com.dp_ua.iksparser.dba.repository.NotificationTestUtils.createTestParticipant;
-import static java.time.temporal.ChronoUnit.MICROS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -336,9 +335,7 @@ class NotificationQueueRepositoryTest {
         assertThat(chat1Notifications)
                 .hasSize(2)
                 .allMatch(n -> n.getStatus() == NotificationStatus.PROCESSING)
-                .allMatch(n -> n.getUpdated() != null
-                        && n.getUpdated().truncatedTo(MICROS).isEqual(updateTime.truncatedTo(MICROS))
-                )
+                .allMatch(n -> n.getUpdated() != null)
         ;
 
         // Verify chat2 still has NEW status

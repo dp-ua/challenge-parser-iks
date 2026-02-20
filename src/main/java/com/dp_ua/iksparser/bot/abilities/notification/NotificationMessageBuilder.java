@@ -16,7 +16,6 @@ import static com.dp_ua.iksparser.service.MessageCreator.SERVICE;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -26,18 +25,12 @@ import org.springframework.stereotype.Component;
 import com.dp_ua.iksparser.bot.abilities.infoview.CompetitionView;
 import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
 import com.dp_ua.iksparser.dba.entity.EventEntity;
-import com.dp_ua.iksparser.dba.entity.HeatEntity;
-import com.dp_ua.iksparser.dba.entity.HeatLineEntity;
 import com.dp_ua.iksparser.dba.entity.NotificationQueueEntity;
 import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * Builds formatted notification messages grouped by competitions.
- * Handles message chunking for Telegram's 4096 character limit.
- */
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -49,42 +42,19 @@ public class NotificationMessageBuilder {
 
     private final CompetitionView competitionView;
 
-
     /**
      * Build list of messages - one or more per competition (chunked if needed)
      */
     public List<NotificationMessage> buildAggregatedMessages(
-            Map<ParticipantEntity, List<NotificationQueueEntity>> grouped) {
+            Map<CompetitionEntity, List<NotificationQueueEntity>> byCompetition) {
 
-        // Группируем по соревнованиям
-        Map<CompetitionEntity, List<NotificationQueueEntity>> byCompetition =
-                groupByCompetition(grouped);
-
-        // Для каждого соревнования создаем сообщение(я) с учетом chunking
-        List<NotificationMessage> allMessages = new ArrayList<>();
+        var allMessages = new ArrayList<NotificationMessage>();
         byCompetition.forEach((competition, notifications) -> {
-            List<NotificationMessage> competitionMessages =
-                    buildMessagesForCompetition(competition, notifications);
+            var competitionMessages = buildMessagesForCompetition(competition, notifications);
             allMessages.addAll(competitionMessages);
         });
 
         return allMessages;
-    }
-
-    /**
-     * Группировка по соревнованиям
-     */
-    private Map<CompetitionEntity, List<NotificationQueueEntity>> groupByCompetition(
-            Map<ParticipantEntity, List<NotificationQueueEntity>> byParticipant) {
-
-        return byParticipant.values().stream()
-                .flatMap(List::stream)
-                .collect(Collectors.groupingBy(
-                        notification -> notification.getHeatLine().getHeat()
-                                .getEvent().getDay().getCompetition(),
-                        LinkedHashMap::new,
-                        Collectors.toList()
-                ));
     }
 
     /**
@@ -94,63 +64,19 @@ public class NotificationMessageBuilder {
             CompetitionEntity competition,
             List<NotificationQueueEntity> notifications) {
 
-        List<NotificationMessage> messages = new ArrayList<>();
+        var messages = new ArrayList<NotificationMessage>();
 
-        // Разделяем на новые заявки и результаты
-        Map<Boolean, List<NotificationQueueEntity>> byStatus = notifications.stream()
+        var byStatus = notifications.stream()
                 .collect(Collectors.partitioningBy(this::hasResult));
 
-        List<NotificationQueueEntity> newEnrollments = byStatus.get(false);
-        List<NotificationQueueEntity> withResults = byStatus.get(true);
+        var newEnrollmentBlocks = groupByEvents(byStatus.get(false), false);
+        var resultBlocks = groupByEvents(byStatus.get(true), true);
 
-        // Группируем по событиям для обработки по частям
-        List<EventBlock> newEnrollmentBlocks = groupByEvents(newEnrollments, false);
-        List<EventBlock> resultBlocks = groupByEvents(withResults, true);
+        var currentChunk = new MessageChunk(competition);
 
-        // Начинаем формировать chunks
-        MessageChunk currentChunk = new MessageChunk(competition);
+        currentChunk = addBlocksToChunks(messages, currentChunk, newEnrollmentBlocks, NEW_ATTENDS_TEXT);
+        currentChunk = addBlocksToChunks(messages, currentChunk, resultBlocks, RESULTS_TEXT);
 
-        // Обрабатываем новые заявки
-        if (!newEnrollmentBlocks.isEmpty()) {
-            String sectionHeader = buildSectionHeader(NEW_ATTENDS_TEXT);
-
-            for (EventBlock eventBlock : newEnrollmentBlocks) {
-                // Проверяем влезет ли этот блок
-                if (!currentChunk.canAdd(sectionHeader + eventBlock.text())) {
-                    // Сохраняем текущий chunk и начинаем новый
-                    messages.add(currentChunk.build(NEW_ATTENDS_TEXT));
-                    currentChunk = new MessageChunk(competition);
-                }
-
-                if (currentChunk.isEmpty()) {
-                    currentChunk.addSection(NEW_ATTENDS_TEXT);
-                }
-
-                currentChunk.addEventBlock(eventBlock);
-            }
-        }
-
-        // Обрабатываем результаты
-        if (!resultBlocks.isEmpty()) {
-            String sectionHeader = buildSectionHeader(RESULTS_TEXT);
-
-            for (EventBlock eventBlock : resultBlocks) {
-                // Проверяем влезет ли этот блок
-                if (!currentChunk.canAdd(sectionHeader + eventBlock.text())) {
-                    // Сохраняем текущий chunk и начинаем новый
-                    messages.add(currentChunk.build(RESULTS_TEXT));
-                    currentChunk = new MessageChunk(competition);
-                }
-
-                if (currentChunk.isEmpty()) {
-                    currentChunk.addSection(RESULTS_TEXT);
-                }
-
-                currentChunk.addEventBlock(eventBlock);
-            }
-        }
-
-        // Добавляем последний chunk если есть контент
         if (!currentChunk.isEmpty()) {
             messages.add(currentChunk.build(null));
         }
@@ -159,6 +85,30 @@ public class NotificationMessageBuilder {
                 competition.getName(), messages.size());
 
         return messages;
+    }
+
+    private MessageChunk addBlocksToChunks(
+            List<NotificationMessage> messages,
+            MessageChunk currentChunk,
+            List<EventBlock> blocks,
+            String sectionTitle
+    ) {
+        if (blocks.isEmpty()) {
+            return currentChunk;
+        }
+        var sectionHeader = buildSectionHeader(sectionTitle);
+
+        for (var eventBlock : blocks) {
+            if (!currentChunk.canAdd(sectionHeader + eventBlock.text())) {
+                messages.add(currentChunk.build(sectionTitle));
+                currentChunk = new MessageChunk(currentChunk.competition);
+            }
+            if (currentChunk.isEmpty()) {
+                currentChunk.addSection(sectionTitle);
+            }
+            currentChunk.addEventBlock(eventBlock);
+        }
+        return currentChunk;
     }
 
     /**
@@ -170,18 +120,16 @@ public class NotificationMessageBuilder {
             return Collections.emptyList();
         }
 
-        // Группируем по Event (событиям)
-        Map<EventEntity, List<NotificationQueueEntity>> byEvent = notifications.stream()
+        var byEvent = notifications.stream()
                 .collect(Collectors.groupingBy(
                         n -> n.getHeatLine().getHeat().getEvent(),
-                        LinkedHashMap::new,
                         Collectors.toList()
                 ));
 
-        List<EventBlock> blocks = new ArrayList<>();
+        var blocks = new ArrayList<EventBlock>();
         byEvent.forEach((event, eventNotifications) -> {
-            String eventText = buildEventBlock(event, eventNotifications, hasResults);
-            List<Long> notificationIds = eventNotifications.stream()
+            var eventText = buildEventBlock(event, eventNotifications, hasResults);
+            var notificationIds = eventNotifications.stream()
                     .map(NotificationQueueEntity::getId)
                     .toList();
             blocks.add(new EventBlock(eventText, notificationIds));
@@ -205,15 +153,15 @@ public class NotificationMessageBuilder {
     private String buildEventBlock(EventEntity event,
                                    List<NotificationQueueEntity> notifications,
                                    boolean hasResults) {
-        StringBuilder block = new StringBuilder();
+        var block = new StringBuilder();
 
         // Заголовок события со ссылкой
         block.append(START)
                 .append(" ");
 
         // Ссылка на событие (стартовый протокол или результаты)
-        String eventUrl = hasResults ? event.getResultUrl() : event.getStartListUrl();
-        String eventName = cleanMarkdown(event.getEventName());
+        var eventUrl = hasResults ? event.getResultUrl() : event.getStartListUrl();
+        var eventName = cleanMarkdown(event.getEventName());
 
         if (eventUrl != null && !eventUrl.isEmpty()) {
             block.append(LINK)
@@ -231,7 +179,7 @@ public class NotificationMessageBuilder {
         }
 
         // Добавляем категорию и раунд
-        List<String> eventDetails = new ArrayList<>();
+        var eventDetails = new ArrayList<String>();
 
         if (event.getCategory() != null && !event.getCategory().isEmpty()) {
             eventDetails.add(cleanMarkdown(event.getCategory()));
@@ -260,18 +208,18 @@ public class NotificationMessageBuilder {
      * Формирует строку для одного участника
      */
     private String buildParticipantLine(NotificationQueueEntity notification) {
-        StringBuilder line = new StringBuilder();
+        var line = new StringBuilder();
 
-        ParticipantEntity participant = notification.getParticipant();
-        HeatLineEntity heatLine = notification.getHeatLine();
-        HeatEntity heat = heatLine.getHeat();
+        var participant = notification.getParticipant();
+        var heatLine = notification.getHeatLine();
+        var heat = heatLine.getHeat();
 
         line.append("  ")
                 .append(ATHLETE)
                 .append(" ");
 
         // Имя участника со ссылкой
-        String participantName = getShortName(participant);
+        var participantName = getShortName(participant);
 
         if (participant.getUrl() != null && !participant.getUrl().isEmpty()) {
             line.append(LINK)
@@ -284,13 +232,12 @@ public class NotificationMessageBuilder {
             line.append(participantName);
         }
 
-        // Дополнительная информация: (заплив X, доріжка Y, №Z)
-        List<String> details = new ArrayList<>();
+        // Дополнительная информация: (забег X, доріжка Y, №Z)
+        var details = new ArrayList<String>();
 
-        // Номер забега (если есть название или номер)
         if (heat.getName() != null && !heat.getName().isEmpty()) {
-            String heatName = cleanMarkdown(heat.getName());
-            details.add("заплив: " + heatName);
+            var heatName = cleanMarkdown(heat.getName());
+            details.add("забіг: " + heatName);
         }
 
         if (heatLine.getLane() != null && !heatLine.getLane().isEmpty()) {
@@ -318,7 +265,7 @@ public class NotificationMessageBuilder {
      * Проверяет есть ли результат (через наличие resultUrl в событии)
      */
     private boolean hasResult(NotificationQueueEntity notification) {
-        EventEntity event = notification.getHeatLine().getHeat().getEvent();
+        var event = notification.getHeatLine().getHeat().getEvent();
         return event.hasResultUrl();
     }
 
@@ -326,8 +273,8 @@ public class NotificationMessageBuilder {
      * Получить короткое имя участника
      */
     private String getShortName(ParticipantEntity participant) {
-        String name = cleanMarkdown(participant.getName());
-        String surname = cleanMarkdown(participant.getSurname());
+        var name = cleanMarkdown(participant.getName());
+        var surname = cleanMarkdown(participant.getSurname());
         return name + " " + surname;
     }
 
@@ -363,13 +310,12 @@ public class NotificationMessageBuilder {
             this.content = new StringBuilder();
             this.notificationIds = new ArrayList<>();
 
-            // Формируем заголовок
-            String header = buildCompetitionHeader(competition);
+            var header = buildCompetitionHeader(competition);
             this.content.append(header);
         }
 
         private String buildCompetitionHeader(CompetitionEntity competition) {
-            StringBuilder header = new StringBuilder();
+            var header = new StringBuilder();
             header.append(SUBSCRIBE)
                     .append(" ")
                     .append(BOLD)
@@ -387,8 +333,8 @@ public class NotificationMessageBuilder {
         }
 
         boolean canAdd(String text) {
-            int currentLength = content.length();
-            int additionalLength = text.length();
+            var currentLength = content.length();
+            var additionalLength = text.length();
             return (currentLength + additionalLength) < MAX_CHUNK_SIZE;
         }
 
@@ -414,7 +360,7 @@ public class NotificationMessageBuilder {
         }
 
         NotificationMessage build(String continueSection) {
-            StringBuilder finalText = new StringBuilder(content);
+            var finalText = new StringBuilder(content);
 
             // Если это не последний chunk, добавляем индикатор продолжения
             if (continueSection != null) {
