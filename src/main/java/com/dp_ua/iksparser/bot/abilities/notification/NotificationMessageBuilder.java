@@ -70,16 +70,27 @@ public class NotificationMessageBuilder {
         var byStatus = notifications.stream()
                 .collect(Collectors.partitioningBy(this::hasResult));
 
-        var newEnrollmentBlocks = groupByEvents(byStatus.get(false), false);
-        var resultBlocks = groupByEvents(byStatus.get(true), true);
+        var newEnrollments = byStatus.get(false);
+        var results = byStatus.get(true);
 
-        var currentChunk = new MessageChunk(competition);
+        if (!newEnrollments.isEmpty()) {
+            var newEnrollmentBlocks = groupByEvents(newEnrollments, false);
+            var enrollmentMessages = buildMessagesForSection(
+                    competition,
+                    newEnrollmentBlocks,
+                    NEW_ATTENDS_TEXT
+            );
+            messages.addAll(enrollmentMessages);
+        }
 
-        currentChunk = addBlocksToChunks(messages, currentChunk, newEnrollmentBlocks, NEW_ATTENDS_TEXT);
-        currentChunk = addBlocksToChunks(messages, currentChunk, resultBlocks, RESULTS_TEXT);
-
-        if (!currentChunk.isEmpty()) {
-            messages.add(currentChunk.build(null));
+        if (!results.isEmpty()) {
+            var resultBlocks = groupByEvents(results, true);
+            var resultMessages = buildMessagesForSection(
+                    competition,
+                    resultBlocks,
+                    RESULTS_TEXT
+            );
+            messages.addAll(resultMessages);
         }
 
         log.debug("Split competition '{}' into {} message(s)",
@@ -88,28 +99,32 @@ public class NotificationMessageBuilder {
         return messages;
     }
 
-    private MessageChunk addBlocksToChunks(
-            List<NotificationMessage> messages,
-            MessageChunk currentChunk,
+    private List<NotificationMessage> buildMessagesForSection(
+            CompetitionEntity competition,
             List<EventBlock> blocks,
-            String sectionTitle
-    ) {
+            String sectionTitle) {
+
+        var messages = new ArrayList<NotificationMessage>();
+
         if (blocks.isEmpty()) {
-            return currentChunk;
+            return messages;
         }
-        var sectionHeader = buildSectionHeader(sectionTitle);
+
+        var currentChunk = new MessageChunk(competition, sectionTitle);
 
         for (var eventBlock : blocks) {
-            if (!currentChunk.canAdd(sectionHeader + eventBlock.text())) {
-                messages.add(currentChunk.build(sectionTitle));
-                currentChunk = new MessageChunk(currentChunk.competition);
-            }
-            if (currentChunk.isEmpty()) {
-                currentChunk.addSection(sectionTitle);
+            if (!currentChunk.canAdd(eventBlock.text())) {
+                messages.add(currentChunk.build(true)); // true = есть продолжение
+                currentChunk = new MessageChunk(competition, sectionTitle);
             }
             currentChunk.addEventBlock(eventBlock);
         }
-        return currentChunk;
+
+        if (!currentChunk.isEmpty()) {
+            messages.add(currentChunk.build(false)); // false = это последнее сообщение секции
+        }
+
+        return messages;
     }
 
     /**
@@ -230,15 +245,6 @@ public class NotificationMessageBuilder {
     }
 
     /**
-     * Формирует заголовок секции
-     */
-    private String buildSectionHeader(String title) {
-        return END_LINE +
-                BOLD + title + BOLD +
-                END_LINE + END_LINE;
-    }
-
-    /**
      * Формирует блок для одного события
      */
     private String buildEventBlock(EventEntity event,
@@ -252,8 +258,7 @@ public class NotificationMessageBuilder {
                 .append(event.getDay().getDayName())
                 .append(", ")
                 .append(event.getTime())
-                .append(END_LINE)
-        ;
+                .append(END_LINE);
 
         // Ссылка на событие (стартовый протокол или результаты)
         var eventUrl = hasResults ? event.getResultUrl() : event.getStartListUrl();
@@ -288,7 +293,6 @@ public class NotificationMessageBuilder {
                     .append(eventName)
                     .append(BOLD);
         }
-
 
         block.append(END_LINE);
 
@@ -388,15 +392,16 @@ public class NotificationMessageBuilder {
         private final CompetitionEntity competition;
         private final StringBuilder content;
         private final List<Long> notificationIds;
-        private String currentSection;
 
-        MessageChunk(CompetitionEntity competition) {
+        MessageChunk(CompetitionEntity competition, String sectionTitle) {
             this.competition = competition;
             this.content = new StringBuilder();
             this.notificationIds = new ArrayList<>();
 
             var header = buildCompetitionHeader(competition);
             this.content.append(header);
+
+            this.content.append(buildSectionHeader(sectionTitle));
         }
 
         private String buildCompetitionHeader(CompetitionEntity competition) {
@@ -417,20 +422,16 @@ public class NotificationMessageBuilder {
             return header.toString();
         }
 
+        private String buildSectionHeader(String title) {
+            return END_LINE +
+                    BOLD + title + BOLD +
+                    END_LINE + END_LINE;
+        }
+
         boolean canAdd(String text) {
             var currentLength = content.length();
             var additionalLength = text.length();
             return (currentLength + additionalLength) < MAX_CHUNK_SIZE;
-        }
-
-        void addSection(String sectionTitle) {
-            if (currentSection == null) {
-                content.append(END_LINE)
-                        .append(sectionTitle)
-                        .append(END_LINE)
-                        .append(END_LINE);
-                currentSection = sectionTitle;
-            }
         }
 
         void addEventBlock(EventBlock eventBlock) {
@@ -442,10 +443,10 @@ public class NotificationMessageBuilder {
             return notificationIds.isEmpty();
         }
 
-        NotificationMessage build(String continueSection) {
+        NotificationMessage build(boolean hasContinuation) {
             var finalText = new StringBuilder(content);
 
-            if (continueSection != null) {
+            if (hasContinuation) {
                 finalText.append(END_LINE)
                         .append(ITALIC)
                         .append("... продовження в наступному повідомленні")
