@@ -9,8 +9,8 @@ view:
 
 # Notification settings
 notification:
-  mode: BOTH  # LEGACY, AGGREGATED, or BOTH
-  onlyForAdmin: true
+  mode: AGGREGATED  # LEGACY, AGGREGATED, or BOTH
+  onlyForAdmin: false
   processor:
     cron-pattern: "0 15,45 6,10,14,18,22 * * *"
   aggregated:
