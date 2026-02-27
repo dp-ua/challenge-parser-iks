@@ -2,6 +2,7 @@ package com.dp_ua.iksparser.bot.abilities.notification;
 
 import static com.dp_ua.iksparser.dba.repository.NotificationTestUtils.TEST_CHAT_ID_1;
 import static com.dp_ua.iksparser.dba.repository.NotificationTestUtils.TEST_COMPETITION_URL;
+import static com.dp_ua.iksparser.dba.repository.NotificationTestUtils.TEST_EVENT_NAME;
 import static com.dp_ua.iksparser.dba.repository.NotificationTestUtils.TEST_PARTICIPANT_NAME_1;
 import static com.dp_ua.iksparser.dba.repository.NotificationTestUtils.TEST_PARTICIPANT_SURNAME_1;
 import static com.dp_ua.iksparser.dba.repository.NotificationTestUtils.createDay;
@@ -76,7 +77,7 @@ class NotificationMessageBuilderTest {
         assertThat(message.getText())
                 .contains("Чемпіонат України")
                 .contains(TEST_PARTICIPANT_SURNAME_1 + " " + TEST_PARTICIPANT_NAME_1)
-                .contains("100м вільний стиль, чоловіки")
+                .contains(TEST_EVENT_NAME)
                 .contains(TEST_COMPETITION_URL)
                 .contains("Нові заявки:"); // Проверяем заголовок секции
     }

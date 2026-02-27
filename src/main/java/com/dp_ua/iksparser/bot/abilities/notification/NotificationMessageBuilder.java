@@ -12,7 +12,6 @@ import static com.dp_ua.iksparser.service.MessageCreator.LINK_END;
 import static com.dp_ua.iksparser.service.MessageCreator.LINK_SEPARATOR;
 import static com.dp_ua.iksparser.service.MessageCreator.LINK_SEPARATOR_END;
 import static com.dp_ua.iksparser.service.MessageCreator.SERVICE;
-import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
@@ -318,11 +317,11 @@ public class NotificationMessageBuilder {
 
         // иконка
         var heatNumber = heat.extractHeatNumber();
-        var heatIcon = EMPTY;
-        if (isNotEmpty(heat.getName())) {
-            heatIcon = Icon.getIconicNumber(heatNumber) + " ";
+        if (ObjectUtils.isNotEmpty(heatNumber)) {
+            line
+                    .append(Icon.getIconicNumber(heatNumber))
+                    .append(" ");
         }
-        line.append(heatIcon);
 
         // Имя участника
         var participantName = getShortName(participant);
