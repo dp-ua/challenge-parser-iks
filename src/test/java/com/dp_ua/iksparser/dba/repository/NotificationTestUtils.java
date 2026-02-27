@@ -45,7 +45,8 @@ public class NotificationTestUtils {
     public static final String TEST_HEAT_LINE_BIB_2 = "456";
 
     // Test Constants - Heat data
-    public static final String TEST_HEAT_DESCRIPTION = "100м вільний стиль, чоловіки";
+    public static final String TEST_HEAT_NAME = "Забіг 1";
+    public static final String TEST_EVENT_NAME = "Біг 60м";
 
     // Test Constants - Time
     public static final int DAYS_OLD_FOR_CLEANUP = 7;
@@ -114,7 +115,7 @@ public class NotificationTestUtils {
      */
     public static HeatEntity createTestHeat() {
         HeatEntity heat = new HeatEntity();
-        heat.setName(TEST_HEAT_DESCRIPTION);
+        heat.setName(TEST_HEAT_NAME);
         return heat;
     }
 
@@ -130,7 +131,7 @@ public class NotificationTestUtils {
     public static EventEntity createTestEvent() {
         return new EventEntity(
                 "10:00",
-                TEST_HEAT_DESCRIPTION,
+                TEST_EVENT_NAME,
                 "Men",
                 "Final",
                 TEST_COMPETITION_URL,

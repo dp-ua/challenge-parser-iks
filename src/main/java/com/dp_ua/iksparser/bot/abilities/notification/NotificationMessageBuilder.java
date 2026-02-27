@@ -21,8 +21,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Component;
 
+import com.dp_ua.iksparser.bot.Icon;
 import com.dp_ua.iksparser.bot.abilities.infoview.CompetitionView;
 import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
 import com.dp_ua.iksparser.dba.entity.EventEntity;
@@ -313,6 +315,14 @@ public class NotificationMessageBuilder {
         var heatLine = notification.getHeatLine();
         var heat = heatLine.getHeat();
 
+        // иконка
+        var heatNumber = heat.extractHeatNumber();
+        if (ObjectUtils.isNotEmpty(heatNumber)) {
+            line
+                    .append(Icon.getIconicNumber(heatNumber))
+                    .append(" ");
+        }
+
         // Имя участника
         var participantName = getShortName(participant);
 
@@ -331,7 +341,9 @@ public class NotificationMessageBuilder {
         var details = new ArrayList<String>();
 
         if (isNotEmpty(heat.getName())) {
-            var heatName = cleanMarkdown(heat.getName());
+            var heatName = ObjectUtils.isNotEmpty(heatNumber)
+                    ? "з." + heatNumber
+                    : cleanMarkdown(heat.getName());
             details.add(heatName);
         }
 
