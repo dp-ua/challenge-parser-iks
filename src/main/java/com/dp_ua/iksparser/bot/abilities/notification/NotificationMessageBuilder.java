@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Component;
 
 import com.dp_ua.iksparser.bot.Icon;
@@ -316,9 +317,9 @@ public class NotificationMessageBuilder {
         var heat = heatLine.getHeat();
 
         // иконка
-        var heatNumber =heat.extractHeatNumber();
+        var heatNumber = heat.extractHeatNumber();
         var heatIcon = EMPTY;
-        if (heatNumber != null) {
+        if (isNotEmpty(heat.getName())) {
             heatIcon = Icon.getIconicNumber(heatNumber) + " ";
         }
         line.append(heatIcon);
@@ -341,7 +342,9 @@ public class NotificationMessageBuilder {
         var details = new ArrayList<String>();
 
         if (isNotEmpty(heat.getName())) {
-            var heatName = cleanMarkdown(heat.getName());
+            var heatName = ObjectUtils.isNotEmpty(heatNumber)
+                    ? "з." + heatNumber
+                    : cleanMarkdown(heat.getName());
             details.add(heatName);
         }
 
