@@ -12,6 +12,7 @@ import static com.dp_ua.iksparser.service.MessageCreator.LINK_END;
 import static com.dp_ua.iksparser.service.MessageCreator.LINK_SEPARATOR;
 import static com.dp_ua.iksparser.service.MessageCreator.LINK_SEPARATOR_END;
 import static com.dp_ua.iksparser.service.MessageCreator.SERVICE;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
+import com.dp_ua.iksparser.bot.Icon;
 import com.dp_ua.iksparser.bot.abilities.infoview.CompetitionView;
 import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
 import com.dp_ua.iksparser.dba.entity.EventEntity;
@@ -312,6 +314,14 @@ public class NotificationMessageBuilder {
         var participant = notification.getParticipant();
         var heatLine = notification.getHeatLine();
         var heat = heatLine.getHeat();
+
+        // иконка
+        var heatNumber =heat.extractHeatNumber();
+        var heatIcon = EMPTY;
+        if (heatNumber != null) {
+            heatIcon = Icon.getIconicNumber(heatNumber) + " ";
+        }
+        line.append(heatIcon);
 
         // Имя участника
         var participantName = getShortName(participant);
