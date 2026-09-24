@@ -1,24 +1,24 @@
 package com.dp_ua.iksparser.dba.repo;
 
-import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
-import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
 
 @DataJpaTest
-public class ParticipantRepoTest {
+class ParticipantRepoTest {
+
     @Autowired
     ParticipantRepo participantRepo;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         participantRepo.deleteAll();
         ParticipantEntity participant1 = new ParticipantEntity();
         participant1.setName("Kolya");
@@ -42,60 +42,15 @@ public class ParticipantRepoTest {
     }
 
     @Test
-    public void shouldFindAll() {
-        List<ParticipantEntity> found = (List<ParticipantEntity>) participantRepo.findAll();
+    void shouldFindAll() {
+        List<ParticipantEntity> found = participantRepo.findAll();
         assertEquals(4, found.size());
     }
 
-    // should not find any participants
     @Test
-    public void shouldFind_None() {
-        List<ParticipantEntity> found = participantRepo.findByNameAndSurnameByPart("Ivan");
-        Assertions.assertTrue(found.isEmpty());
-    }
-
-    @Test
-    public void shouldFind_OneParticipant_FullName() {
-        List<ParticipantEntity> found = participantRepo.findByNameAndSurnameByPart("Kolya");
-        assertFalse(found.isEmpty());
-        assertEquals(1, found.size());
-        assertEquals("Kolya", found.get(0).getName());
-        assertEquals("Targetov", found.get(0).getSurname());
-    }
-
-    @Test
-    public void shouldFind_OneParticipant_Surname() {
-        List<ParticipantEntity> found = participantRepo.findByNameAndSurnameByPart("Targetov");
-        assertEquals(1, found.size());
-        assertEquals("Kolya", found.get(0).getName());
-        assertEquals("Targetov", found.get(0).getSurname());
-    }
-
-    @Test
-    public void shouldFind_OneParticipant_PartialName() {
-        List<ParticipantEntity> found = participantRepo.findByNameAndSurnameByPart("Kol");
-        assertEquals(1, found.size());
-        assertEquals("Kolya", found.get(0).getName());
-        assertEquals("Targetov", found.get(0).getSurname());
-    }
-
-    @Test
-    public void shouldFind_OneParticipant_IgnoreCase() {
-        List<ParticipantEntity> found = participantRepo.findByNameAndSurnameByPart("kolya");
-        assertEquals(1, found.size());
-        assertEquals("Kolya", found.get(0).getName());
-        assertEquals("Targetov", found.get(0).getSurname());
-    }
-
-    @Test
-    public void shouldFind_TwoParticipants_SurnamePart() {
-        List<ParticipantEntity> found = participantRepo.findByNameAndSurnameByPart("target");
-        assertEquals(2, found.size());
-    }
-
-    @Test
-    public void shouldFindDuplicates() {
+    void shouldFindDuplicates() {
         List<ParticipantEntity> duplicates = participantRepo.findDuplicates();
         assertEquals(2, duplicates.size());
     }
+
 }

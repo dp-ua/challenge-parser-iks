@@ -1,25 +1,23 @@
 package com.dp_ua.iksparser.dba.service;
 
 import java.text.Collator;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import com.dp_ua.iksparser.dba.dto.ParticipantDto;
 import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
 import com.dp_ua.iksparser.dba.repo.ParticipantRepo;
+import com.dp_ua.iksparser.dba.spec.ParticipantSpecifications;
 import com.dp_ua.iksparser.service.PageableService;
 import com.dp_ua.iksparser.service.SqlPreprocessorService;
 
@@ -27,7 +25,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@Component
+@Service
 @Transactional
 @Slf4j
 @RequiredArgsConstructor
@@ -62,36 +60,27 @@ public class ParticipantService {
     }
 
     public Page<ParticipantEntity> findAllBySurnameAndNameParts(List<String> parts, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+        var pageable = PageRequest.of(page, size);
         List<String> maskedLowerCaseParts = parts != null ? getMaskedLowerCaseParts(parts) : Collections.emptyList();
 
         if (maskedLowerCaseParts.isEmpty()) {
             return repo.findAll(pageable);
         }
 
-        List<ParticipantEntity> content = findAllBySurnameAndNameParts(parts);
-        Collator collator = Collator.getInstance(new Locale("uk", "UA"));
+        var content = findAllBySurnameAndNameParts(maskedLowerCaseParts);
+        var collator = Collator.getInstance(new Locale("uk", "UA"));
         content.sort(Comparator.comparing(ParticipantEntity::getSurname, collator).thenComparing(ParticipantEntity::getName, collator));
         return pageableService.getPage(content, pageable);
     }
 
     protected List<ParticipantEntity> findAllBySurnameAndNameParts(List<String> parts) {
-        Set<ParticipantEntity> result = new HashSet<>();
-
-        if (parts == null || parts.isEmpty()) {
-            repo.findAll().forEach(result::add);
-            return new ArrayList<>(result);
-        } else {
-            List<String> maskedLowerCaseParts = getMaskedLowerCaseParts(parts);
-
-            for (String part : maskedLowerCaseParts) {
-                result.addAll(repo.findByNameAndSurnameByPart(part));
-            }
-            return result.stream()
-                    .filter(participant -> containsParts(participant, maskedLowerCaseParts))
-                    .collect(Collectors.toCollection(ArrayList::new));
+        if (CollectionUtils.isEmpty(parts)) {
+            return List.of();
         }
+        var spec = ParticipantSpecifications.hasNameAndSurnameParts(parts);
+        return repo.findAll(spec);
     }
+
 
     private List<String> getMaskedLowerCaseParts(List<String> parts) {
         List<String> result = List.copyOf(parts.stream()
