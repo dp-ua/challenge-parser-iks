@@ -7,7 +7,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.Ordered;
@@ -16,13 +15,12 @@ import org.springframework.stereotype.Component;
 
 import com.dp_ua.iksparser.SpringApp;
 import com.dp_ua.iksparser.bot.abilities.competition.CompetitionFacade;
-import com.dp_ua.iksparser.bot.event.UpdateCompetitionEvent;
 import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
 import com.dp_ua.iksparser.dba.entity.EventEntity;
-import com.dp_ua.iksparser.dba.entity.UpdateStatusEntity;
 import com.dp_ua.iksparser.dba.service.CompetitionService;
 import com.dp_ua.iksparser.dba.service.EventService;
 import com.dp_ua.iksparser.exeption.ParsingException;
+import com.dp_ua.iksparser.service.CompetitionUpdateQueue;
 import com.dp_ua.iksparser.service.StaleCompetitionPolicy;
 
 import jakarta.transaction.Transactional;
@@ -37,7 +35,7 @@ public class CronCompetitionUpdater implements ApplicationListener<ContextRefres
     private final EventService eventService;
     private final CompetitionService competitionService;
     private final CompetitionFacade competitionFacade;
-    private final ApplicationEventPublisher publisher;
+    private final CompetitionUpdateQueue updateQueue;
     private final StaleCompetitionPolicy staleCompetitionPolicy;
 
     private final Set<String> finishedOrCanceledStatuses = Set.of(C_FINISHED.getName(), C_CANCELED.getName());
@@ -80,7 +78,7 @@ public class CronCompetitionUpdater implements ApplicationListener<ContextRefres
                 .filter(competition -> !staleCompetitionPolicy.isStale(competition))
                 .forEach(competition -> {
                     log.info("Update competition with id: {} begin date: {}", competition.getId(), competition.getBeginDate());
-                    runEventToUpdateCompetition(competition);
+                    requestCompetitionUpdate(competition);
                 });
     }
 
@@ -125,7 +123,7 @@ public class CronCompetitionUpdater implements ApplicationListener<ContextRefres
         return !beginDate.isAfter(oneWeekFromNow);
     }
 
-    private void runEventToUpdateCompetition(CompetitionEntity competition) {
+    private void requestCompetitionUpdate(CompetitionEntity competition) {
         if (competition.isURLEmpty()) {
             log.debug("Can't update. Competition URL is empty, id: {}", competition.getId());
             return;
@@ -134,12 +132,7 @@ public class CronCompetitionUpdater implements ApplicationListener<ContextRefres
             log.warn("Can't update. Competition URL is not valid, id: {}", competition.getId());
             return;
         }
-        UpdateStatusEntity message = new UpdateStatusEntity();
-        message.setCompetitionId(competition.getId());
-        message.setChatId("");
-        message.setEditMessageId(null);
-        UpdateCompetitionEvent updateCompetitionEvent = new UpdateCompetitionEvent(this, message);
-        publisher.publishEvent(updateCompetitionEvent);
+        updateQueue.requestUpdate(competition.getId());
     }
 
     @Override

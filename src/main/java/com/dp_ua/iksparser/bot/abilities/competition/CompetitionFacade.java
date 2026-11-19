@@ -1,10 +1,10 @@
 package com.dp_ua.iksparser.bot.abilities.competition;
 
+import java.util.List;
+
 import com.dp_ua.iksparser.dba.dto.CompetitionDto;
 import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
 import com.dp_ua.iksparser.exeption.ParsingException;
-
-import java.util.List;
 
 public interface CompetitionFacade {
     void showCompetitions(String chatId, int page, Integer editMessageId);
@@ -19,7 +19,6 @@ public interface CompetitionFacade {
 
     void searchingByCoachWithName(String chatId, String commandArgument, Integer editMessageId);
 
-    void showNotLoadedInfo(String chatId, long commandArgument, Integer editMessageId);
 
     void updateCompetitionsList(int year) throws ParsingException;
 

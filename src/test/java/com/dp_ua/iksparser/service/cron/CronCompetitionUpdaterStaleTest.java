@@ -1,6 +1,6 @@
 package com.dp_ua.iksparser.service.cron;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -11,30 +11,28 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.springframework.context.ApplicationEventPublisher;
 
 import com.dp_ua.iksparser.bot.abilities.competition.CompetitionFacade;
-import com.dp_ua.iksparser.bot.event.UpdateCompetitionEvent;
 import com.dp_ua.iksparser.configuration.CompetitionProperties;
 import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
 import com.dp_ua.iksparser.dba.service.CompetitionService;
 import com.dp_ua.iksparser.dba.service.EventService;
+import com.dp_ua.iksparser.service.CompetitionUpdateQueue;
 import com.dp_ua.iksparser.service.StaleCompetitionPolicy;
 
 class CronCompetitionUpdaterStaleTest {
 
     private CompetitionService competitionService;
-    private ApplicationEventPublisher publisher;
+    private CompetitionUpdateQueue updateQueue;
     private CronCompetitionUpdater updater;
 
     @BeforeEach
     void setUp() {
         competitionService = mock(CompetitionService.class);
-        publisher = mock(ApplicationEventPublisher.class);
+        updateQueue = mock(CompetitionUpdateQueue.class);
         StaleCompetitionPolicy policy = new StaleCompetitionPolicy(new CompetitionProperties());
         updater = new CronCompetitionUpdater(mock(EventService.class), competitionService,
-                mock(CompetitionFacade.class), publisher, policy);
+                mock(CompetitionFacade.class), updateQueue, policy);
     }
 
     private CompetitionEntity competition(long id, LocalDate endDate) {
@@ -54,8 +52,8 @@ class CronCompetitionUpdaterStaleTest {
 
         updater.updateAllCompetitionsDetails();
 
-        ArgumentCaptor<UpdateCompetitionEvent> captor = ArgumentCaptor.forClass(UpdateCompetitionEvent.class);
-        verify(publisher, times(1)).publishEvent(captor.capture());
-        assertEquals(2L, captor.getValue().getMessage().getCompetitionId());
+        verify(updateQueue, times(1)).requestUpdate(anyLong());
+        verify(updateQueue).requestUpdate(2L);
     }
+
 }

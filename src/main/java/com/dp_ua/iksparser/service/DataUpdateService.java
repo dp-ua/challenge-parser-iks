@@ -3,11 +3,6 @@ package com.dp_ua.iksparser.service;
 import static com.dp_ua.iksparser.dba.entity.CompetitionStatus.C_IN_PROGRESS;
 import static com.dp_ua.iksparser.dba.entity.CompetitionStatus.C_NOT_STARTED;
 import static com.dp_ua.iksparser.dba.entity.CompetitionStatus.C_PLANED;
-import static com.dp_ua.iksparser.service.DataUpdateService.UpdateStatus.U_ERROR;
-import static com.dp_ua.iksparser.service.DataUpdateService.UpdateStatus.U_FINISHED;
-import static com.dp_ua.iksparser.service.DataUpdateService.UpdateStatus.U_INFORM_ERROR;
-import static com.dp_ua.iksparser.service.DataUpdateService.UpdateStatus.U_STARTED;
-import static com.dp_ua.iksparser.service.DataUpdateService.UpdateStatus.U_UPDATED;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -15,33 +10,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import org.jsoup.nodes.Document;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.ApplicationListener;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import com.dp_ua.iksparser.bot.command.impl.competition.CommandCompetition;
-import com.dp_ua.iksparser.bot.command.impl.competition.CommandCompetitionNotLoaded;
-import com.dp_ua.iksparser.bot.event.GetMessageEvent;
 import com.dp_ua.iksparser.bot.event.SubscribeEvent;
-import com.dp_ua.iksparser.bot.event.UpdateCompetitionEvent;
-import com.dp_ua.iksparser.bot.message.SelfMessage;
 import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
 import com.dp_ua.iksparser.dba.entity.DayEntity;
 import com.dp_ua.iksparser.dba.entity.EventEntity;
 import com.dp_ua.iksparser.dba.entity.HeatEntity;
 import com.dp_ua.iksparser.dba.entity.HeatLineEntity;
 import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
-import com.dp_ua.iksparser.dba.entity.UpdateStatusEntity;
 import com.dp_ua.iksparser.dba.service.CompetitionService;
 import com.dp_ua.iksparser.dba.service.DayService;
 import com.dp_ua.iksparser.dba.service.EventService;
 import com.dp_ua.iksparser.dba.service.HeatService;
-import com.dp_ua.iksparser.dba.service.UpdateStatusService;
 import com.dp_ua.iksparser.exeption.ParsingException;
 import com.dp_ua.iksparser.service.parser.CompetitionPageParser;
 import com.dp_ua.iksparser.service.parser.EventPageParser;
@@ -54,9 +38,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class DataUpdateService implements ApplicationListener<UpdateCompetitionEvent> {
+public class DataUpdateService {
 
-    private final UpdateStatusService service;
     private final CompetitionService competitionService;
     private final Downloader downloader;
     private final CompetitionPageParser competitionParser;
@@ -66,55 +49,28 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
     private final EventService eventService;
     private final HeatService heatService;
 
-    private final CompetitionUpdateGuard updateGuard;
 
-    @Override
-    @Async("updateExecutor")
+    /**
+     * Updates one competition from the site. Called one by one from {@link CompetitionUpdateQueue}.
+     */
     @Transactional
-    public void onApplicationEvent(UpdateCompetitionEvent event) {
-        UpdateStatusEntity message = event.getMessage();
-
-        message.setStatus(U_STARTED.name());
-        service.save(message);
-
-        long competitionId = message.getCompetitionId();
-        if (!updateGuard.tryStart(competitionId)) {
-            log.info("Already updating competition {}", competitionId);
+    public void update(long competitionId) {
+        CompetitionEntity competition = competitionService.findById(competitionId);
+        if (competition == null) {
+            log.error("Competition with id {} not found", competitionId);
             return;
         }
         try {
-            CompetitionEntity competition = competitionService.findById(competitionId);
-            if (competition == null) {
-                String s1 = String.format("Competition with id %d not found", competitionId);
-                log.error(s1);
-                message.setReason(s1);
-                message.setStatus(U_ERROR.name());
-                service.save(message);
-                return;
-            }
-            performUpdate(competition);
-        } finally {
-            updateGuard.finish(competitionId);
-        }
-    }
-
-    private void performUpdate(CompetitionEntity competition) {
-        long competitionId = competition.getId();
-        try {
             updateCompetition(competition);
             registerUpdateSuccess(competition);
-            changeStatus(competitionId, U_STARTED, U_UPDATED);
         } catch (Exception e) {
             log.error("[{}]Error updating competition", competitionId, e);
             registerUpdateFailure(competitionId);
-            changeStatus(competitionId, U_STARTED, U_ERROR);
         } catch (ParsingException e) {
             log.warn("[{}] Error parsing competition, reason:{}", competitionId, e.getMessage());
             registerUpdateFailure(competitionId);
-            changeStatus(competitionId, U_STARTED, U_INFORM_ERROR);
         } finally {
             log.info("[{}]Finished updating competition", competitionId);
-            List.of(U_UPDATED, U_INFORM_ERROR).forEach(status -> sendMessages(competitionId, status));
         }
     }
 
@@ -177,51 +133,6 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
                 date.isEqual(now.minusDays(1)) || // yesterday
                 date.isEqual(now.minusDays(2)); // day before yesterday
     }
-
-    private void sendMessages(long competitionId, UpdateStatus status) {
-        List<UpdateStatusEntity> statuses = service.findAllByCompetitionIdAndStatus(competitionId, status.name());
-
-        statuses.stream()
-                .collect(Collectors.toMap(UpdateStatusEntity::getChatId, Function.identity(), (a, b) -> a))
-                .values()
-                .forEach(entry -> {
-                    if (!entry.getChatId().isEmpty()) {
-                        GetMessageEvent messageEvent = getGetMessageEvent(competitionId, entry, status);
-                        publisher.publishEvent(messageEvent);
-                    }
-                });
-        statuses.forEach(updateStatusEntity -> {
-            updateStatusEntity.setStatus(U_FINISHED.name());
-            service.save(updateStatusEntity);
-        });
-        service.flush();
-    }
-
-    private GetMessageEvent getGetMessageEvent(long competitionId, UpdateStatusEntity updateStatusEntity, UpdateStatus status) {
-        SelfMessage selfMessage = null;
-        if (status == U_UPDATED) {
-            selfMessage = getUpdateMessage(competitionId, updateStatusEntity);
-        }
-        if (status == U_INFORM_ERROR) {
-            selfMessage = getErrorMessage(competitionId, updateStatusEntity);
-        }
-        return new GetMessageEvent(this, selfMessage);
-    }
-
-    private SelfMessage getUpdateMessage(long competitionId, UpdateStatusEntity updateStatusEntity) {
-        SelfMessage selfMessage = new SelfMessage();
-        selfMessage.setChatId(updateStatusEntity.getChatId());
-        selfMessage.setMessageText(CommandCompetition.getCallbackCommand(competitionId));
-        return selfMessage;
-    }
-
-    private SelfMessage getErrorMessage(long competitionId, UpdateStatusEntity updateStatusEntity) {
-        SelfMessage selfMessage = new SelfMessage();
-        selfMessage.setChatId(updateStatusEntity.getChatId());
-        selfMessage.setMessageText(CommandCompetitionNotLoaded.getCallBackCommand(competitionId));
-        return selfMessage;
-    }
-
 
     private Map<ParticipantEntity, List<HeatLineEntity>> operateEventsToParseHeats(List<EventEntity> events) throws ParsingException {
         Map<ParticipantEntity, List<HeatLineEntity>> participations = new HashMap<>();
@@ -352,24 +263,6 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
         dayService.save(day);
         day.setCompetition(competition);
         competition.addDay(day);
-    }
-
-    private void changeStatus(long competitionId, UpdateStatus oldStatus, UpdateStatus
-            newStatus) {
-        List<UpdateStatusEntity> allByCompetitionId = service.findAllByCompetitionIdAndStatus(competitionId, oldStatus.name());
-        allByCompetitionId.forEach(updateStatusEntity -> {
-            updateStatusEntity.setStatus(newStatus.name());
-            service.save(updateStatusEntity);
-        });
-        service.saveAll(allByCompetitionId);
-    }
-
-    public enum UpdateStatus {
-        U_STARTED,
-        U_UPDATED,
-        U_FINISHED,
-        U_INFORM_ERROR,
-        U_ERROR
     }
 
 }
