@@ -48,7 +48,7 @@ public class App implements ApplicationListener<ContextRefreshedEvent>, Ordered 
     public void connectBot() {
         BotSession botSession = botController.botConnect();
         stateService.saveBotSession(botSession);
-        log.info("BotSession: " + botSession);
+        log.debug("BotSession: " + botSession);
     }
 
     @Override

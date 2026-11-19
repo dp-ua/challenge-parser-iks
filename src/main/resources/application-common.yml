@@ -19,6 +19,9 @@ notification:
     minutesThreshold: 60
 
 logging:
+  level:
+    org.springframework.web.servlet.DispatcherServlet: WARN
+    "[org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/]]": WARN
   file:
     name: ./logs/file.log
   pattern:
