@@ -2,42 +2,31 @@ name: Java CI [ver17]
 
 on:
   push:
+    branches: [ master ]
   pull_request:
     branches: [ master ]
 
+# Новый пуш в PR отменяет предыдущий (ещё идущий) запуск. Запуски на master не отменяем.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
 jobs:
-  # Быстрая проверка для обычных пушей
+  # Быстрая проверка для пушей в master
   quick-check:
     name: Quick Build
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
         with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: 'maven'
-
-      - name: Build with Maven
-        run: mvn --batch-mode --update-snapshots clean install -DskipTests
-
-      - name: Run Tests
-        run: mvn --batch-mode test
-
-  # Полная проверка для PR
-  full-check:
-    name: Full Build and Coverage
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+          persist-credentials: false
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -47,7 +36,33 @@ jobs:
           cache: 'maven'
 
       - name: Build and Test with Maven
-        run: mvn --batch-mode --update-snapshots clean verify
+        run: mvn --batch-mode verify
+
+  # Полная проверка для PR
+  full-check:
+    name: Full Build and Coverage
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      pull-requests: write  # комментарий с покрытием в PR
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Build and Test with Maven
+        run: mvn --batch-mode verify
 
       - name: Generate JaCoCo Badge
         id: jacoco
@@ -60,9 +75,12 @@ jobs:
           generate-summary: true
 
       - name: Log coverage percentage
+        env:
+          COVERAGE: ${{ steps.jacoco.outputs.coverage }}
+          BRANCHES: ${{ steps.jacoco.outputs.branches }}
         run: |
-          echo "Coverage = ${{ steps.jacoco.outputs.coverage }}"
-          echo "Branches = ${{ steps.jacoco.outputs.branches }}"
+          echo "Coverage = $COVERAGE"
+          echo "Branches = $BRANCHES"
 
       - name: Upload JaCoCo coverage report
         uses: actions/upload-artifact@v4
