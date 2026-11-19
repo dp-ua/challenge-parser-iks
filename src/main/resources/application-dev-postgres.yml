@@ -15,7 +15,7 @@ spring:
   config:
     import: application-common.yml
   datasource:
-    url: jdbc:postgresql://localhost/iks_db
+    url: jdbc:postgresql://localhost:5444/iks_db?serverTimezone=UTC
     driver-class-name: org.postgresql.Driver
     username: ${TEST_DB_USERNAME}
     password: ${TEST_DB_PASSWORD}
