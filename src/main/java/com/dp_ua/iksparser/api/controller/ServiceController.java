@@ -6,7 +6,6 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,15 +16,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dp_ua.iksparser.bot.abilities.competition.CompetitionFacade;
-import com.dp_ua.iksparser.bot.event.UpdateCompetitionEvent;
 import com.dp_ua.iksparser.configuration.IsServiceEnable;
 import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
 import com.dp_ua.iksparser.dba.entity.EventEntity;
-import com.dp_ua.iksparser.dba.entity.UpdateStatusEntity;
 import com.dp_ua.iksparser.dba.service.CompetitionService;
 import com.dp_ua.iksparser.dba.service.EventService;
 import com.dp_ua.iksparser.exeption.ParsingException;
 import com.dp_ua.iksparser.monitor.LogRequestDetails;
+import com.dp_ua.iksparser.service.CompetitionUpdateQueue;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -47,7 +45,7 @@ public class ServiceController {
     private final CompetitionService competitionService;
     private final EventService eventService;
     private final CompetitionFacade competitionFacade;
-    private final ApplicationEventPublisher publisher;
+    private final CompetitionUpdateQueue updateQueue;
 
     @Operation(summary = "Delete an event by ID", description = "Deletes an event from the database by its ID.")
     @DeleteMapping("/event/{eventId}")
@@ -87,13 +85,13 @@ public class ServiceController {
         if (competition == null) {
             return ResponseEntity.notFound().build();
         }
-        runEventToUpdateCompetition(competition);
+        requestCompetitionUpdate(competition);
         log.info("Update competition by id " + id);
         return ResponseEntity.ok("Going to update competition: " + id +
                 " at " + DateTimeFormatter.ISO_INSTANT.format(Instant.now()));
     }
 
-    private void runEventToUpdateCompetition(CompetitionEntity competition) {
+    private void requestCompetitionUpdate(CompetitionEntity competition) {
         if (competition.isURLEmpty()) {
             log.warn("Can't update. Competition URL is empty, id: {}", competition.getId());
             return;
@@ -102,12 +100,7 @@ public class ServiceController {
             log.warn("Can't update. Competition URL is not valid, id: {}", competition.getId());
             return;
         }
-        UpdateStatusEntity message = new UpdateStatusEntity();
-        message.setCompetitionId(competition.getId());
-        message.setChatId("");
-        message.setEditMessageId(null);
-        UpdateCompetitionEvent updateCompetitionEvent = new UpdateCompetitionEvent(this, message);
-        publisher.publishEvent(updateCompetitionEvent);
+        updateQueue.requestUpdate(competition.getId());
     }
 
     @GetMapping("competition/full/{id}")

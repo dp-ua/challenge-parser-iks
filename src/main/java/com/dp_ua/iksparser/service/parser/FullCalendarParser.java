@@ -1,24 +1,27 @@
 package com.dp_ua.iksparser.service.parser;
 
-import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
-import com.dp_ua.iksparser.exeption.ParsingException;
-import com.dp_ua.iksparser.service.Downloader;
-import lombok.extern.slf4j.Slf4j;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+import org.springframework.stereotype.Component;
+
+import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
+import com.dp_ua.iksparser.exeption.ParsingException;
+import com.dp_ua.iksparser.service.Downloader;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class FullCalendarParser implements MainParserService {
-    @Autowired
-    Downloader downloader;
+
+    private final Downloader downloader;
 
     private static final String URL = "https://www.iks.org.ua/calendar/?search_year={$year}" +
             "&search_month=&search_country=%D0%A3%D0%BA%D1%80%D0%B0%D1%97%D0%BD%D0%B0" +
@@ -89,4 +92,5 @@ public class FullCalendarParser implements MainParserService {
     private String getURL(int year) {
         return URL.replace("{$year}", String.valueOf(year));
     }
+
 }

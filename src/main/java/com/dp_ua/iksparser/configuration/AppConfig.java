@@ -2,6 +2,8 @@ package com.dp_ua.iksparser.configuration;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import org.springframework.context.annotation.Bean;
@@ -11,6 +13,7 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -52,12 +55,13 @@ public class AppConfig {
         return executor;
     }
 
+    /**
+     * Competition updates run strictly one at a time (participants and coaches are shared between
+     * competitions, parallel updates created duplicates). Extra requests wait in the queue.
+     */
     @Bean("updateExecutor")
-    public TaskExecutor updateTaskExecutor() {
-        SimpleAsyncTaskExecutor executor = new SimpleAsyncTaskExecutor();
-        executor.setThreadNamePrefix("UpdateExecutor-");
-        executor.setConcurrencyLimit(2);
-        return executor;
+    public ExecutorService updateExecutor() {
+        return Executors.newSingleThreadExecutor(new CustomizableThreadFactory("UpdateExecutor-"));
     }
 
     @Bean
@@ -67,7 +71,7 @@ public class AppConfig {
 
     @Bean
     public Map<ResponseType, Class<? extends ResponseContentGenerator>> contentMap(List<ResponseContentGenerator> contentGenerators) {
-        return contentGenerators.stream()
+        Map<ResponseType, Class<? extends ResponseContentGenerator>> contentMap = contentGenerators.stream()
                 .filter(content -> content.getClass().isAnnotationPresent(ResponseTypeMarker.class))
                 .collect(Collectors.toMap(
                         content -> content.getClass().getAnnotation(ResponseTypeMarker.class).value(),
@@ -78,6 +82,8 @@ public class AppConfig {
                             return existing;
                         }
                 ));
+        contentMap.forEach((key, value) -> log.info("key: [{}], class: {}", key, value.getSimpleName()));
+        return contentMap;
     }
 
 }

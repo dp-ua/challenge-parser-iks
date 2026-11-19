@@ -1,32 +1,38 @@
 package com.dp_ua.iksparser.bot.abilities.response.content;
 
-import com.dp_ua.iksparser.bot.Icon;
-import com.dp_ua.iksparser.bot.abilities.infoview.ParticipantView;
-import com.dp_ua.iksparser.bot.abilities.response.ResponseContentGenerator;
-import com.dp_ua.iksparser.bot.abilities.response.ResponseTypeMarker;
-import com.dp_ua.iksparser.bot.command.impl.participants.CommandShowFindAllParticipants;
-import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
+import static com.dp_ua.iksparser.bot.abilities.response.ResponseType.SHOW_ALL_PARTICIPANTS;
+import static com.dp_ua.iksparser.service.MessageCreator.BOLD;
+import static com.dp_ua.iksparser.service.MessageCreator.END_LINE;
+import static com.dp_ua.iksparser.service.MessageCreator.ITALIC;
+import static com.dp_ua.iksparser.service.MessageCreator.SERVICE;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import org.apache.logging.log4j.util.Strings;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import com.dp_ua.iksparser.bot.Icon;
+import com.dp_ua.iksparser.bot.abilities.infoview.ParticipantView;
+import com.dp_ua.iksparser.bot.abilities.response.ResponseContentGenerator;
+import com.dp_ua.iksparser.bot.abilities.response.ResponseTypeMarker;
+import com.dp_ua.iksparser.bot.command.impl.participants.CommandShowFindAllParticipants;
+import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
 
-import static com.dp_ua.iksparser.bot.abilities.response.ResponseType.SHOW_ALL_PARTICIPANTS;
-import static com.dp_ua.iksparser.service.MessageCreator.*;
+import lombok.RequiredArgsConstructor;
 
 @Component
 @Scope("prototype")
 @ResponseTypeMarker(SHOW_ALL_PARTICIPANTS)
+@RequiredArgsConstructor
 public class ResponseShowAllParticipants implements ResponseContentGenerator {
-    @Autowired
-    ParticipantView participantView;
+
+    private final ParticipantView participantView;
 
     // todo add STAR to list. Information about subscription to the athlete
     @Override
@@ -92,4 +98,5 @@ public class ResponseShowAllParticipants implements ResponseContentGenerator {
         }
         return navigation;
     }
+
 }

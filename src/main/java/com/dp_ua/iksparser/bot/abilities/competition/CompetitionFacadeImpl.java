@@ -428,27 +428,6 @@ public class CompetitionFacadeImpl extends FacadeMethods implements CompetitionF
         return result;
     }
 
-    @Override
-    public void showNotLoadedInfo(String chatId, long competitionId, Integer editMessageId) {
-        log.info("showNotLoadedInfo. CommandArgument {}, chatId:{} ", competitionId, chatId);
-        sendTypingAction(chatId);
-
-        handleCompetition(chatId, competitionId, editMessageId, competition -> {
-            String sb = competitionView.info(competition) +
-                    END_LINE +
-                    competitionView.notFilledInfo();
-
-            InlineKeyboardMarkup keyboard = getCompetitionDetailsKeyboard(competition, false);
-
-            publishEvent(prepareSendMessageEvent(
-                    chatId,
-                    editMessageId,
-                    sb,
-                    keyboard
-            ));
-        });
-    }
-
     private boolean isNotFoundCoaches(List<CoachEntity> foundCoaches, String coachName) {
         if (foundCoaches.isEmpty()) {
             log.info("No coaches found: {}", coachName);

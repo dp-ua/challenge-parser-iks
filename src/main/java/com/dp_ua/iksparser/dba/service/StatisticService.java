@@ -1,23 +1,23 @@
 package com.dp_ua.iksparser.dba.service;
 
-import com.dp_ua.iksparser.dba.entity.StatisticEntity;
-import com.dp_ua.iksparser.dba.repo.StatisticRepo;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.stereotype.Component;
+
+import com.dp_ua.iksparser.dba.entity.StatisticEntity;
+import com.dp_ua.iksparser.dba.repo.StatisticRepo;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class StatisticService {
+
     private final StatisticRepo repo;
 
-    @Autowired
-    public StatisticService(StatisticRepo repo) {
-        this.repo = repo;
-    }
 
     public void save(String chatId, String name, String text) {
         log.debug("save statistic: chatId={}, text={}", chatId, text);
@@ -31,4 +31,5 @@ public class StatisticService {
     public List<StatisticEntity> getAllByDate(LocalDate date) {
         return repo.findByUpdatedInDate(date);
     }
+
 }

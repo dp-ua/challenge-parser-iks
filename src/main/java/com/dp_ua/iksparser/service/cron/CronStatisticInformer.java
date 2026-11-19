@@ -1,25 +1,27 @@
 package com.dp_ua.iksparser.service.cron;
 
-import com.dp_ua.iksparser.bot.controller.BotController;
-import com.dp_ua.iksparser.dba.entity.StatisticEntity;
-import com.dp_ua.iksparser.dba.service.StatisticService;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
-
 import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+import com.dp_ua.iksparser.bot.controller.BotController;
+import com.dp_ua.iksparser.dba.entity.StatisticEntity;
+import com.dp_ua.iksparser.dba.service.StatisticService;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class CronStatisticInformer {
-    @Autowired
-    StatisticService service;
-    @Autowired
-    BotController bot;
+
+    private final StatisticService service;
+    private final BotController bot;
 
     @Scheduled(cron = "0 0 7 * * *")  // every day at 7:00
     public void inform() {
@@ -45,4 +47,5 @@ public class CronStatisticInformer {
                         LinkedHashMap::new
                 ));
     }
+
 }

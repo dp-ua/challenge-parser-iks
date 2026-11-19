@@ -1,31 +1,37 @@
 package com.dp_ua.iksparser.bot.abilities.response.content;
 
-import com.dp_ua.iksparser.bot.Icon;
-import com.dp_ua.iksparser.bot.abilities.infoview.ParticipantView;
-import com.dp_ua.iksparser.bot.abilities.response.ResponseContentGenerator;
-import com.dp_ua.iksparser.bot.abilities.response.ResponseTypeMarker;
-import com.dp_ua.iksparser.bot.command.impl.subscribe.CommandSubscriptionsList;
-import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
-import org.springframework.beans.factory.annotation.Autowired;
+import static com.dp_ua.iksparser.bot.abilities.response.ResponseType.SUBSCRIPTIONS_LIST;
+import static com.dp_ua.iksparser.service.MessageCreator.END_LINE;
+import static com.dp_ua.iksparser.service.MessageCreator.SERVICE;
+import static com.dp_ua.iksparser.service.MessageCreator.SPACE;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.dp_ua.iksparser.bot.Icon;
+import com.dp_ua.iksparser.bot.abilities.infoview.ParticipantView;
+import com.dp_ua.iksparser.bot.abilities.response.ResponseContentGenerator;
+import com.dp_ua.iksparser.bot.abilities.response.ResponseTypeMarker;
+import com.dp_ua.iksparser.bot.command.impl.subscribe.CommandSubscriptionsList;
+import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
 
-import static com.dp_ua.iksparser.bot.abilities.response.ResponseType.SUBSCRIPTIONS_LIST;
-import static com.dp_ua.iksparser.service.MessageCreator.*;
+import lombok.RequiredArgsConstructor;
 
 @Component
 @Scope("prototype")
 @ResponseTypeMarker(SUBSCRIPTIONS_LIST)
+@RequiredArgsConstructor
 public class ResponseShowAllSubscriptions implements ResponseContentGenerator {
+
     protected static final int ARGS_PARTICIPANTS_INDEX = 0;
-    @Autowired
-    ParticipantView participantView;
+
+    private final ParticipantView participantView;
 
     @Override
     public String messageText(Object... args) {
@@ -83,4 +89,5 @@ public class ResponseShowAllSubscriptions implements ResponseContentGenerator {
         }
         return navigation;
     }
+
 }

@@ -24,3 +24,11 @@ logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# Competitions settings
+competition:
+  # an old competition is excluded from automatic updates when it ended earlier than
+  # stale-after-months ago AND failed to update on stale-failed-days different days
+  # (manual update by admin still works)
+  stale-after-months: 3
+  stale-failed-days: 20

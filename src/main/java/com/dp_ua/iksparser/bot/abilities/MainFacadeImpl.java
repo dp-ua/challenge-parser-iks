@@ -1,5 +1,12 @@
 package com.dp_ua.iksparser.bot.abilities;
 
+import static com.dp_ua.iksparser.bot.abilities.response.ResponseType.MENU;
+import static com.dp_ua.iksparser.bot.abilities.response.ResponseType.START;
+import static com.dp_ua.iksparser.service.MessageCreator.SERVICE;
+
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Component;
+
 import com.dp_ua.iksparser.bot.abilities.competition.CompetitionFacade;
 import com.dp_ua.iksparser.bot.abilities.participant.ParticipantFacade;
 import com.dp_ua.iksparser.bot.abilities.response.ResponseContainer;
@@ -7,29 +14,21 @@ import com.dp_ua.iksparser.bot.abilities.response.ResponseContentFactory;
 import com.dp_ua.iksparser.bot.abilities.response.ResponseContentGenerator;
 import com.dp_ua.iksparser.bot.abilities.subscribe.SubscribeFacade;
 import com.dp_ua.iksparser.bot.event.SendMessageEvent;
-import jakarta.transaction.Transactional;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.stereotype.Component;
 
-import static com.dp_ua.iksparser.bot.abilities.response.ResponseType.MENU;
-import static com.dp_ua.iksparser.bot.abilities.response.ResponseType.START;
-import static com.dp_ua.iksparser.service.MessageCreator.SERVICE;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class MainFacadeImpl implements MainFacade {
-    @Autowired
-    CompetitionFacade competitionFacade;
-    @Autowired
-    SubscribeFacade subscribeFacade;
-    @Autowired
-    ParticipantFacade participantFacade;
-    @Autowired
-    ApplicationEventPublisher publisher;
-    @Autowired
-    ResponseContentFactory responseContentFactory;
+
+    private final CompetitionFacade competitionFacade;
+    private final SubscribeFacade subscribeFacade;
+    private final ParticipantFacade participantFacade;
+    private final ApplicationEventPublisher publisher;
+    private final ResponseContentFactory responseContentFactory;
 
     @Override
     @Transactional
@@ -55,4 +54,5 @@ public class MainFacadeImpl implements MainFacade {
         SendMessageEvent sendMessageEvent = SERVICE.getSendMessageEvent(chatId, null, content);
         publisher.publishEvent(sendMessageEvent);
     }
+
 }
