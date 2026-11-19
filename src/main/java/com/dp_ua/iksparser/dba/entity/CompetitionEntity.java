@@ -3,6 +3,7 @@ package com.dp_ua.iksparser.dba.entity;
 import static com.dp_ua.iksparser.service.UrlUtils.encodeUrl;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -35,6 +36,8 @@ public class CompetitionEntity extends DomainElement {
     private String country;
     private String city;
     private String url;
+    private Integer failedUpdateDays;
+    private LocalDate lastFailedUpdateDate;
     @OneToMany(mappedBy = "competition", cascade = CascadeType.ALL)
     private List<DayEntity> days;
 
@@ -71,6 +74,22 @@ public class CompetitionEntity extends DomainElement {
         this.country = competition.getCountry();
         this.city = competition.getCity();
         this.status = competition.getStatus();
+    }
+
+    public int getFailedUpdateDays() {
+        return failedUpdateDays == null ? 0 : failedUpdateDays;
+    }
+
+    public void registerUpdateFailure(LocalDate today) {
+        if (!today.equals(lastFailedUpdateDate)) {
+            failedUpdateDays = getFailedUpdateDays() + 1;
+            lastFailedUpdateDate = today;
+        }
+    }
+
+    public void resetUpdateFailures() {
+        failedUpdateDays = 0;
+        lastFailedUpdateDate = null;
     }
 
     public void addDay(DayEntity day) {

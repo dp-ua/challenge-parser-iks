@@ -1,18 +1,27 @@
 package com.dp_ua.iksparser.service;
 
-import com.dp_ua.iksparser.bot.command.impl.competition.CommandCompetition;
-import com.dp_ua.iksparser.bot.command.impl.competition.CommandCompetitionNotLoaded;
-import com.dp_ua.iksparser.bot.event.GetMessageEvent;
-import com.dp_ua.iksparser.bot.event.SubscribeEvent;
-import com.dp_ua.iksparser.bot.event.UpdateCompetitionEvent;
-import com.dp_ua.iksparser.bot.message.SelfMessage;
-import com.dp_ua.iksparser.dba.entity.*;
-import com.dp_ua.iksparser.dba.service.*;
-import com.dp_ua.iksparser.exeption.ParsingException;
-import com.dp_ua.iksparser.service.parser.CompetitionPageParser;
-import com.dp_ua.iksparser.service.parser.EventPageParser;
-import jakarta.transaction.Transactional;
-import lombok.extern.slf4j.Slf4j;
+import static com.dp_ua.iksparser.dba.entity.CompetitionStatus.C_IN_PROGRESS;
+import static com.dp_ua.iksparser.dba.entity.CompetitionStatus.C_NOT_STARTED;
+import static com.dp_ua.iksparser.dba.entity.CompetitionStatus.C_PLANED;
+import static com.dp_ua.iksparser.service.DataUpdateService.UpdateStatus.U_ERROR;
+import static com.dp_ua.iksparser.service.DataUpdateService.UpdateStatus.U_FINISHED;
+import static com.dp_ua.iksparser.service.DataUpdateService.UpdateStatus.U_INFORM_ERROR;
+import static com.dp_ua.iksparser.service.DataUpdateService.UpdateStatus.U_STARTED;
+import static com.dp_ua.iksparser.service.DataUpdateService.UpdateStatus.U_UPDATED;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -20,16 +29,30 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
-import java.util.*;
-import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import com.dp_ua.iksparser.bot.command.impl.competition.CommandCompetition;
+import com.dp_ua.iksparser.bot.command.impl.competition.CommandCompetitionNotLoaded;
+import com.dp_ua.iksparser.bot.event.GetMessageEvent;
+import com.dp_ua.iksparser.bot.event.SubscribeEvent;
+import com.dp_ua.iksparser.bot.event.UpdateCompetitionEvent;
+import com.dp_ua.iksparser.bot.message.SelfMessage;
+import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
+import com.dp_ua.iksparser.dba.entity.DayEntity;
+import com.dp_ua.iksparser.dba.entity.EventEntity;
+import com.dp_ua.iksparser.dba.entity.HeatEntity;
+import com.dp_ua.iksparser.dba.entity.HeatLineEntity;
+import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
+import com.dp_ua.iksparser.dba.entity.UpdateStatusEntity;
+import com.dp_ua.iksparser.dba.service.CompetitionService;
+import com.dp_ua.iksparser.dba.service.DayService;
+import com.dp_ua.iksparser.dba.service.EventService;
+import com.dp_ua.iksparser.dba.service.HeatService;
+import com.dp_ua.iksparser.dba.service.UpdateStatusService;
+import com.dp_ua.iksparser.exeption.ParsingException;
+import com.dp_ua.iksparser.service.parser.CompetitionPageParser;
+import com.dp_ua.iksparser.service.parser.EventPageParser;
 
-import static com.dp_ua.iksparser.dba.entity.CompetitionStatus.*;
-import static com.dp_ua.iksparser.service.DataUpdateService.UpdateStatus.*;
+import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j
@@ -83,18 +106,40 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
         lock.lock();
         try {
             updateCompetition(competition);
+            registerUpdateSuccess(competition);
             changeStatus(competitionId, U_STARTED, U_UPDATED);
         } catch (Exception e) {
             log.error("[{}]Error updating competition", competitionId, e);
+            registerUpdateFailure(competitionId);
             changeStatus(competitionId, U_STARTED, U_ERROR);
         } catch (ParsingException e) {
             log.warn("[{}] Error parsing competition, reason:{}", competitionId, e.getMessage());
+            registerUpdateFailure(competitionId);
             changeStatus(competitionId, U_STARTED, U_INFORM_ERROR);
         } finally {
             log.info("[{}]Finished updating competition", competitionId);
             lock.unlock();
             updating.remove(competitionId);
             List.of(U_UPDATED, U_INFORM_ERROR).forEach(status -> sendMessages(competitionId, status));
+        }
+    }
+
+    private void registerUpdateSuccess(CompetitionEntity competition) {
+        if (competition.getFailedUpdateDays() > 0) {
+            competition.resetUpdateFailures();
+            competitionService.save(competition);
+        }
+    }
+
+    private void registerUpdateFailure(long competitionId) {
+        try {
+            CompetitionEntity competition = competitionService.findById(competitionId);
+            if (competition != null) {
+                competition.registerUpdateFailure(LocalDate.now());
+                competitionService.save(competition);
+            }
+        } catch (Exception e) {
+            log.warn("[{}] Can't register update failure: {}", competitionId, e.getMessage());
         }
     }
 

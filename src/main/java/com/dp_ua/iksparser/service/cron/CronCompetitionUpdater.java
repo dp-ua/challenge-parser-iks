@@ -23,6 +23,7 @@ import com.dp_ua.iksparser.dba.entity.UpdateStatusEntity;
 import com.dp_ua.iksparser.dba.service.CompetitionService;
 import com.dp_ua.iksparser.dba.service.EventService;
 import com.dp_ua.iksparser.exeption.ParsingException;
+import com.dp_ua.iksparser.service.StaleCompetitionPolicy;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +38,7 @@ public class CronCompetitionUpdater implements ApplicationListener<ContextRefres
     private final CompetitionService competitionService;
     private final CompetitionFacade competitionFacade;
     private final ApplicationEventPublisher publisher;
+    private final StaleCompetitionPolicy staleCompetitionPolicy;
 
     private final Set<String> finishedOrCanceledStatuses = Set.of(C_FINISHED.getName(), C_CANCELED.getName());
 
@@ -69,8 +71,13 @@ public class CronCompetitionUpdater implements ApplicationListener<ContextRefres
 
     private void updateCompetitions(List<CompetitionEntity> competitions) {
         log.info("Going to update competitions. Found {} ", competitions.size());
+        long staleCount = competitions.stream().filter(staleCompetitionPolicy::isStale).count();
+        if (staleCount > 0) {
+            log.info("Skipping {} stale competitions (manual update only)", staleCount);
+        }
         competitions.stream()
                 .filter(CompetitionEntity::isCanBeUpdated)
+                .filter(competition -> !staleCompetitionPolicy.isStale(competition))
                 .forEach(competition -> {
                     log.info("Update competition with id: {} begin date: {}", competition.getId(), competition.getBeginDate());
                     runEventToUpdateCompetition(competition);

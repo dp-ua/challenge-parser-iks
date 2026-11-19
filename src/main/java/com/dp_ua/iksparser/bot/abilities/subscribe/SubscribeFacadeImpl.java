@@ -1,45 +1,42 @@
 package com.dp_ua.iksparser.bot.abilities.subscribe;
 
-import com.dp_ua.iksparser.bot.abilities.infoview.SubscriptionView;
-import com.dp_ua.iksparser.bot.abilities.response.ResponseContainer;
-import com.dp_ua.iksparser.bot.abilities.response.ResponseContentFactory;
-import com.dp_ua.iksparser.bot.abilities.response.ResponseContentGenerator;
-import com.dp_ua.iksparser.bot.event.SendMessageEvent;
-import com.dp_ua.iksparser.dba.entity.HeatLineEntity;
-import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
-import com.dp_ua.iksparser.dba.entity.SubscriberEntity;
-import com.dp_ua.iksparser.dba.service.CompetitionService;
-import com.dp_ua.iksparser.dba.service.SubscriberService;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import static com.dp_ua.iksparser.bot.abilities.response.ResponseType.NEW_EVENT_INFORM;
+import static com.dp_ua.iksparser.bot.abilities.response.ResponseType.SUBSCRIPTIONS_LIST;
+import static com.dp_ua.iksparser.service.MessageCreator.SERVICE;
+
+import java.util.List;
+
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 
-import java.util.List;
+import com.dp_ua.iksparser.bot.abilities.infoview.SubscriptionView;
+import com.dp_ua.iksparser.bot.abilities.response.ResponseContainer;
+import com.dp_ua.iksparser.bot.abilities.response.ResponseContentFactory;
+import com.dp_ua.iksparser.bot.abilities.response.ResponseContentGenerator;
+import com.dp_ua.iksparser.bot.event.SendMessageEvent;
+import com.dp_ua.iksparser.configuration.ViewProperties;
+import com.dp_ua.iksparser.dba.entity.HeatLineEntity;
+import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
+import com.dp_ua.iksparser.dba.entity.SubscriberEntity;
+import com.dp_ua.iksparser.dba.service.CompetitionService;
+import com.dp_ua.iksparser.dba.service.SubscriberService;
 
-import static com.dp_ua.iksparser.bot.abilities.response.ResponseType.NEW_EVENT_INFORM;
-import static com.dp_ua.iksparser.bot.abilities.response.ResponseType.SUBSCRIPTIONS_LIST;
-import static com.dp_ua.iksparser.service.MessageCreator.SERVICE;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class SubscribeFacadeImpl implements SubscribeFacade {
-    @Value("${view.participants.pageSize}")
-    private int pageSize;
-    @Autowired
-    SubscriberService subscriberService;
-    @Autowired
-    ApplicationEventPublisher publisher;
-    @Autowired
-    ResponseContentFactory responseContentFactory;
 
-    @Autowired
-    SubscriptionView view;
-    @Autowired
-    CompetitionService competitionService;
+    private final ViewProperties viewProperties;
+    private final SubscriberService subscriberService;
+    private final ApplicationEventPublisher publisher;
+    private final ResponseContentFactory responseContentFactory;
+    private final SubscriptionView view;
+    private final CompetitionService competitionService;
 
     @Override
     public boolean isSubscribed(String chatId, ParticipantEntity participant) {
@@ -99,7 +96,7 @@ public class SubscribeFacadeImpl implements SubscribeFacade {
     }
 
     private Page<ParticipantEntity> getSubscriptions(String chatId, int page) {
-        return subscriberService.getSubscriptions(chatId, page, pageSize);
+        return subscriberService.getSubscriptions(chatId, page, viewProperties.getParticipants().getPageSize());
     }
 
     @Override
@@ -117,4 +114,5 @@ public class SubscribeFacadeImpl implements SubscribeFacade {
         InlineKeyboardMarkup keyboard = view.getSubscriptionsKeyboard();
         return SERVICE.getSendMessageEvent(chatId, text, keyboard, editMessageId);
     }
+
 }

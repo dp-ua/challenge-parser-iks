@@ -1,5 +1,20 @@
 package com.dp_ua.iksparser.bot.abilities.participant;
 
+import static com.dp_ua.iksparser.bot.abilities.response.ResponseType.PARTICIPANTS_VIEW_MAIN;
+import static com.dp_ua.iksparser.bot.abilities.response.ResponseType.PARTICIPANT_DETAILS;
+import static com.dp_ua.iksparser.bot.abilities.response.ResponseType.SHOW_ALL_PARTICIPANTS;
+import static com.dp_ua.iksparser.bot.command.CommandArgumentName.PAGE;
+import static com.dp_ua.iksparser.bot.command.CommandArgumentName.PARTICIPANT_ID;
+import static com.dp_ua.iksparser.bot.command.CommandArgumentName.SEARCH;
+import static com.dp_ua.iksparser.service.MessageCreator.SERVICE;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+
 import com.dp_ua.iksparser.bot.abilities.FacadeMethods;
 import com.dp_ua.iksparser.bot.abilities.StateService;
 import com.dp_ua.iksparser.bot.abilities.infoview.ParticipantView;
@@ -9,30 +24,19 @@ import com.dp_ua.iksparser.bot.abilities.subscribe.SubscribeFacade;
 import com.dp_ua.iksparser.bot.command.impl.participants.CommandParticipants;
 import com.dp_ua.iksparser.bot.command.impl.participants.CommandShowFindAllParticipants;
 import com.dp_ua.iksparser.bot.event.SendMessageEvent;
+import com.dp_ua.iksparser.configuration.ViewProperties;
 import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
 import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
 import com.dp_ua.iksparser.dba.service.CompetitionService;
 import com.dp_ua.iksparser.dba.service.ParticipantService;
+
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-
-import java.util.List;
-
-import static com.dp_ua.iksparser.bot.abilities.response.ResponseType.*;
-import static com.dp_ua.iksparser.bot.command.CommandArgumentName.*;
-import static com.dp_ua.iksparser.service.MessageCreator.SERVICE;
 
 @Component
 @Slf4j
 public class ParticipantsFacadeImpl extends FacadeMethods implements ParticipantFacade {
-    @Value("${view.participants.pageSize}")
-    private int PARTICIPANTS_PAGE_SIZE;
-    @Value("${view.competitions.detailed.pageSize}")
-    private int COMPETITION_PAGE_SIZE;
+    @Autowired
+    private ViewProperties viewProperties;
     @Autowired
     private ParticipantService participantService;
     @Autowired
@@ -77,7 +81,7 @@ public class ParticipantsFacadeImpl extends FacadeMethods implements Participant
         String search = jSonReader.getVal(jsonArguments, SEARCH.getValue());
         validate(search, "Search not found");
 
-        Page<ParticipantEntity> participants = participantService.findAllBySurnameAndNameParts(List.of(search), page, PARTICIPANTS_PAGE_SIZE);
+        Page<ParticipantEntity> participants = participantService.findAllBySurnameAndNameParts(List.of(search), page, viewProperties.getParticipants().getPageSize());
         ResponseContainer container = content.getContainer(participants, search);
 
         List<InlineKeyboardButton> backButton = SERVICE.getBackButton(CommandParticipants.getCallbackCommand());
@@ -98,7 +102,7 @@ public class ParticipantsFacadeImpl extends FacadeMethods implements Participant
 
         participantService.findById(id).ifPresent(participant -> {
             boolean subscribed = subscribeFacade.isSubscribed(chatId, participant);
-            Page<CompetitionEntity> competitions = competitionService.findCompetitionsByParticipant(participant, page, COMPETITION_PAGE_SIZE);
+            Page<CompetitionEntity> competitions = competitionService.findCompetitionsByParticipant(participant, page, viewProperties.getCompetitions().getDetailed().getPageSize());
 
             ResponseContentGenerator content = contentFactory.getContentForResponse(PARTICIPANT_DETAILS);
             validate(content, "ResponseContent for PARTICIPANTS_VIEW_MAIN not found");
