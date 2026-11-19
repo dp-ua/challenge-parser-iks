@@ -1,22 +1,22 @@
 package com.dp_ua.iksparser.dba.service;
 
-import com.dp_ua.iksparser.dba.entity.UpdateStatusEntity;
-import com.dp_ua.iksparser.dba.repo.UpdateStatusRepo;
-import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import com.dp_ua.iksparser.dba.entity.UpdateStatusEntity;
+import com.dp_ua.iksparser.dba.repo.UpdateStatusRepo;
+
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 @Component
 @Transactional
+@RequiredArgsConstructor
 public class UpdateStatusService {
+
     private final UpdateStatusRepo repo;
 
-    @Autowired
-    public UpdateStatusService(UpdateStatusRepo repo) {
-        this.repo = repo;
-    }
 
     public void save(UpdateStatusEntity message) {
         repo.save(message);
@@ -33,4 +33,5 @@ public class UpdateStatusService {
     public void flush() {
         repo.flush();
     }
+
 }

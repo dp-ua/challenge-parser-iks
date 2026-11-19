@@ -1,29 +1,32 @@
 package com.dp_ua.iksparser.bot.abilities.response.content.search;
 
+import static com.dp_ua.iksparser.bot.abilities.response.ResponseType.SEARCH_BY_BIB_NUMBER;
+
+import java.util.Optional;
+
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+
 import com.dp_ua.iksparser.bot.abilities.infoview.CompetitionView;
 import com.dp_ua.iksparser.bot.abilities.infoview.SearchView;
 import com.dp_ua.iksparser.bot.abilities.response.ResponseContentGenerator;
 import com.dp_ua.iksparser.bot.abilities.response.ResponseTypeMarker;
 import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 
-import java.util.Optional;
-
-import static com.dp_ua.iksparser.bot.abilities.response.ResponseType.SEARCH_BY_BIB_NUMBER;
+import lombok.RequiredArgsConstructor;
 
 @Component
 @Scope("prototype")
 @ResponseTypeMarker(SEARCH_BY_BIB_NUMBER)
+@RequiredArgsConstructor
 public class ResponseSearchByBibNumber implements ResponseContentGenerator {
+
     private static final int ARGS_SIZE = 1;
     private static final int ARGS_COMPETITION_INDEX = 0;
-    @Autowired
-    SearchView searchView;
-    @Autowired
-    CompetitionView competitionView;
+
+    private final SearchView searchView;
+    private final CompetitionView competitionView;
 
     @Override
     public String messageText(Object... args) {
@@ -55,4 +58,5 @@ public class ResponseSearchByBibNumber implements ResponseContentGenerator {
                     ", expected: " + CompetitionEntity.class.getName());
         }
     }
+
 }

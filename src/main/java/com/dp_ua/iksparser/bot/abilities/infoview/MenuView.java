@@ -1,24 +1,36 @@
 package com.dp_ua.iksparser.bot.abilities.infoview;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import static com.dp_ua.iksparser.bot.Icon.ATHLETE;
+import static com.dp_ua.iksparser.bot.Icon.COACH;
+import static com.dp_ua.iksparser.bot.Icon.EVENT;
+import static com.dp_ua.iksparser.bot.Icon.MENU;
+import static com.dp_ua.iksparser.bot.Icon.ROBOT;
+import static com.dp_ua.iksparser.service.MessageCreator.END_LINE;
+import static com.dp_ua.iksparser.service.MessageCreator.ITALIC;
+import static com.dp_ua.iksparser.service.MessageCreator.LINK;
+import static com.dp_ua.iksparser.service.MessageCreator.LINK_END;
+import static com.dp_ua.iksparser.service.MessageCreator.LINK_SEPARATOR;
+import static com.dp_ua.iksparser.service.MessageCreator.LINK_SEPARATOR_END;
+import static com.dp_ua.iksparser.service.MessageCreator.SERVICE;
+import static com.dp_ua.iksparser.service.MessageCreator.SPACE;
+import static com.dp_ua.iksparser.service.MessageCreator.SPACE_LONG;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.dp_ua.iksparser.bot.Icon.*;
-import static com.dp_ua.iksparser.service.MessageCreator.*;
+import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+
+import lombok.RequiredArgsConstructor;
 
 @Component
+@RequiredArgsConstructor
 public class MenuView {
-    @Autowired
-    CompetitionView competitionView;
-    @Autowired
-    ParticipantView participantView;
-    @Autowired
-    SubscriptionView subscriptionView;
+
+    private final CompetitionView competitionView;
+    private final ParticipantView participantView;
+    private final SubscriptionView subscriptionView;
 
     public String mainMenu(String competitionsInfo, String participantsInfo, String subscribeInfo) {
         return "В боті ви зможете знайти інформацію по змаганнях, що проводяться Федерацією легкої атлетики України." +
@@ -111,4 +123,5 @@ public class MenuView {
 
         return keyboard;
     }
+
 }

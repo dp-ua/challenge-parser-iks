@@ -1,32 +1,44 @@
 package com.dp_ua.iksparser.bot.abilities.infoview;
 
-import com.dp_ua.iksparser.bot.command.impl.subscribe.CommandSubscriptionsList;
-import com.dp_ua.iksparser.dba.entity.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import static com.dp_ua.iksparser.bot.Icon.ATHLETE;
+import static com.dp_ua.iksparser.bot.Icon.MESSAGE;
+import static com.dp_ua.iksparser.bot.Icon.SUBSCRIBE;
+import static com.dp_ua.iksparser.bot.Icon.UNSUBSCRIBE;
+import static com.dp_ua.iksparser.service.MessageCreator.BOLD;
+import static com.dp_ua.iksparser.service.MessageCreator.END_LINE;
+import static com.dp_ua.iksparser.service.MessageCreator.ITALIC;
+import static com.dp_ua.iksparser.service.MessageCreator.SERVICE;
+import static com.dp_ua.iksparser.service.MessageCreator.SPACE;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static com.dp_ua.iksparser.bot.Icon.*;
-import static com.dp_ua.iksparser.service.MessageCreator.*;
+import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+
+import com.dp_ua.iksparser.bot.command.impl.subscribe.CommandSubscriptionsList;
+import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
+import com.dp_ua.iksparser.dba.entity.EventEntity;
+import com.dp_ua.iksparser.dba.entity.HeatLineEntity;
+import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
+import com.dp_ua.iksparser.dba.entity.SubscriberEntity;
+
+import lombok.RequiredArgsConstructor;
 
 @Component
+@RequiredArgsConstructor
 public class SubscriptionView {
+
     public static final String STATUS_NEW_ENROLL = "Нова заявка в івентах";
     public static final String STATUS_HAS_RESULT = "Є результати змагання";
     public static final String BUTTON_TEXT_UNSUBSCRIBE = UNSUBSCRIBE + " Відписатись";
     public static final String BUTTON_TEXT_SUBSCRIBE = SUBSCRIBE + " Підписатись";
-    @Autowired
-    CompetitionView competitionView;
-    @Autowired
-    HeatLineView heatLineView;
-    @Autowired
-    ParticipantView participantView;
+    private final CompetitionView competitionView;
+    private final HeatLineView heatLineView;
+    private final ParticipantView participantView;
 
     public String info(ParticipantEntity participant, List<HeatLineEntity> heatLines, CompetitionEntity competition) {
         StringBuilder sb = new StringBuilder()
@@ -146,4 +158,5 @@ public class SubscriptionView {
         keyboard.setKeyboard(rows);
         return keyboard;
     }
+
 }

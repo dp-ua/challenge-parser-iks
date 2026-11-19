@@ -1,5 +1,12 @@
 package com.dp_ua.iksparser.bot.performer;
 
+import static com.dp_ua.iksparser.service.MessageCreator.SERVICE;
+
+import java.util.List;
+
+import org.springframework.context.ApplicationListener;
+import org.springframework.stereotype.Component;
+
 import com.dp_ua.iksparser.bot.abilities.StateService;
 import com.dp_ua.iksparser.bot.command.CommandInterface;
 import com.dp_ua.iksparser.bot.command.TextCommandDetectorService;
@@ -7,26 +14,19 @@ import com.dp_ua.iksparser.bot.event.GetMessageEvent;
 import com.dp_ua.iksparser.bot.message.Message;
 import com.dp_ua.iksparser.bot.message.SelfMessage;
 import com.dp_ua.iksparser.exeption.NotForMeException;
-import com.dp_ua.iksparser.service.MessageCreator;
 import com.dp_ua.iksparser.service.SqlPreprocessorService;
+
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationListener;
-import org.springframework.stereotype.Component;
-
-import java.util.List;
-
-import static com.dp_ua.iksparser.service.MessageCreator.SERVICE;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class GetMessagePerformer implements ApplicationListener<GetMessageEvent> {
-    @Autowired
-    TextCommandDetectorService commandDetector;
-    @Autowired
-    StateService stateService;
-    @Autowired
-    SqlPreprocessorService sqlPreprocessorService;
+
+    private final TextCommandDetectorService commandDetector;
+    private final StateService stateService;
+    private final SqlPreprocessorService sqlPreprocessorService;
 
     @Override
     public void onApplicationEvent(GetMessageEvent event) {
@@ -65,4 +65,5 @@ public class GetMessagePerformer implements ApplicationListener<GetMessageEvent>
         selfMessage.setMessageText(textCommand);
         return new GetMessageEvent(message.getChatId(), selfMessage);
     }
+
 }

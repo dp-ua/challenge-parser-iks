@@ -1,28 +1,27 @@
 package com.dp_ua.iksparser.bot.performer;
 
+import static com.dp_ua.iksparser.bot.message.SelfMessage.SELF_USER_NAME;
+
+import org.springframework.context.ApplicationListener;
+import org.springframework.stereotype.Component;
+
 import com.dp_ua.iksparser.bot.abilities.subscribe.SubscribeFacade;
 import com.dp_ua.iksparser.bot.controller.BotController;
 import com.dp_ua.iksparser.bot.event.GetMessageEvent;
 import com.dp_ua.iksparser.bot.message.Message;
-import com.dp_ua.iksparser.bot.message.SelfMessage;
 import com.dp_ua.iksparser.dba.service.StatisticService;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationListener;
-import org.springframework.stereotype.Component;
 
-import static com.dp_ua.iksparser.bot.message.SelfMessage.SELF_USER_NAME;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class StatisticPerformer implements ApplicationListener<GetMessageEvent> {
-    @Autowired
-    StatisticService service;
-    @Autowired
-    SubscribeFacade subscribeFacade;
 
-    @Autowired
-    BotController bot;
+    private final StatisticService service;
+    private final SubscribeFacade subscribeFacade;
+    private final BotController bot;
 
     @Override
     public void onApplicationEvent(GetMessageEvent event) {
@@ -53,4 +52,5 @@ public class StatisticPerformer implements ApplicationListener<GetMessageEvent> 
     private void sendMessageToAdmin(String chatId, String name) {
         bot.sendMessageToAdmin("New user:{" + chatId + ", " + name + "}");
     }
+
 }

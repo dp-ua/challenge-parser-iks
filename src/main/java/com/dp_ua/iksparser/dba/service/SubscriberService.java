@@ -1,32 +1,31 @@
 package com.dp_ua.iksparser.dba.service;
 
-import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
-import com.dp_ua.iksparser.dba.entity.SubscriberEntity;
-import com.dp_ua.iksparser.dba.repo.SubscriberRepo;
-import com.dp_ua.iksparser.service.PageableService;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Component;
-
 import java.text.Collator;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Component;
+
+import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
+import com.dp_ua.iksparser.dba.entity.SubscriberEntity;
+import com.dp_ua.iksparser.dba.repo.SubscriberRepo;
+import com.dp_ua.iksparser.service.PageableService;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class SubscriberService {
-    private final SubscriberRepo repo;
-    @Autowired
-    PageableService pageableService;
 
-    @Autowired
-    public SubscriberService(SubscriberRepo repo) {
-        this.repo = repo;
-    }
+    private final SubscriberRepo repo;
+    private final PageableService pageableService;
+
 
     public boolean isSubscribed(String chatId, ParticipantEntity participant) {
         return repo.findByChatIdAndParticipant(chatId, participant).isPresent();
@@ -57,9 +56,10 @@ public class SubscriberService {
         return repo.findByChatId(chatId);
     }
 
-    public int subscribersCount(String chatId){
+    public int subscribersCount(String chatId) {
         return repo.countByChatId(chatId);
     }
+
     public Page<ParticipantEntity> getSubscriptions(String chatId, int page, int pageSize) {
         Pageable pageRequest = pageableService.createPageRequest(page, pageSize);
 
@@ -76,4 +76,5 @@ public class SubscriberService {
     public void unsubscribeAll(ParticipantEntity p) {
         repo.deleteAllByParticipant(p);
     }
+
 }

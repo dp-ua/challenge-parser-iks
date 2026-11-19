@@ -23,7 +23,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.jsoup.nodes.Document;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationListener;
 import org.springframework.scheduling.annotation.Async;
@@ -52,30 +51,25 @@ import com.dp_ua.iksparser.service.parser.CompetitionPageParser;
 import com.dp_ua.iksparser.service.parser.EventPageParser;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class DataUpdateService implements ApplicationListener<UpdateCompetitionEvent> {
-    @Autowired
-    private UpdateStatusService service;
-    @Autowired
-    CompetitionService competitionService;
-    @Autowired
-    private Downloader downloader;
-    @Autowired
-    private CompetitionPageParser competitionParser;
-    @Autowired
-    EventPageParser eventParser;
-    @Autowired
-    ApplicationEventPublisher publisher;
-    @Autowired
-    private DayService dayService;
-    @Autowired
-    private EventService eventService;
-    @Autowired
-    private HeatService heatService;
+
+    private final UpdateStatusService service;
+    private final CompetitionService competitionService;
+    private final Downloader downloader;
+    private final CompetitionPageParser competitionParser;
+    private final EventPageParser eventParser;
+    private final ApplicationEventPublisher publisher;
+    private final DayService dayService;
+    private final EventService eventService;
+    private final HeatService heatService;
+
     private static final Set<Long> updating = new ConcurrentSkipListSet<>();
     Lock lock = new ReentrantLock();
 
@@ -377,4 +371,5 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
         U_INFORM_ERROR,
         U_ERROR
     }
+
 }

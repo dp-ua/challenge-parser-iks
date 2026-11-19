@@ -1,25 +1,32 @@
 package com.dp_ua.iksparser.bot.abilities.infoview;
 
+import static com.dp_ua.iksparser.bot.Icon.COACH;
+import static com.dp_ua.iksparser.bot.Icon.FIND;
+import static com.dp_ua.iksparser.bot.Icon.HEAT;
+import static com.dp_ua.iksparser.bot.Icon.LOOK;
+import static com.dp_ua.iksparser.service.MessageCreator.BOLD;
+import static com.dp_ua.iksparser.service.MessageCreator.END_LINE;
+import static com.dp_ua.iksparser.service.MessageCreator.ITALIC;
+import static com.dp_ua.iksparser.service.MessageCreator.SPACE;
+
+import java.util.List;
+
+import org.springframework.stereotype.Component;
+
 import com.dp_ua.iksparser.dba.entity.CoachEntity;
 import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
 import com.dp_ua.iksparser.dba.entity.HeatLineEntity;
 import com.dp_ua.iksparser.dba.entity.ParticipantEntity;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-import java.util.List;
-
-import static com.dp_ua.iksparser.bot.Icon.*;
-import static com.dp_ua.iksparser.service.MessageCreator.*;
+import lombok.RequiredArgsConstructor;
 
 @Component
+@RequiredArgsConstructor
 public class SearchView {
-    @Autowired
-    CompetitionView competitionView;
-    @Autowired
-    ParticipantView participantView;
-    @Autowired
-    HeatLineView heatLineView;
+
+    private final CompetitionView competitionView;
+    private final ParticipantView participantView;
+    private final HeatLineView heatLineView;
 
 
     public String findByBibNumber(CompetitionEntity competition) {
@@ -124,4 +131,5 @@ public class SearchView {
 
         return message.toString();
     }
+
 }

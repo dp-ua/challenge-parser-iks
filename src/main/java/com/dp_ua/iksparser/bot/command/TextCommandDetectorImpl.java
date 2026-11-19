@@ -1,23 +1,25 @@
 package com.dp_ua.iksparser.bot.command;
 
-import com.dp_ua.iksparser.bot.Bot;
-import com.dp_ua.iksparser.exeption.NotForMeException;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.stereotype.Component;
+
+import com.dp_ua.iksparser.bot.Bot;
+import com.dp_ua.iksparser.exeption.NotForMeException;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class TextCommandDetectorImpl implements TextCommandDetectorService {
+
     public static final String CLASSIC_COMMAND_FIRST_SYMBOL = "/";
     public static final String AT = "@";
-    @Autowired
-    Bot bot;
-    @Autowired
-    CommandProvider commandProvider;
+    private final Bot bot;
+    private final CommandProvider commandProvider;
 
     private String getBotName() {
         return bot.getBotUsername();
@@ -67,4 +69,5 @@ public class TextCommandDetectorImpl implements TextCommandDetectorService {
             return true;
         } else return !text.contains(AT);
     }
+
 }

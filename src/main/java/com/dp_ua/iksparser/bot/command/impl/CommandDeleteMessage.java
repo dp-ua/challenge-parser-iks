@@ -1,28 +1,30 @@
 package com.dp_ua.iksparser.bot.command.impl;
 
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
+
 import com.dp_ua.iksparser.bot.abilities.StateService;
 import com.dp_ua.iksparser.bot.command.CommandInterface;
 import com.dp_ua.iksparser.bot.event.SendMessageEvent;
 import com.dp_ua.iksparser.bot.message.Message;
 import com.dp_ua.iksparser.service.MessageCreator;
+
+import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 
 
 @Component
 @ToString
 @Slf4j
+@RequiredArgsConstructor
 public class CommandDeleteMessage implements CommandInterface {
+
     public static final String command = "deletemessage";
     private final boolean isInTextCommand = false;
-    @Autowired
-    ApplicationEventPublisher publisher;
-    @Autowired
-    StateService stateService;
+    private final ApplicationEventPublisher publisher;
+    private final StateService stateService;
 
     @Override
     public String command() {
@@ -38,4 +40,5 @@ public class CommandDeleteMessage implements CommandInterface {
         publisher.publishEvent(sendMessageEvent);
         stateService.resetState(message.getChatId());
     }
+
 }
