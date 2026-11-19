@@ -19,7 +19,7 @@ services:
       - IKS_DB_USERNAME=${IKS_DB_USERNAME}
       - IKS_DB_PASSWORD=${IKS_DB_PASSWORD}
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8181/actuator/health" ]  # Adjust the URL based on your actual health check endpoint
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:8181/actuator/health | grep -q UP" ]  # the image has no curl, only busybox wget
       interval: 10s
       timeout: 5s
       retries: 3

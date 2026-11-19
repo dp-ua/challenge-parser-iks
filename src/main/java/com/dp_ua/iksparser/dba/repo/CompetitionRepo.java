@@ -1,6 +1,8 @@
 package com.dp_ua.iksparser.dba.repo;
 
-import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -9,8 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Optional;
+import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
 
 @Repository
 public interface CompetitionRepo extends CrudRepository<CompetitionEntity, Long> {
@@ -38,6 +39,14 @@ public interface CompetitionRepo extends CrudRepository<CompetitionEntity, Long>
 
     @Query("SELECT c.beginDate FROM CompetitionEntity c")
     List<String> findAllBeginDates();
+
+    @Query("SELECT DISTINCT d.competition FROM EventEntity e JOIN e.day d " +
+            "WHERE (e.startListUrl IS NULL OR e.startListUrl = '') " +
+            "AND (e.resultUrl IS NULL OR e.resultUrl = '')")
+    List<CompetitionEntity> findAllWithNotFilledEvents();
+
+    @Query("SELECT c.id FROM CompetitionEntity c WHERE c.days IS NOT EMPTY")
+    List<Long> findAllFilledIds();
 
     @Query("SELECT c FROM CompetitionEntity c WHERE c.days IS NOT EMPTY")
     List<CompetitionEntity> findAllWithFilledDays();

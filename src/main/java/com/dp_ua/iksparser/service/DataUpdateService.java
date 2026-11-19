@@ -62,7 +62,12 @@ public class DataUpdateService {
         }
         try {
             updateCompetition(competition);
-            registerUpdateSuccess(competition);
+            if (competition.isFilled()) {
+                registerUpdateSuccess(competition);
+            } else {
+                log.info("[{}] Competition page has no days, counted as a failed update day", competitionId);
+                registerUpdateFailure(competitionId);
+            }
         } catch (Exception e) {
             log.error("[{}]Error updating competition", competitionId, e);
             registerUpdateFailure(competitionId);
@@ -70,7 +75,7 @@ public class DataUpdateService {
             log.warn("[{}] Error parsing competition, reason:{}", competitionId, e.getMessage());
             registerUpdateFailure(competitionId);
         } finally {
-            log.info("[{}]Finished updating competition", competitionId);
+            log.debug("[{}]Finished updating competition", competitionId);
         }
     }
 
@@ -95,7 +100,7 @@ public class DataUpdateService {
 
     @Transactional
     private void updateCompetition(CompetitionEntity competition) throws ParsingException {
-        log.info("[{}] Updating competition", competition.getId());
+        log.debug("[{}] Updating competition", competition.getId());
         Document document = downloader.getDocument(competition.getUrl());
 
         operateDaysAndAddItToCompetition(competition, document);
@@ -103,13 +108,13 @@ public class DataUpdateService {
         Map<ParticipantEntity, List<HeatLineEntity>> participations = operateEventsToParseHeats(newEvents);
         competitionService.save(competition);
         if (participations.isEmpty()) {
-            log.info("[{}]No new participants", competition.getId());
+            log.debug("[{}]No new participants", competition.getId());
         } else if (isNeedToInformSubscribers(competition)) {
             log.info("[{}] Informing subscribers about new participants: [{}]",
                     competition.getId(), participations.size());
             publisher.publishEvent(new SubscribeEvent(this, participations));
         } else {
-            log.info("[{}] No need to inform subscribers. Status: [{}], end date: [{}]",
+            log.debug("[{}] No need to inform subscribers. Status: [{}], end date: [{}]",
                     competition.getId(), competition.getStatus(), competition.getEndDate());
         }
     }

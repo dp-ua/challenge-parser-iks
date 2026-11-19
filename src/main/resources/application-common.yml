@@ -27,8 +27,11 @@ logging:
 
 # Competitions settings
 competition:
-  # an old competition is excluded from automatic updates when it ended earlier than
-  # stale-after-months ago AND failed to update on stale-failed-days different days
-  # (manual update by admin still works)
+  # competitions that ended earlier than stale-after-months ago:
+  #  - already loaded ones are not updated automatically (frozen)
+  #  - not loaded ones are retried daily until they fail on stale-failed-days different days (stale)
+  # manual update by admin always works
   stale-after-months: 3
   stale-failed-days: 20
+  # only competitions that ended no more than N days ago (or are not finished) are polled every few minutes
+  frequent-update-window-days: 7

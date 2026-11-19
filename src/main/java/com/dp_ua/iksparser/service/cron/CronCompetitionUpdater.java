@@ -16,12 +16,10 @@ import org.springframework.stereotype.Component;
 import com.dp_ua.iksparser.SpringApp;
 import com.dp_ua.iksparser.bot.abilities.competition.CompetitionFacade;
 import com.dp_ua.iksparser.dba.entity.CompetitionEntity;
-import com.dp_ua.iksparser.dba.entity.EventEntity;
 import com.dp_ua.iksparser.dba.service.CompetitionService;
-import com.dp_ua.iksparser.dba.service.EventService;
 import com.dp_ua.iksparser.exeption.ParsingException;
+import com.dp_ua.iksparser.service.CompetitionUpdatePolicy;
 import com.dp_ua.iksparser.service.CompetitionUpdateQueue;
-import com.dp_ua.iksparser.service.StaleCompetitionPolicy;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -32,11 +30,10 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class CronCompetitionUpdater implements ApplicationListener<ContextRefreshedEvent>, Ordered {
 
-    private final EventService eventService;
     private final CompetitionService competitionService;
     private final CompetitionFacade competitionFacade;
     private final CompetitionUpdateQueue updateQueue;
-    private final StaleCompetitionPolicy staleCompetitionPolicy;
+    private final CompetitionUpdatePolicy updatePolicy;
 
     private final Set<String> finishedOrCanceledStatuses = Set.of(C_FINISHED.getName(), C_CANCELED.getName());
 
@@ -67,41 +64,38 @@ public class CronCompetitionUpdater implements ApplicationListener<ContextRefres
         }
     }
 
-    private void updateCompetitions(List<CompetitionEntity> competitions) {
-        log.info("Going to update competitions. Found {} ", competitions.size());
-        long staleCount = competitions.stream().filter(staleCompetitionPolicy::isStale).count();
-        if (staleCount > 0) {
-            log.info("Skipping {} stale competitions (manual update only)", staleCount);
-        }
-        competitions.stream()
+    private void updateCompetitions(String job, List<CompetitionEntity> competitions) {
+        List<CompetitionEntity> canBeUpdated = competitions.stream()
                 .filter(CompetitionEntity::isCanBeUpdated)
-                .filter(competition -> !staleCompetitionPolicy.isStale(competition))
-                .forEach(competition -> {
-                    log.info("Update competition with id: {} begin date: {}", competition.getId(), competition.getBeginDate());
-                    requestCompetitionUpdate(competition);
-                });
+                .toList();
+        List<CompetitionEntity> toUpdate = canBeUpdated.stream()
+                .filter(competition -> !updatePolicy.isStale(competition))
+                .toList();
+        log.info("[{}] Competitions: {}, stale (manual update only): {}, queued for update: {}",
+                job, competitions.size(), canBeUpdated.size() - toUpdate.size(), toUpdate.size());
+        toUpdate.forEach(this::requestCompetitionUpdate);
     }
 
     @Scheduled(cron = "0 0/9 10-23 * * *") // every 9 minutes check not filled events from 10 to 23
     public void checkNotFilledEvents() {
-        List<CompetitionEntity> competitions = eventService.findAll().stream()
-                .filter(EventEntity::isNotFilled)
-                .map(eventEntity -> eventEntity.getDay().getCompetition())
-                .distinct()
+        LocalDate today = LocalDate.now();
+        List<CompetitionEntity> competitions = competitionService.findCompetitionsWithNotFilledEvents().stream()
+                .filter(competition -> updatePolicy.isInFrequentWindow(competition, today))
                 .toList();
-        log.info("Update competitions with not filled events. Found {} ", competitions.size());
-        updateCompetitions(competitions.stream().toList());
+        updateCompetitions("not filled events", competitions);
     }
 
     @Scheduled(cron = "0 15 6 * * *") // every day at 6:15 update all competition
     @Transactional
     public void updateAllCompetitionsDetails() {
-        List<CompetitionEntity> competitions = competitionService.findAllOrderByUpdated()
-                .stream()
-                .filter(CompetitionEntity::isCanBeUpdated)
+        LocalDate today = LocalDate.now();
+        Set<Long> filledIds = competitionService.findFilledCompetitionIds();
+        List<CompetitionEntity> all = competitionService.findAllOrderByUpdated();
+        List<CompetitionEntity> competitions = all.stream()
+                .filter(competition -> !updatePolicy.isFrozen(competition, today, filledIds.contains(competition.getId())))
                 .toList();
-        log.info("Update All competitions. Found {} ", competitions.size());
-        updateCompetitions(competitions);
+        log.info("[all] Frozen competitions (old and already loaded, manual update only): {}", all.size() - competitions.size());
+        updateCompetitions("all", competitions);
     }
 
     @Scheduled(cron = "0 0/20 10-23 * * *") // every 20 minutes check closest competitions
@@ -111,9 +105,9 @@ public class CronCompetitionUpdater implements ApplicationListener<ContextRefres
                 .stream()
                 .filter(competition ->
                         !finishedOrCanceledStatuses.contains(competition.getStatus()) && isWithinOneWeekFromBeginDate(competition, date))
+                .filter(competition -> updatePolicy.isInFrequentWindow(competition, date))
                 .toList();
-        log.info("Update closest competitions. Found {} ", competitions.size());
-        updateCompetitions(competitions);
+        updateCompetitions("closest", competitions);
     }
 
     private boolean isWithinOneWeekFromBeginDate(CompetitionEntity competition, LocalDate date) {
