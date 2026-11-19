@@ -1,15 +1,17 @@
 package com.dp_ua.iksparser.bot.abilities;
 
-import com.dp_ua.iksparser.bot.abilities.response.ResponseContentFactory;
-import com.dp_ua.iksparser.bot.event.SendMessageEvent;
-import com.dp_ua.iksparser.service.JsonReader;
-import lombok.extern.slf4j.Slf4j;
+import static com.dp_ua.iksparser.bot.event.SendMessageEvent.MsgType.CHAT_ACTION;
+import static com.dp_ua.iksparser.service.MessageCreator.SERVICE;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.telegram.telegrambots.meta.api.methods.send.SendChatAction;
 
-import static com.dp_ua.iksparser.bot.event.SendMessageEvent.MsgType.CHAT_ACTION;
-import static com.dp_ua.iksparser.service.MessageCreator.SERVICE;
+import com.dp_ua.iksparser.bot.abilities.response.ResponseContentFactory;
+import com.dp_ua.iksparser.bot.event.SendMessageEvent;
+import com.dp_ua.iksparser.service.JsonReader;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class FacadeMethods {
@@ -23,7 +25,7 @@ public class FacadeMethods {
     protected JsonReader jSonReader;
 
     protected void sendTypingAction(String chatId) {
-        log.info("sendTyping for chat: {}", chatId);
+        log.debug("sendTyping for chat: {}", chatId);
         SendChatAction chatAction = SERVICE.getChatAction(chatId);
         publisher.publishEvent(new SendMessageEvent(this, chatAction, CHAT_ACTION));
     }

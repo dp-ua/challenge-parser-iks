@@ -30,7 +30,8 @@ public class SendMessagePerformer implements ApplicationListener<SendMessageEven
     @Override
     @Async
     public void onApplicationEvent(SendMessageEvent event) {
-        log.info("SendMessageEvent. Type: {}, Message:{}",
+        log.info("OUT type={}", event.getMsgType());
+        log.debug("SendMessageEvent. Type: {}, Message:{}",
                 event.getMsgType(),
                 event.getMessage().toString().replace("\n", " "));
         Message result = null;
@@ -69,7 +70,8 @@ public class SendMessagePerformer implements ApplicationListener<SendMessageEven
             throw new RuntimeException(e);
         }
         if (result != null) {
-            log.info("Message sent. id:{},chatId:{},text:{}", result.getMessageId(), chatId, result.getText().replace("\n", " "));
+            log.info("Message sent. id:{},chatId:{}", result.getMessageId(), chatId);
+            log.debug("Sent text: {}", result.getText().replace("\n", " "));
             // todo тут можно фиксировать результаты отправки сообщений
             /*   возможно необходимо будет сохранять айди сообщений для последующего удаления/редактирования
              */

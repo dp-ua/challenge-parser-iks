@@ -1,5 +1,16 @@
 package com.dp_ua.iksparser.bot.command;
 
+import static com.dp_ua.iksparser.bot.abilities.response.ResponseType.NOT_IMPLEMENTED;
+import static com.dp_ua.iksparser.bot.command.CommandArgumentName.ACTION;
+import static com.dp_ua.iksparser.bot.command.CommandArgumentName.COMPETITION_ID;
+import static com.dp_ua.iksparser.bot.command.CommandArgumentName.PAGE;
+import static com.dp_ua.iksparser.bot.command.CommandArgumentName.PARTICIPANT_ID;
+import static com.dp_ua.iksparser.service.MessageCreator.SERVICE;
+
+import org.apache.commons.lang3.NotImplementedException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
+
 import com.dp_ua.iksparser.bot.abilities.action.ActionController;
 import com.dp_ua.iksparser.bot.abilities.action.ActionType;
 import com.dp_ua.iksparser.bot.abilities.response.ResponseContainer;
@@ -8,14 +19,8 @@ import com.dp_ua.iksparser.bot.abilities.response.ResponseContentGenerator;
 import com.dp_ua.iksparser.bot.event.SendMessageEvent;
 import com.dp_ua.iksparser.bot.message.Message;
 import com.dp_ua.iksparser.service.JsonReader;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.NotImplementedException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 
-import static com.dp_ua.iksparser.bot.abilities.response.ResponseType.NOT_IMPLEMENTED;
-import static com.dp_ua.iksparser.bot.command.CommandArgumentName.*;
-import static com.dp_ua.iksparser.service.MessageCreator.SERVICE;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public abstract class BaseCommand implements CommandInterface {
@@ -78,7 +83,7 @@ public abstract class BaseCommand implements CommandInterface {
             String callBackQueryId = message.getCallBackQueryId();
             SendMessageEvent answerCallbackQuery = SERVICE.getAnswerCallbackQuery(callBackQueryId, text);
             if (answerCallbackQuery != null) {
-                log.info("answerCallbackQuery: {}", answerCallbackQuery);
+                log.debug("answerCallbackQuery: {}", answerCallbackQuery);
                 publisher.publishEvent(answerCallbackQuery);
             }
         }

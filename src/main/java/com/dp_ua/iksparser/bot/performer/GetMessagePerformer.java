@@ -31,7 +31,7 @@ public class GetMessagePerformer implements ApplicationListener<GetMessageEvent>
     @Override
     public void onApplicationEvent(GetMessageEvent event) {
         Message message = event.getMessage();
-        log.info("GetMessageEvent: {}", message);
+        log.debug("GetMessageEvent: {}", message);
         try {
             List<CommandInterface> commands = commandDetector.getParsedCommands(message.getMessageText());
             log.info("commands: {}", commands.stream().map(o -> o.getClass().getSimpleName()).toList());
