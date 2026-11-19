@@ -105,7 +105,7 @@ public class CompetitionEntity extends DomainElement {
     }
 
     public boolean isCanBeUpdated() {
-        return !isURLEmpty() || !isUrlNotValid();
+        return !isURLEmpty() && !isUrlNotValid();
     }
 
     public boolean isUrlNotValid() {

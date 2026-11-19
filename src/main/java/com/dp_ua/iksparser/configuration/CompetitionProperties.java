@@ -30,4 +30,11 @@ public class CompetitionProperties {
     @Positive(message = "competition.stale-failed-days must be positive")
     private int staleFailedDays = 20;
 
+    /**
+     * Only competitions that ended no more than this number of days ago (or are not finished yet)
+     * are polled by the jobs that run every few minutes.
+     */
+    @Positive(message = "competition.frequent-update-window-days must be positive")
+    private int frequentUpdateWindowDays = 7;
+
 }

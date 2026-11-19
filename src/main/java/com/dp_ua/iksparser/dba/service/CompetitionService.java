@@ -12,9 +12,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
@@ -56,6 +58,20 @@ public class CompetitionService {
 
     public List<CompetitionEntity> getFilledCompetitions() {
         return repo.findAllWithFilledDays();
+    }
+
+    /**
+     * @return competitions that have at least one event with neither a start list nor a result link
+     */
+    public List<CompetitionEntity> findCompetitionsWithNotFilledEvents() {
+        return repo.findAllWithNotFilledEvents();
+    }
+
+    /**
+     * @return ids of competitions that already have loaded days
+     */
+    public Set<Long> findFilledCompetitionIds() {
+        return new HashSet<>(repo.findAllFilledIds());
     }
 
     public YearRange getMinAndMaxYear() {

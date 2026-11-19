@@ -40,7 +40,7 @@ public class CompetitionPageParser {
                 events.add(event);
             }
         }
-        log.info("For day[{}] Events count: {}", day.getDateId(), events.size());
+        log.debug("For day[{}] Events count: {}", day.getDateId(), events.size());
         return events;
     }
 
@@ -54,7 +54,7 @@ public class CompetitionPageParser {
             DayEntity dayEntity = serviceParser.parseDay(dayText + " (" + dayId + ")");
             result.add(dayEntity);
         }
-        log.info("Days count: {}", result.size());
+        log.debug("Days count: {}", result.size());
         return result;
     }
 
