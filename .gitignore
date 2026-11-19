@@ -14,3 +14,5 @@ target/
 logs/
 
 .pi/
+docs/codemie/
+docs/superpowers/
