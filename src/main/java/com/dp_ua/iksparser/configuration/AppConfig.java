@@ -56,7 +56,8 @@ public class AppConfig {
     public TaskExecutor updateTaskExecutor() {
         SimpleAsyncTaskExecutor executor = new SimpleAsyncTaskExecutor();
         executor.setThreadNamePrefix("UpdateExecutor-");
-        executor.setConcurrencyLimit(2);
+        // single thread: competition updates must run one at a time
+        executor.setConcurrencyLimit(1);
         return executor;
     }
 
@@ -67,7 +68,7 @@ public class AppConfig {
 
     @Bean
     public Map<ResponseType, Class<? extends ResponseContentGenerator>> contentMap(List<ResponseContentGenerator> contentGenerators) {
-        return contentGenerators.stream()
+        Map<ResponseType, Class<? extends ResponseContentGenerator>> contentMap = contentGenerators.stream()
                 .filter(content -> content.getClass().isAnnotationPresent(ResponseTypeMarker.class))
                 .collect(Collectors.toMap(
                         content -> content.getClass().getAnnotation(ResponseTypeMarker.class).value(),
@@ -78,6 +79,8 @@ public class AppConfig {
                             return existing;
                         }
                 ));
+        contentMap.forEach((key, value) -> log.info("key: [{}], class: {}", key, value.getSimpleName()));
+        return contentMap;
     }
 
 }

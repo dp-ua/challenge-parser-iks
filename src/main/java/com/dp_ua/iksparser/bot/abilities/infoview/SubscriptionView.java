@@ -11,9 +11,9 @@ import static com.dp_ua.iksparser.service.MessageCreator.SERVICE;
 import static com.dp_ua.iksparser.service.MessageCreator.SPACE;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -32,10 +32,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SubscriptionView {
 
-    public static final String STATUS_NEW_ENROLL = "Нова заявка в івентах";
-    public static final String STATUS_HAS_RESULT = "Є результати змагання";
-    public static final String BUTTON_TEXT_UNSUBSCRIBE = UNSUBSCRIBE + " Відписатись";
-    public static final String BUTTON_TEXT_SUBSCRIBE = SUBSCRIBE + " Підписатись";
+    private static final String BUTTON_TEXT_UNSUBSCRIBE = UNSUBSCRIBE + " Відписатись";
+    private static final String BUTTON_TEXT_SUBSCRIBE = SUBSCRIBE + " Підписатись";
     private final CompetitionView competitionView;
     private final HeatLineView heatLineView;
     private final ParticipantView participantView;
@@ -54,7 +52,7 @@ public class SubscriptionView {
 
         separateHeatLinesByStatuses(heatLines).forEach((status, lines) -> {
             if (!lines.isEmpty()) {
-                sb.append(status)
+                sb.append(status.title)
                         .append(":")
                         .append(END_LINE);
                 lines.forEach(heatLine -> sb.append(heatLineView.info(heatLine)));
@@ -65,24 +63,27 @@ public class SubscriptionView {
         return sb.toString();
     }
 
-    private Map<String, List<HeatLineEntity>> separateHeatLinesByStatuses(List<HeatLineEntity> heatLines) {
-        Map<String, List<HeatLineEntity>> result = getPreparedMap();
+    private Map<HeatLineStatus, List<HeatLineEntity>> separateHeatLinesByStatuses(List<HeatLineEntity> heatLines) {
+        Map<HeatLineStatus, List<HeatLineEntity>> result = new EnumMap<>(HeatLineStatus.class);
+        for (HeatLineStatus status : HeatLineStatus.values()) {
+            result.put(status, new ArrayList<>());
+        }
         for (HeatLineEntity heatLine : heatLines) {
             EventEntity event = heatLine.getHeat().getEvent();
-            if (event.hasResultUrl()) {
-                result.get(STATUS_HAS_RESULT).add(heatLine);
-            } else {
-                result.get(STATUS_NEW_ENROLL).add(heatLine);
-            }
+            result.get(event.hasResultUrl() ? HeatLineStatus.HAS_RESULT : HeatLineStatus.NEW_ENROLL).add(heatLine);
         }
         return result;
     }
 
-    private static Map<String, List<HeatLineEntity>> getPreparedMap() {
-        Map<String, List<HeatLineEntity>> result = new TreeMap<>();
-        result.put(STATUS_NEW_ENROLL, new ArrayList<>());
-        result.put(STATUS_HAS_RESULT, new ArrayList<>());
-        return result;
+    /**
+     * Groups of heat lines in the subscription message. Declaration order is the display order.
+     */
+    @RequiredArgsConstructor
+    private enum HeatLineStatus {
+        HAS_RESULT("Є результати змагання"),
+        NEW_ENROLL("Нова заявка в івентах");
+
+        private final String title;
     }
 
     private InlineKeyboardButton button(boolean subscribed, String callbackData) {

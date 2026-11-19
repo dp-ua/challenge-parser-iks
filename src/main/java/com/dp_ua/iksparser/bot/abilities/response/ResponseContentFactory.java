@@ -1,25 +1,20 @@
 package com.dp_ua.iksparser.bot.abilities.response;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.Map;
+
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class ResponseContentFactory {
 
     private final ApplicationContext context;
     private final Map<ResponseType, Class<? extends ResponseContentGenerator>> contentMap;
-
-    @Autowired
-    public ResponseContentFactory(ApplicationContext context, Map<ResponseType, Class<? extends ResponseContentGenerator>> contentMap) {
-        this.context = context;
-        this.contentMap = contentMap;
-        contentMap.forEach((key, value) -> log.info("key: [{}], class: {}", key, value.getSimpleName()));
-    }
 
     public ResponseContentGenerator getContentForResponse(ResponseType type) {
         Class<? extends ResponseContentGenerator> responseContentClass = contentMap.get(type);

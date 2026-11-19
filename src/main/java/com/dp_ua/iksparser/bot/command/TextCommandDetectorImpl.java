@@ -16,8 +16,9 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class TextCommandDetectorImpl implements TextCommandDetectorService {
 
-    public static final String CLASSIC_COMMAND_FIRST_SYMBOL = "/";
-    public static final String AT = "@";
+    private static final String CLASSIC_COMMAND_FIRST_SYMBOL = "/";
+    private static final String AT = "@";
+
     private final Bot bot;
     private final CommandProvider commandProvider;
 

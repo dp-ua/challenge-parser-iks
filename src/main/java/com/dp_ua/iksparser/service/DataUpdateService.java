@@ -15,10 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -70,8 +66,7 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
     private final EventService eventService;
     private final HeatService heatService;
 
-    private static final Set<Long> updating = new ConcurrentSkipListSet<>();
-    Lock lock = new ReentrantLock();
+    private final CompetitionUpdateGuard updateGuard;
 
     @Override
     @Async("updateExecutor")
@@ -83,21 +78,28 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
         service.save(message);
 
         long competitionId = message.getCompetitionId();
-        if (updating.contains(competitionId)) {
+        if (!updateGuard.tryStart(competitionId)) {
             log.info("Already updating competition {}", competitionId);
             return;
         }
-        CompetitionEntity competition = competitionService.findById(competitionId);
-        if (competition == null) {
-            String s1 = String.format("Competition with id %d not found", competitionId);
-            log.error(s1);
-            message.setReason(s1);
-            message.setStatus(U_ERROR.name());
-            service.save(message);
-            return;
+        try {
+            CompetitionEntity competition = competitionService.findById(competitionId);
+            if (competition == null) {
+                String s1 = String.format("Competition with id %d not found", competitionId);
+                log.error(s1);
+                message.setReason(s1);
+                message.setStatus(U_ERROR.name());
+                service.save(message);
+                return;
+            }
+            performUpdate(competition);
+        } finally {
+            updateGuard.finish(competitionId);
         }
-        updating.add(competitionId);
-        lock.lock();
+    }
+
+    private void performUpdate(CompetitionEntity competition) {
+        long competitionId = competition.getId();
         try {
             updateCompetition(competition);
             registerUpdateSuccess(competition);
@@ -112,8 +114,6 @@ public class DataUpdateService implements ApplicationListener<UpdateCompetitionE
             changeStatus(competitionId, U_STARTED, U_INFORM_ERROR);
         } finally {
             log.info("[{}]Finished updating competition", competitionId);
-            lock.unlock();
-            updating.remove(competitionId);
             List.of(U_UPDATED, U_INFORM_ERROR).forEach(status -> sendMessages(competitionId, status));
         }
     }
